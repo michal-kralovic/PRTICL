@@ -1,0 +1,4 @@
+name: PRTICL
+version: '${project.version}'
+main: com.minkuh.prticl.PRTICL
+api-version: '1.20'
