@@ -1,4 +1,14 @@
-name: PRTICL
+name: Prticl
 version: '${project.version}'
-main: com.minkuh.prticl.PRTICL
+main: com.minkuh.prticl.Prticl
 api-version: '1.20'
+commands:
+  hi:
+    description: Says hi back to you!
+    aliases:
+      - hello
+      - greetings
+    usage: /<command>
+  particle:
+    description: The main command for PRTICL
+    usage: /<command>

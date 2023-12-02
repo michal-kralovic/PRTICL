@@ -1,0 +1,41 @@
+package com.minkuh.prticl.systemutil.message;
+
+import net.kyori.adventure.text.TextComponent;
+import org.jetbrains.annotations.NotNull;
+
+import static com.minkuh.prticl.systemutil.message.MessageColors.*;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.TextColor.color;
+import static net.kyori.adventure.text.format.TextDecoration.BOLD;
+import static net.kyori.adventure.text.format.TextDecoration.State.FALSE;
+import static net.kyori.adventure.text.format.TextDecoration.State.TRUE;
+
+public class BaseMessageComponents implements IBaseMessageComponents {
+    public @NotNull TextComponent prticlDash() {
+        return text().content("[").color(color(prtclStrong)).decoration(BOLD, TRUE)
+                .append(text().decoration(BOLD, FALSE).content("PRTICL").color(color(prtclLight))
+                        .append(text().content("]").color(color(prtclStrong)).decoration(BOLD, TRUE))
+                            .append(text(" ")))
+                .build();
+    }
+
+    public @NotNull TextComponent prticlMessage(String message, int color) {
+        return prticlDash().append(text().decoration(BOLD, FALSE).content(message).color(color(color)));
+    }
+
+    public @NotNull TextComponent prticlSystemMessage(String message) {
+        return prticlMessage(message, system);
+    }
+
+    public @NotNull TextComponent prticlPlayerMessage(String message) {
+        return prticlMessage(message, player);
+    }
+
+    public @NotNull TextComponent prticlWarningMessage(String message) {
+        return prticlMessage("WARNING: " + message, warning);
+    }
+
+    public @NotNull TextComponent prticlErrorMessage(String message) {
+        return prticlMessage("ERROR: " + message, error);
+    }
+}
