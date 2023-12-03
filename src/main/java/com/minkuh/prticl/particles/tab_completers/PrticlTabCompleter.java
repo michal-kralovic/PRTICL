@@ -19,60 +19,58 @@ public class PrticlTabCompleter implements TabCompleter {
 
     List<String> particleCommandList = new ArrayList<>();
     List<String> particleList = new ArrayList<>();
-    List<String> numberMarker = new ArrayList<>();
+    List<String> marker = new ArrayList<>();
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (sender instanceof Player && label.equalsIgnoreCase("particle")) {
+        if (sender instanceof Player && label.equalsIgnoreCase("prticl")) {
             if (args.length == 1) {
                 particleCommandList.clear();
                 return sortedCommands(args[0]);
             }
             if (args[0].equalsIgnoreCase("spawn")) {
                 if (args.length == 2) {
-                    particleList.clear();
-                    particleList.add("particle");
                     return sortedParticles(args[1]);
                 }
                 if (args.length == 3) {
-                    if (label.equalsIgnoreCase("particle") && args[2].isEmpty()) {
-                        numberMarker.add("repeat_delay s");
-                        return numberMarker;
+                    if (label.equalsIgnoreCase("prticl") && args[2].isEmpty()) {
+                        marker.clear();
+                        marker.add("repeat_delay s");
+                        return marker;
                     }
                 }
             }
             if (args[0].equalsIgnoreCase("line")) {
                 switch (args.length) {
                     case 2: {
-                        numberMarker.clear();
-                        numberMarker.add("x");
-                        return numberMarker;
+                        marker.clear();
+                        return marker(marker, "x");
                     }
                     case 3: {
-                        numberMarker.clear();
-                        numberMarker.add("y");
-                        return numberMarker;
+                        marker.clear();
+                        return marker(marker, "y");
                     }
                     case 4: {
-                        numberMarker.clear();
-                        numberMarker.add("z");
-                        return numberMarker;
+                        marker.clear();
+                        return marker(marker, "z");
                     }
                     case 5: {
-                        numberMarker.clear();
-                        numberMarker.add("x2");
-                        return numberMarker;
+                        marker.clear();
+                        return marker(marker, "x2");
                     }
                     case 6: {
-                        numberMarker.clear();
-                        numberMarker.add("y2");
-                        return numberMarker;
+                        marker.clear();
+                        return marker(marker, "y2");
                     }
                     case 7: {
-                        numberMarker.clear();
-                        numberMarker.add("z2");
-                        return numberMarker;
+                        marker.clear();
+                        return marker(marker, "z2");
                     }
+                    case 8: {
+                        marker.clear();
+                        return marker(marker, "density");
+                    }
+                    default: return Collections.emptyList();
                 }
             }
         }
@@ -93,15 +91,24 @@ public class PrticlTabCompleter implements TabCompleter {
     }
 
     public List<String> sortedCommands(String arg) {
+        final List<String> commands = new ArrayList<>();
+        commands.add("spawn");
+        commands.add("line");
+
         final List<String> completions = new ArrayList<>();
 
-        completions.add("spawn");
-        completions.add("line");
+        StringUtil.copyPartialMatches(arg, commands, completions);
 
         particleCommandList.clear();
 
-        particleList.addAll(completions);
+        particleCommandList.addAll(completions);
 
-        return particleList;
+        return particleCommandList;
+    }
+
+    private static List<String> marker(List<String> numberMarker, String marker) {
+        numberMarker.clear();
+        numberMarker.add(marker);
+        return numberMarker;
     }
 }

@@ -1,6 +1,6 @@
 package com.minkuh.prticl.particles.commands;
 
-import com.minkuh.prticl.particles.PrticlNode;
+import com.minkuh.prticl.particles.prticl.PrticlNode;
 import com.minkuh.prticl.particles.schedulers.PrticlScheduler;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Bukkit;
@@ -9,8 +9,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+/**
+ * A Command for handling the creation of PrticlNodes.
+ * <br>TODO: Separate logic into PrticlSpawner.
+ */
 public class PrticlSpawnCommand extends PrticlCommand {
-
     private final Plugin plugin;
 
     public PrticlSpawnCommand(Plugin plugin) {
@@ -25,7 +28,7 @@ public class PrticlSpawnCommand extends PrticlCommand {
 
                 node.setLocation(((Player) sender).getLocation());
                 node.setParticleType(Particle.valueOf(args[1]));
-                node.setCreator(((Player) sender).getPlayer());
+                node.setCreatedBy(((Player) sender).getPlayer());
 
                 if (args.length == 3) {
                     try {
@@ -48,6 +51,6 @@ public class PrticlSpawnCommand extends PrticlCommand {
 
     @Override
     String getCommandName() {
-        return "spawn";
+        return CommandNames.commandNames.get(0);
     }
 }

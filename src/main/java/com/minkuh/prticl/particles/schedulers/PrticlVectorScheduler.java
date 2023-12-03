@@ -1,22 +1,32 @@
 package com.minkuh.prticl.particles.schedulers;
 
-import com.minkuh.prticl.particles.PrticlNode;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.util.Vector;
 
 public class PrticlVectorScheduler implements Runnable {
 
-    private PrticlNode nodeA;
-    private PrticlNode nodeB;
+    private double length;
+    private double distance;
+    private double space;
+    private Location p1;
+    private Vector vector;
 
-    public PrticlVectorScheduler(PrticlNode nodeA, PrticlNode nodeB) {
-        this.nodeA = nodeA;
-        this.nodeB = nodeB;
+    public PrticlVectorScheduler(double length, double distance, Location p1, Vector vector, double space) {
+        this.length = length;
+        this.distance = distance;
+        this.p1 = p1;
+        this.vector = vector;
+        this.space = space;
     }
 
     @Override
     public void run() {
-        World world = nodeA.getLocation().getWorld();
-        world.spawnParticle(nodeA.getParticleType(), nodeA.getLocation(), 1);
-        world.spawnParticle(nodeB.getParticleType(), nodeB.getLocation(), 1);
+        World world = p1.getWorld();
+        for (; length < distance; p1.add(vector)) {
+            world.spawnParticle(Particle.HEART, p1.getX(), p1.getY(), p1.getZ(), 1);
+            length += space;
+        }
     }
 }

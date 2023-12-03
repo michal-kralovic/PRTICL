@@ -8,14 +8,18 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * PRTICL 🎉
+ */
 public final class Prticl extends JavaPlugin {
-
     private final CommandsUtil cmdUtil = new CommandsUtil(this);
 
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new RightClickEventListener(), this);
-        this.getCommand("particle").setTabCompleter(new PrticlTabCompleter());
+        this.getCommand("prticl").setTabCompleter(new PrticlTabCompleter());
+
+        saveResource("config.json", false);
     }
 
     @Override

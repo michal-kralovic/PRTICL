@@ -1,6 +1,6 @@
 package com.minkuh.prticl.particles.schedulers;
 
-import com.minkuh.prticl.particles.PrticlNode;
+import com.minkuh.prticl.particles.prticl.PrticlNode;
 import org.bukkit.World;
 
 public class PrticlScheduler implements Runnable {
@@ -14,6 +14,6 @@ public class PrticlScheduler implements Runnable {
     @Override
     public void run() {
         World world = node.getLocation().getWorld();
-        world.spawnParticle(node.getParticleType(), node.getLocation(), 1);
+        world.spawnParticle(node.getParticleType(), node.getLocation(), node.getParticleDensity());
     }
 }

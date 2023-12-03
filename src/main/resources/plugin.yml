@@ -8,7 +8,7 @@ commands:
     aliases:
       - hello
       - greetings
-    usage: /<command>
-  particle:
-    description: The main command for PRTICL
-    usage: /<command>
+    usage: /<command> (message)
+  prticl:
+    description: The PRTICL command
+    usage: /<command> [sub-command] (params)
