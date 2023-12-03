@@ -26,7 +26,6 @@ public class PrticlVectorCommand extends PrticlCommand {
 
     @Override
     public boolean command(String[] args, CommandSender sender) {
-
         if (allLineInputsAvailable(args)) {
             World world = ((Player) sender).getWorld();
             Player player = (Player) sender;
@@ -52,12 +51,17 @@ public class PrticlVectorCommand extends PrticlCommand {
             drawLine(line.getLoc1(), line.getLoc2(), line.getDensity());
             return true;
         }
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("This command can only be executed by a player!");
+            return true;
+        }
         return false;
     }
 
     /**
      * Utility method for returning the relative or the given X coordinate.
-     * @param arg The given argument
+     *
+     * @param arg    The given argument
      * @param player The executing Player
      * @return Relative coordinate if '~' present, else given coordinate.
      */
@@ -71,7 +75,8 @@ public class PrticlVectorCommand extends PrticlCommand {
 
     /**
      * Utility method for returning the relative or the given Y coordinate.
-     * @param arg The given argument
+     *
+     * @param arg    The given argument
      * @param player The executing Player
      * @return Relative Y coordinate if '~' present, else given Y coordinate.
      */
@@ -85,7 +90,8 @@ public class PrticlVectorCommand extends PrticlCommand {
 
     /**
      * Utility method for returning the relative or the given Z coordinate.
-     * @param arg The given argument
+     *
+     * @param arg    The given argument
      * @param player The executing Player
      * @return Relative Z coordinate if '~' present, else given Z coordinate.
      */
@@ -99,6 +105,7 @@ public class PrticlVectorCommand extends PrticlCommand {
 
     /**
      * Determines whether all necessary arguments are passed.
+     *
      * @param args The array of arguments to check
      * @return TRUE if all necessary args are present.
      */
@@ -112,6 +119,7 @@ public class PrticlVectorCommand extends PrticlCommand {
 
     /**
      * Determines whether the given argument is a relative coordinate.
+     *
      * @param arg The given coordinate
      * @return TRUE if the given argument is a relative coordinate.
      */
@@ -121,9 +129,10 @@ public class PrticlVectorCommand extends PrticlCommand {
 
     /**
      * Draws a line between two points in a world.
+     *
      * @param point1 The starting point
      * @param point2 The ending point
-     * @param space The amount of space to include between particles
+     * @param space  The amount of space to include between particles
      */
     public void drawLine(Location point1, Location point2, double space) {
         World world = point1.getWorld();
@@ -143,6 +152,6 @@ public class PrticlVectorCommand extends PrticlCommand {
 
     @Override
     String getCommandName() {
-        return CommandNames.commandNames.get(1);
+        return "line";
     }
 }

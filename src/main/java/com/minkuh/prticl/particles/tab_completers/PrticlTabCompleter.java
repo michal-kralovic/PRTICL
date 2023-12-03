@@ -35,7 +35,7 @@ public class PrticlTabCompleter implements TabCompleter {
                 if (args.length == 3) {
                     if (label.equalsIgnoreCase("prticl") && args[2].isEmpty()) {
                         marker.clear();
-                        marker.add("repeat_delay s");
+                        marker.add("repeat_delay (ticks)");
                         return marker;
                     }
                 }
@@ -95,7 +95,7 @@ public class PrticlTabCompleter implements TabCompleter {
         commands.add("spawn");
         commands.add("line");
 
-        final List<String> completions = new ArrayList<>();
+        List<String> completions = new ArrayList<>();
 
         StringUtil.copyPartialMatches(arg, commands, completions);
 
@@ -106,9 +106,9 @@ public class PrticlTabCompleter implements TabCompleter {
         return particleCommandList;
     }
 
-    private static List<String> marker(List<String> numberMarker, String marker) {
-        numberMarker.clear();
-        numberMarker.add(marker);
-        return numberMarker;
+    private static List<String> marker(List<String> marker, String strMarker) {
+        marker.clear();
+        marker.add(strMarker);
+        return marker;
     }
 }

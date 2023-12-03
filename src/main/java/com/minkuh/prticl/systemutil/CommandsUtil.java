@@ -1,6 +1,5 @@
 package com.minkuh.prticl.systemutil;
 
-import com.minkuh.prticl.particles.commands.CommandNames;
 import com.minkuh.prticl.particles.commands.PrticlSpawnCommand;
 import com.minkuh.prticl.particles.commands.PrticlVectorCommand;
 import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
@@ -15,7 +14,6 @@ import java.util.Locale;
  * A utility class for executing Commands.
  */
 public class CommandsUtil {
-
     PrticlSpawnCommand spawnParticleCommand;
     PrticlVectorCommand vectorCommand;
     public static BaseMessageComponents messageComponents = new BaseMessageComponents();
@@ -27,6 +25,7 @@ public class CommandsUtil {
 
     /**
      * Determines which Command to execute based on the input arguments.
+     *
      * @return TRUE if handled.
      */
     public boolean commandSwitcher(Command command, CommandSender sender, String[] args) {
@@ -40,9 +39,9 @@ public class CommandsUtil {
             break;
 
             case "prticl": {
-                if (args[0].equalsIgnoreCase(CommandNames.commandNames.get(0)))
+                if (args[0].equalsIgnoreCase("spawn"))
                     return spawnParticleCommand.command(args, sender);
-                if (args[0].equalsIgnoreCase(CommandNames.commandNames.get(1)))
+                if (args[0].equalsIgnoreCase("line"))
                     return vectorCommand.command(args, sender);
             }
             break;

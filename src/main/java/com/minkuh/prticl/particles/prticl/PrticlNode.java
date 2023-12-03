@@ -2,19 +2,39 @@ package com.minkuh.prticl.particles.prticl;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The most important element of PRTICL - its Nodes.
  * <br>A model class for a PRTICL node.
  */
-public class PrticlNode {
+public class PrticlNode implements ConfigurationSerializable {
     private int Id;
+
     private int repeatDelay = 20;
-    private int particleDensity;
+
+    private int particleDensity = 1;
     private org.bukkit.Particle particleType;
     private Location location;
     private Player createdBy;
+
+    public PrticlNode() {
+
+    }
+
+    public PrticlNode(int id, int repeatDelay, int particleDensity, Particle particleType, Location location, Player createdBy) {
+        Id = id;
+        this.repeatDelay = repeatDelay;
+        this.particleDensity = particleDensity;
+        this.particleType = particleType;
+        this.location = location;
+        this.createdBy = createdBy;
+    }
 
     public Player getCreatedBy() {
         return createdBy;
@@ -73,5 +93,30 @@ public class PrticlNode {
                 ", location=" + location +
                 ", creator=" + createdBy +
                 '}';
+    }
+
+    @Override
+    public @NotNull Map<String, Object> serialize() {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("id", this.Id);
+        data.put("repeat-delay", this.repeatDelay);
+        data.put("particle-density", this.particleDensity);
+        data.put("particle-type", this.particleType);
+        data.put("location", this.location);
+        data.put("owner", this.createdBy);
+
+        return data;
+    }
+
+    public static PrticlNode deserialize(Map<String, Object> args) {
+        return new PrticlNode(
+                (int) args.get("id"),
+                (int) args.get("repeat-delay"),
+                (int) args.get("particle-density"),
+                (Particle) args.get("particle-type"),
+                (Location) args.get("location"),
+                (Player) args.get("owner")
+        );
     }
 }
