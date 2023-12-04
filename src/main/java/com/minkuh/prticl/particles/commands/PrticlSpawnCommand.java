@@ -36,7 +36,7 @@ public class PrticlSpawnCommand extends PrticlCommand {
         if (args.length == 2 || args.length == 3) {
             if (EnumUtils.isValidEnum(Particle.class, args[1])) {
                 Player player = ((Player) sender).getPlayer();
-                PrticlNode node = PrticlSpawner.createPrticl(Particle.valueOf(args[1]), player.getLocation(), player);
+                PrticlNode node = PrticlSpawner.createPrticl(Particle.valueOf(args[1]), player.getLocation(), player.getName());
 
                 if (args.length == 3) {
                     try {

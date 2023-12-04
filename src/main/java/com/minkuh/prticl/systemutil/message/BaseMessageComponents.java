@@ -10,7 +10,7 @@ import static net.kyori.adventure.text.format.TextDecoration.BOLD;
 import static net.kyori.adventure.text.format.TextDecoration.State.FALSE;
 import static net.kyori.adventure.text.format.TextDecoration.State.TRUE;
 
-public class BaseMessageComponents implements IBaseMessageComponents {
+public class BaseMessageComponents {
     public @NotNull TextComponent prticlDash() {
         return text().content("[").color(color(prtclStrong)).decoration(BOLD, TRUE)
                 .append(text().decoration(BOLD, FALSE).content("PRTICL").color(color(prtclLight))

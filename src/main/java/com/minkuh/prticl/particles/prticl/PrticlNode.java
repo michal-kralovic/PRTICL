@@ -3,7 +3,6 @@ package com.minkuh.prticl.particles.prticl;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -21,13 +20,13 @@ public class PrticlNode implements ConfigurationSerializable {
     private int particleDensity = 1;
     private org.bukkit.Particle particleType;
     private Location location;
-    private Player createdBy;
+    private String createdBy;
 
     public PrticlNode() {
 
     }
 
-    public PrticlNode(int id, int repeatDelay, int particleDensity, Particle particleType, Location location, Player createdBy) {
+    public PrticlNode(int id, int repeatDelay, int particleDensity, Particle particleType, Location location, String createdBy) {
         Id = id;
         this.repeatDelay = repeatDelay;
         this.particleDensity = particleDensity;
@@ -36,11 +35,11 @@ public class PrticlNode implements ConfigurationSerializable {
         this.createdBy = createdBy;
     }
 
-    public Player getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(Player createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -102,7 +101,7 @@ public class PrticlNode implements ConfigurationSerializable {
         data.put("id", this.Id);
         data.put("repeat-delay", this.repeatDelay);
         data.put("particle-density", this.particleDensity);
-        data.put("particle-type", this.particleType);
+        data.put("particle-type", this.particleType.toString());
         data.put("location", this.location);
         data.put("owner", this.createdBy);
 
@@ -114,9 +113,9 @@ public class PrticlNode implements ConfigurationSerializable {
                 (int) args.get("id"),
                 (int) args.get("repeat-delay"),
                 (int) args.get("particle-density"),
-                (Particle) args.get("particle-type"),
+                Particle.valueOf((String) args.get("particle-type")),
                 (Location) args.get("location"),
-                (Player) args.get("owner")
+                (String) args.get("owner")
         );
     }
 }

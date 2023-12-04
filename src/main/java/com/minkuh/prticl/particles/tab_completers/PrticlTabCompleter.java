@@ -70,7 +70,8 @@ public class PrticlTabCompleter implements TabCompleter {
                         marker.clear();
                         return marker(marker, "density");
                     }
-                    default: return Collections.emptyList();
+                    default:
+                        return Collections.emptyList();
                 }
             }
         }
