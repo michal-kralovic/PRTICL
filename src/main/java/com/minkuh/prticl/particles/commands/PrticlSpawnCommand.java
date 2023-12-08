@@ -28,13 +28,12 @@ public class PrticlSpawnCommand extends PrticlCommand {
 
     @Override
     public boolean command(String[] args, CommandSender sender) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("This command can only be executed by a player!");
-            return true;
-        }
+        if (isCommandSentByPlayer(sender)) {
+            if (args.length == 2 || args.length == 3) {
+                if (!EnumUtils.isValidEnum(Particle.class, args[1])) {
+                    sender.sendMessage(messageComponents.prticlErrorMessage("Invalid particle!"));
+                }
 
-        if (args.length == 2 || args.length == 3) {
-            if (EnumUtils.isValidEnum(Particle.class, args[1])) {
                 Player player = ((Player) sender).getPlayer();
                 PrticlNode node = PrticlSpawner.createPrticl(Particle.valueOf(args[1]), player.getLocation(), player.getName());
 
@@ -47,18 +46,16 @@ public class PrticlSpawnCommand extends PrticlCommand {
                 }
 
                 sender.sendMessage(messageComponents.prticlPlayerMessage("Created: " + node));
-                config.set(plugin.getResource("config.yml").toString(), node.serialize());
+                config.set("Particle " + node.getId(), node.serialize());
                 try {
-                    config.save(String.valueOf(config));
+                    config.save("plugins/Prticl/config.yml");
                 } catch (IOException e) {
-                    messageComponents.prticlErrorMessage("oof.");
+                    messageComponents.prticlErrorMessage("Couldn't write to file.");
                 }
 
                 Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new PrticlScheduler(node), 0, node.getRepeatDelay());
-            } else {
-                sender.sendMessage(messageComponents.prticlErrorMessage("Invalid particle!"));
+                return true;
             }
-            return true;
         }
         return false;
     }

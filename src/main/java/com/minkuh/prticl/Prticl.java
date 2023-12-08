@@ -21,9 +21,9 @@ public final class Prticl extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new RightClickEventListener(), this);
         this.getCommand("prticl").setTabCompleter(new PrticlTabCompleter());
 
-        saveResource("config.yml", false);
-
         ConfigurationSerialization.registerClass(PrticlNode.class);
+
+        saveResource("config.yml", false);
 
         /*
         File dataFolder = getDataFolder();

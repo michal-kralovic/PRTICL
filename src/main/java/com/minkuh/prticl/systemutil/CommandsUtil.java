@@ -1,5 +1,6 @@
 package com.minkuh.prticl.systemutil;
 
+import com.minkuh.prticl.particles.commands.PrticlCreateCommand;
 import com.minkuh.prticl.particles.commands.PrticlSpawnCommand;
 import com.minkuh.prticl.particles.commands.PrticlVectorCommand;
 import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
@@ -16,11 +17,13 @@ import java.util.Locale;
 public class CommandsUtil {
     PrticlSpawnCommand spawnParticleCommand;
     PrticlVectorCommand vectorCommand;
+    PrticlCreateCommand createCommand;
     public static BaseMessageComponents messageComponents = new BaseMessageComponents();
 
     public CommandsUtil(Plugin plugin) {
         spawnParticleCommand = new PrticlSpawnCommand(plugin);
         vectorCommand = new PrticlVectorCommand(plugin);
+        createCommand = new PrticlCreateCommand(plugin);
     }
 
     /**
@@ -43,6 +46,8 @@ public class CommandsUtil {
                     return spawnParticleCommand.command(args, sender);
                 if (args[0].equalsIgnoreCase("line"))
                     return vectorCommand.command(args, sender);
+                if (args[0].equalsIgnoreCase("create"))
+                    return createCommand.command(args, sender);
             }
             break;
 
