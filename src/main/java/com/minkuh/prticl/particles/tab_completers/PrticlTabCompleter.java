@@ -96,13 +96,17 @@ public class PrticlTabCompleter implements TabCompleter {
             }
             case 5 -> {
                 marker.clear();
-                yield marker(marker, "x y z");
+                yield marker(marker, "particle_density");
             }
             case 6 -> {
                 marker.clear();
-                yield marker(marker, "y z");
+                yield marker(marker, "x y z");
             }
             case 7 -> {
+                marker.clear();
+                yield marker(marker, "y z");
+            }
+            case 8 -> {
                 marker.clear();
                 yield marker(marker, "z");
             }

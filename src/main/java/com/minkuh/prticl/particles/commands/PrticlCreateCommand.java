@@ -33,8 +33,7 @@ public class PrticlCreateCommand extends PrticlCommand {
             switch (args.length) {
                 case 2 -> {
                     PrticlNode node = builder.setName(args[1])
-                                                .setCreatedBy(sender.getName())
-                                                .build();
+                                                .setCreatedBy(sender.getName()).build();
 
                     if (!saveNodeToConfig(config, node))
                         sender.sendMessage(prticlMessage.error("Couldn't save the node to config!"));
@@ -43,8 +42,7 @@ public class PrticlCreateCommand extends PrticlCommand {
                 case 3 -> {
                     PrticlNode node = builder.setName(args[1])
                                                 .setParticleType(Particle.valueOf(args[2]))
-                                                .setCreatedBy(sender.getName())
-                                                .build();
+                                                .setCreatedBy(sender.getName()).build();
 
                     if (!saveNodeToConfig(config, node))
                         sender.sendMessage(prticlMessage.error("Couldn't save the node to config!"));
@@ -55,16 +53,26 @@ public class PrticlCreateCommand extends PrticlCommand {
                         PrticlNode node = builder.setName(args[1])
                                                     .setParticleType(Particle.valueOf(args[2]))
                                                     .setRepeatDelay(Integer.parseInt(args[3]))
-                                                    .setCreatedBy(sender.getName())
-                                                    .build();
+                                                    .setCreatedBy(sender.getName()).build();
 
                         if (!saveNodeToConfig(config, node))
                             sender.sendMessage(prticlMessage.error("Couldn't save the node to config!"));
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(prticlMessage.error("Incorrect repeat delay (has to be a number in ticks)!"));
+                        sender.sendMessage(prticlMessage.error("Incorrect repeat delay! (has to be a number in ticks)"));
                         return true;
                     }
                     sender.sendMessage(prticlMessage.player("Created the node."));
+                }
+                case 5 -> {
+                    try {
+                        PrticlNode node = builder.setName(args[1])
+                                                    .setParticleType(Particle.valueOf(args[2]))
+                                                    .setRepeatDelay(Integer.parseInt(args[3]))
+                                                    .setParticleDensity(Integer.parseInt(args[4]))
+                                                    .setCreatedBy(sender.getName()).build();
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage(prticlMessage.error("Incorrect particle density format! (has to be a number)"));
+                    }
                 }
                 default -> sender.sendMessage(prticlMessage.error("Unexpected error!"));
             }
