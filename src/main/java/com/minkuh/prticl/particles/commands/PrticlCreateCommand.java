@@ -12,6 +12,9 @@ import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.sa
 
 /**
  * Provides a configurable module-based way of creating a PRTICL node before spawning it.
+ * <br><br>In-game usage: <b>/prticl create (name) (particle) (repeat delay in ticks) (particle density) (x) (y) (z)</b>
+ * <br>- <i>where nothing except for the name is necessary to specify.</i>
+ * <br><br>Example: <b>/prticl create leaf_blower CHERRY_LEAVES 5 5</b>
  */
 public class PrticlCreateCommand extends PrticlCommand {
     private Plugin plugin;
@@ -70,9 +73,14 @@ public class PrticlCreateCommand extends PrticlCommand {
                                                     .setRepeatDelay(Integer.parseInt(args[3]))
                                                     .setParticleDensity(Integer.parseInt(args[4]))
                                                     .setCreatedBy(sender.getName()).build();
+
+                        if (!saveNodeToConfig(config, node))
+                            sender.sendMessage(prticlMessage.error("Couldn't save the node to config!"));
                     } catch (NumberFormatException e) {
                         sender.sendMessage(prticlMessage.error("Incorrect particle density format! (has to be a number)"));
+                        return true;
                     }
+                    sender.sendMessage(prticlMessage.player("Created the node."));
                 }
                 default -> sender.sendMessage(prticlMessage.error("Unexpected error!"));
             }
@@ -81,6 +89,12 @@ public class PrticlCreateCommand extends PrticlCommand {
         return false;
     }
 
+    /**
+     * Utility method to block the player from entering a name that's longer than 50 characters, or an empty one.
+     * @param arg The name to be checked
+     * @param sender The sender that sent the command
+     * @return TRUE if handled.
+     */
     private static boolean nameLimitationHandle(String arg, CommandSender sender) {
         BaseMessageComponents messageComponents1 = new BaseMessageComponents();
         boolean result = false;
