@@ -1,56 +1,92 @@
 package com.minkuh.prticl.particles.commands;
 
-import com.minkuh.prticl.particles.prticl.PrticlSpawner;
-import org.apache.commons.lang3.EnumUtils;
+import com.minkuh.prticl.particles.prticl.PrticlNode;
+import com.minkuh.prticl.particles.prticl.PrticlNodeBuilder;
+import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
 import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
+
+import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.saveNodeToConfig;
 
 /**
  * Provides a configurable module-based way of creating a PRTICL node before spawning it.
  */
 public class PrticlCreateCommand extends PrticlCommand {
     private Plugin plugin;
+    private FileConfiguration config;
+    private PrticlNodeBuilder builder;
 
     public PrticlCreateCommand(Plugin plugin) {
         this.plugin = plugin;
+        this.config = plugin.getConfig();
+        this.builder = new PrticlNodeBuilder(plugin);
     }
 
     @Override
     public boolean command(String[] args, CommandSender sender) {
         if (isCommandSentByPlayer(sender)) {
-            return switch (args.length) {
-                case 2 -> {
-                    if (args[1].length() > 50) {
-                        sender.sendMessage(messageComponents.prticlErrorMessage("Prticl node name can't be longer than 50 characters!"));
-                        yield true;
-                    }
-                    if (args[1].isBlank()) {
-                        sender.sendMessage(messageComponents.prticlErrorMessage("Prticle node name can't be empty!"));
-                        yield true;
-                    }
+            if (nameLimitationHandle(args[1], sender))
+                return true;
 
-                    PrticlSpawner.createPrticl(args[1], sender.getName());
-                    sender.sendMessage(messageComponents.prticlPlayerMessage("Created the node."));
-                    yield true;
+            switch (args.length) {
+                case 2 -> {
+                    PrticlNode node = builder.setName(args[1])
+                                                .setCreatedBy(sender.getName())
+                                                .build();
+
+                    if (!saveNodeToConfig(config, node))
+                        sender.sendMessage(prticlMessage.error("Couldn't save the node to config!"));
+                    sender.sendMessage(prticlMessage.player("Created the node."));
                 }
                 case 3 -> {
-                    if (!EnumUtils.isValidEnum(Particle.class, args[2])) {
-                        sender.sendMessage(messageComponents.prticlErrorMessage("Your input contains an incorrect particle!"));
-                        yield true;
-                    }
+                    PrticlNode node = builder.setName(args[1])
+                                                .setParticleType(Particle.valueOf(args[2]))
+                                                .setCreatedBy(sender.getName())
+                                                .build();
 
-                    PrticlSpawner.createPrticl(args[1], Particle.valueOf(args[2]), sender.getName());
-                    sender.sendMessage(messageComponents.prticlPlayerMessage("Created the node."));
-                    yield true;
+                    if (!saveNodeToConfig(config, node))
+                        sender.sendMessage(prticlMessage.error("Couldn't save the node to config!"));
+                    sender.sendMessage(prticlMessage.player("Created the node."));
                 }
-                default ->  {
-                    sender.sendMessage(messageComponents.prticlErrorMessage("Unexpected error!"));
-                    yield false;
+                case 4 -> {
+                    try {
+                        PrticlNode node = builder.setName(args[1])
+                                                    .setParticleType(Particle.valueOf(args[2]))
+                                                    .setRepeatDelay(Integer.parseInt(args[3]))
+                                                    .setCreatedBy(sender.getName())
+                                                    .build();
+
+                        if (!saveNodeToConfig(config, node))
+                            sender.sendMessage(prticlMessage.error("Couldn't save the node to config!"));
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage(prticlMessage.error("Incorrect repeat delay (has to be a number in ticks)!"));
+                        return true;
+                    }
+                    sender.sendMessage(prticlMessage.player("Created the node."));
                 }
-            };
+                default -> sender.sendMessage(prticlMessage.error("Unexpected error!"));
+            }
+            return true;
         }
         return false;
+    }
+
+    private static boolean nameLimitationHandle(String arg, CommandSender sender) {
+        BaseMessageComponents messageComponents1 = new BaseMessageComponents();
+        boolean result = false;
+
+        if (arg.length() > 50) {
+            sender.sendMessage(messageComponents1.error("Prticl node name can't be longer than 50 characters!"));
+            result = true;
+        }
+        if (arg.isBlank()) {
+            sender.sendMessage(messageComponents1.error("Prticle node name can't be empty!"));
+            result = true;
+        }
+
+        return result;
     }
 
     @Override

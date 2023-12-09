@@ -44,7 +44,7 @@ public class PrticlVectorCommand extends PrticlCommand {
                 );
                 if (args.length == 8) line.setDensity(Double.parseDouble(args[7]));
             } catch (NumberFormatException e) {
-                sender.sendMessage(messageComponents.prticlErrorMessage("Incorrect coordinates input!"));
+                sender.sendMessage(prticlMessage.error("Incorrect coordinates input!"));
                 return true;
             }
 

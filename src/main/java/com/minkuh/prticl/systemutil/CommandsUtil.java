@@ -35,7 +35,7 @@ public class CommandsUtil {
         switch (command.getName().toLowerCase(Locale.ROOT)) {
             case "hi": {
                 if (sender instanceof Player && args.length != 0) {
-                    sender.sendMessage(messageComponents.prticlPlayerMessage("Hello " + args[0] + "!"));
+                    sender.sendMessage(messageComponents.player("Hello " + args[0] + "!"));
                     return true;
                 }
             }

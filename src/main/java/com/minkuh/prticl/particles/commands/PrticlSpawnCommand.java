@@ -1,21 +1,20 @@
 package com.minkuh.prticl.particles.commands;
 
 import com.minkuh.prticl.particles.prticl.PrticlNode;
-import com.minkuh.prticl.particles.prticl.PrticlSpawner;
 import com.minkuh.prticl.particles.schedulers.PrticlScheduler;
-import org.apache.commons.lang3.EnumUtils;
+import com.minkuh.prticl.systemutil.exceptions.NodeNotFoundException;
 import org.bukkit.Bukkit;
-import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.io.IOException;
+import java.rmi.StubNotFoundException;
+
+import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.getNodeFromConfigById;
 
 /**
  * A Command for handling the creation of PrticlNodes.
- * <br>TODO: Separate logic into PrticlSpawner.
  */
 public class PrticlSpawnCommand extends PrticlCommand {
     private final Plugin plugin;
@@ -28,34 +27,28 @@ public class PrticlSpawnCommand extends PrticlCommand {
 
     @Override
     public boolean command(String[] args, CommandSender sender) {
-        if (isCommandSentByPlayer(sender)) {
-            if (args.length == 2 || args.length == 3) {
-                if (!EnumUtils.isValidEnum(Particle.class, args[1])) {
-                    sender.sendMessage(messageComponents.prticlErrorMessage("Invalid particle!"));
-                }
+        if (isCommandSentByPlayer(sender) && args.length == 2) {
+            PrticlNode node = new PrticlNode();
 
-                Player player = ((Player) sender).getPlayer();
-                PrticlNode node = PrticlSpawner.createPrticl(Particle.valueOf(args[1]), player.getLocation(), player.getName());
-
-                if (args.length == 3) {
-                    try {
-                        node.setRepeatDelay(Integer.parseInt(args[2]));
-                    } catch (NumberFormatException e) {
-                        messageComponents.prticlErrorMessage("Incorrect repeat delay input! (in ticks)");
-                    }
-                }
-
-                sender.sendMessage(messageComponents.prticlPlayerMessage("Created: " + node));
-                config.set("Particle " + node.getId(), node.serialize());
-                try {
-                    config.save("plugins/Prticl/config.yml");
-                } catch (IOException e) {
-                    messageComponents.prticlErrorMessage("Couldn't write to file.");
-                }
-
-                Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new PrticlScheduler(node), 0, node.getRepeatDelay());
+            try {
+                node = getNodeFromConfigById(config, Integer.parseInt(args[1]));
+            } catch (NumberFormatException e) {
+                sender.sendMessage(prticlMessage.error("Incorrect node ID format!"));
                 return true;
+            } catch (NodeNotFoundException e) {
+                sender.sendMessage(prticlMessage.error("Couldn't find a node with ID " + node.getId() + "!"));
+                return true;
+            } catch (Exception e) {
+                sender.sendMessage(prticlMessage.error(e.getMessage()));
             }
+
+            if (node.getLocation() == null) {
+                node.setLocation(((Player) sender).getLocation());
+            }
+
+            sender.sendMessage(prticlMessage.player("Spawned " + node.getName() + ", ID " + node.getId()));
+            Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new PrticlScheduler(node), 0, node.getRepeatDelay());
+            return true;
         }
         return false;
     }

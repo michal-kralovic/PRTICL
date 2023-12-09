@@ -76,14 +76,9 @@ public class PrticlTabCompleter implements TabCompleter {
 
     private static List<String> spawnLogic(List<String> marker, String[] args) {
         if (args.length == 2) {
-            return sortedParticles(args[1]);
-        }
-        if (args.length == 3) {
-            if (args[2].isEmpty()) {
-                marker.clear();
-                marker.add("repeat_delay (ticks)");
-                return marker;
-            }
+            marker.clear();
+            marker.add("node_id");
+            return marker;
         }
         return Collections.emptyList();
     }
@@ -97,13 +92,17 @@ public class PrticlTabCompleter implements TabCompleter {
             case 3 -> sortedParticles(args[2]);
             case 4 -> {
                 marker.clear();
-                yield marker(marker, "x y z");
+                yield marker(marker, "repeat_delay");
             }
             case 5 -> {
                 marker.clear();
-                yield marker(marker, "y z");
+                yield marker(marker, "x y z");
             }
             case 6 -> {
+                marker.clear();
+                yield marker(marker, "y z");
+            }
+            case 7 -> {
                 marker.clear();
                 yield marker(marker, "z");
             }

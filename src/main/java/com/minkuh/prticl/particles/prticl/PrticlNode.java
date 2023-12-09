@@ -14,10 +14,10 @@ import java.util.Map;
  */
 public class PrticlNode implements ConfigurationSerializable {
     private int id;
-    private String name;
+    private String name = "node";
     private int repeatDelay = 20;
     private int particleDensity = 1;
-    private org.bukkit.Particle particleType;
+    private org.bukkit.Particle particleType = Particle.HEART;
     private Location location;
     private String createdBy;
 
@@ -108,17 +108,25 @@ public class PrticlNode implements ConfigurationSerializable {
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> data = new HashMap<>();
 
-        data.put("id", this.id);
-        data.put("name", this.name);
-        data.put("repeat-delay", this.repeatDelay);
+        if (this.location != null) {
+            data.put("location", this.location.serialize());
+        }
         data.put("particle-density", this.particleDensity);
+        data.put("repeat-delay", this.repeatDelay);
         data.put("particle-type", this.particleType.toString());
-        data.put("location", this.location.serialize());
         data.put("owner", this.createdBy);
+        data.put("name", this.name);
+        data.put("id", this.id);
 
         return data;
     }
 
+    /**
+     * Creates a Prticl node from the config.
+     *
+     * @param args The node in the config
+     * @return The deserialized Prticl node.
+     */
     public static PrticlNode deserialize(Map<String, Object> args) {
         return new PrticlNode(
                 (int) args.get("id"),

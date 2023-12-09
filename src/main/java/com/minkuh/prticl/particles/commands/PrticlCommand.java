@@ -12,7 +12,7 @@ public abstract class PrticlCommand {
     /**
      * Allows access to PRTICL system messages.
      */
-    BaseMessageComponents messageComponents = new BaseMessageComponents();
+    BaseMessageComponents prticlMessage = new BaseMessageComponents();
 
     /**
      * A utility method to handle non-Player command triggers.

@@ -12,9 +12,9 @@ import static net.kyori.adventure.text.format.TextDecoration.State.TRUE;
 
 public class BaseMessageComponents {
     public @NotNull TextComponent prticlDash() {
-        return text().content("[").color(color(prtclStrong)).decoration(BOLD, TRUE)
-                .append(text().decoration(BOLD, FALSE).content("PRTICL").color(color(prtclLight))
-                        .append(text().content("]").color(color(prtclStrong)).decoration(BOLD, TRUE))
+        return text().content("[").color(color(prticlStrong)).decoration(BOLD, TRUE)
+                .append(text().decoration(BOLD, FALSE).content("PRTICL").color(color(prticlLight))
+                        .append(text().content("]").color(color(prticlStrong)).decoration(BOLD, TRUE))
                             .append(text(" ")))
                 .build();
     }
@@ -23,19 +23,19 @@ public class BaseMessageComponents {
         return prticlDash().append(text().decoration(BOLD, FALSE).content(message).color(color(color)));
     }
 
-    public @NotNull TextComponent prticlSystemMessage(String message) {
+    public @NotNull TextComponent system(String message) {
         return prticlMessage(message, system);
     }
 
-    public @NotNull TextComponent prticlPlayerMessage(String message) {
+    public @NotNull TextComponent player(String message) {
         return prticlMessage(message, player);
     }
 
-    public @NotNull TextComponent prticlWarningMessage(String message) {
+    public @NotNull TextComponent warning(String message) {
         return prticlMessage("WARNING: " + message, warning);
     }
 
-    public @NotNull TextComponent prticlErrorMessage(String message) {
+    public @NotNull TextComponent error(String message) {
         return prticlMessage("ERROR: " + message, error);
     }
 }

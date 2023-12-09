@@ -17,7 +17,7 @@ public class RightClickEventListener implements Listener {
     @EventHandler
     public void onRightClick(@NotNull PlayerInteractEvent event) {
         if (isMainHandRightClick(event)) {
-            event.getPlayer().sendMessage(messageComponents.prticlSystemMessage("You used your RMB for something!"));
+            event.getPlayer().sendMessage(messageComponents.system("You used your RMB for something!"));
         }
     }
 

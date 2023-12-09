@@ -23,6 +23,7 @@ public final class Prticl extends JavaPlugin {
 
         ConfigurationSerialization.registerClass(PrticlNode.class);
 
+        getResource("config.yml");
         saveResource("config.yml", false);
 
         /*
