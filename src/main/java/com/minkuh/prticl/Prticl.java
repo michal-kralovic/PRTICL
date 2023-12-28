@@ -2,7 +2,7 @@ package com.minkuh.prticl;
 
 import com.minkuh.prticl.eventlisteners.RightClickEventListener;
 import com.minkuh.prticl.particles.prticl.PrticlNode;
-import com.minkuh.prticl.particles.tab_completers.PrticlTabCompleter;
+import com.minkuh.prticl.particles.tabcompleters.PrticlTabCompleter;
 import com.minkuh.prticl.systemutil.CommandsUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,25 +23,14 @@ public final class Prticl extends JavaPlugin {
 
         ConfigurationSerialization.registerClass(PrticlNode.class);
 
+        saveDefaultConfig();
+
         getResource("config.yml");
-        saveResource("config.yml", false);
 
-        /*
-        File dataFolder = getDataFolder();
-
-        if (!dataFolder.exists()) dataFolder.mkdirs();
-
-        try {
-            for (File file : dataFolder.listFiles()) {
-                if (file.isFile())
-                    try (Reader reader = new FileReader(file)) {
-                        PrticlNode node = gson.fromJson(reader, PrticlNode.class);
-                    }
-            }
-        } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Failed to read node from file. ", e);
+        if (getConfig().getConfigurationSection("particles") == null) {
+            getConfig().createSection("particles");
+            saveConfig();
         }
-         */
     }
 
     @Override
@@ -51,6 +40,6 @@ public final class Prticl extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // onDisable logic
+        saveConfig();
     }
 }

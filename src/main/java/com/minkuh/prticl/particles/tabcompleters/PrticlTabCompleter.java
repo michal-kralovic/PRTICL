@@ -1,4 +1,4 @@
-package com.minkuh.prticl.particles.tab_completers;
+package com.minkuh.prticl.particles.tabcompleters;
 
 import org.bukkit.Particle;
 import org.bukkit.command.Command;
@@ -40,6 +40,15 @@ public class PrticlTabCompleter implements TabCompleter {
         return Collections.emptyList();
     }
 
+    private static List<String> spawnLogic(List<String> marker, String[] args) {
+        if (args.length == 2) {
+            marker.clear();
+            marker.add("node_id");
+            return marker;
+        }
+        return Collections.emptyList();
+    }
+
     private static List<String> lineLogic(List<String> marker, String[] args) {
         return switch (args.length) {
             case 2 -> {
@@ -72,15 +81,6 @@ public class PrticlTabCompleter implements TabCompleter {
             }
             default -> Collections.emptyList();
         };
-    }
-
-    private static List<String> spawnLogic(List<String> marker, String[] args) {
-        if (args.length == 2) {
-            marker.clear();
-            marker.add("node_id");
-            return marker;
-        }
-        return Collections.emptyList();
     }
 
     private static List<String> createLogic(List<String> marker, String[] args) {

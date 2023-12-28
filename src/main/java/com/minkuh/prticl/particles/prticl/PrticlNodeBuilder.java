@@ -2,19 +2,24 @@ package com.minkuh.prticl.particles.prticl;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+
+import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.getNodeFromConfigById;
+import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.loadConfigNodes;
 
 /**
  * A builder pattern class for building Prticl nodes.
  */
 public class PrticlNodeBuilder {
     private static Plugin plugin;
-    private static SortedMap<Integer, PrticlNode> prticlNodes = new TreeMap<>();
+    private static Map<Integer, PrticlNode> prticlNodes = new TreeMap<>();
     private static List<PrticlNode> nodes = new ArrayList<>();
 
     private int id;
@@ -31,6 +36,7 @@ public class PrticlNodeBuilder {
 
     /**
      * Sets the name of the new Prticl node.
+     *
      * @param name The name to call the new Prticl node
      * @return This builder.
      */
@@ -41,6 +47,7 @@ public class PrticlNodeBuilder {
 
     /**
      * Sets the particle type of the new Prticl node.
+     *
      * @param particleType The particle type to assign to the new Prticl node
      * @return This builder.
      */
@@ -51,6 +58,7 @@ public class PrticlNodeBuilder {
 
     /**
      * Sets the location of the new Prticl node.
+     *
      * @param location The location to assign to the new Prticl node
      * @return This builder.
      */
@@ -61,6 +69,7 @@ public class PrticlNodeBuilder {
 
     /**
      * Sets the author of the new Prticl node.
+     *
      * @param createdBy The author of the new Prticl node
      * @return This builder.
      */
@@ -71,6 +80,7 @@ public class PrticlNodeBuilder {
 
     /**
      * Sets the respawn frequency of the new Prticl node.
+     *
      * @param repeatDelay The respawn frequency of the new Prticl node
      * @return This builder.
      */
@@ -81,6 +91,7 @@ public class PrticlNodeBuilder {
 
     /**
      * Sets the particle density of the new Prticl node.
+     *
      * @param particleDensity The particle density of the new Prticl node
      * @return This builder.
      */
@@ -91,6 +102,7 @@ public class PrticlNodeBuilder {
 
     /**
      * Builds the Prticl node.
+     *
      * @return The freshly-baked Prticl node.
      */
     public PrticlNode build() {
@@ -99,6 +111,21 @@ public class PrticlNodeBuilder {
     }
 
     private static PrticlNode addNodeToMapAndReturn(PrticlNode node) {
+
+        Map<String, Object> nodesInConfig = loadConfigNodes();
+        for (Map.Entry<String, Object> entry : nodesInConfig.entrySet()) {
+            MemorySection particle = (MemorySection) entry.getValue();
+
+            try {
+                int nodeId = (int) particle.get("id");
+                PrticlNode nodeForSaving = getNodeFromConfigById(plugin.getConfig(), nodeId);
+
+                prticlNodes.put(nodeId, nodeForSaving);
+            } catch (Exception ignored) {
+                plugin.getLogger().log(Level.SEVERE, "HORRIBLE STUFF HAPPENED--------------------");
+            }
+        }
+
         nodes.clear();
         nodes.addAll(prticlNodes.values());
         nodes.add(node);
@@ -108,6 +135,7 @@ public class PrticlNodeBuilder {
             prticlNodes.put(nodes.size(), prticlNode);
         }
 
+        plugin.saveConfig();
         return node;
     }
 }

@@ -1,7 +1,7 @@
 package com.minkuh.prticl.particles.commands;
 
 import com.minkuh.prticl.particles.prticl.PrticlLine;
-import com.minkuh.prticl.particles.schedulers.PrticlVectorScheduler;
+import com.minkuh.prticl.particles.schedulers.PrticlLineScheduler;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,12 +15,12 @@ import org.bukkit.util.Vector;
  * A Command for handling the creation of particle lines.
  * <br>TODO: Create logic for creation of particle lines from existing saved PrticlNodes.
  */
-public class PrticlVectorCommand extends PrticlCommand {
+public class PrticlLineCommand extends PrticlCommand {
 
     PrticlLine line = new PrticlLine();
     private final Plugin plugin;
 
-    public PrticlVectorCommand(Plugin plugin) {
+    public PrticlLineCommand(Plugin plugin) {
         this.plugin = plugin;
     }
 
@@ -147,7 +147,7 @@ public class PrticlVectorCommand extends PrticlCommand {
 
         double length = 0;
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new PrticlVectorScheduler(length, distance, point1, vector, space), 0, 5);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new PrticlLineScheduler(length, distance, point1, vector, space), 0, 5);
     }
 
     @Override

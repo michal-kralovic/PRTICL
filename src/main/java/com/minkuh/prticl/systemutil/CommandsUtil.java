@@ -1,8 +1,9 @@
 package com.minkuh.prticl.systemutil;
 
 import com.minkuh.prticl.particles.commands.PrticlCreateCommand;
+import com.minkuh.prticl.particles.commands.PrticlListCommand;
 import com.minkuh.prticl.particles.commands.PrticlSpawnCommand;
-import com.minkuh.prticl.particles.commands.PrticlVectorCommand;
+import com.minkuh.prticl.particles.commands.PrticlLineCommand;
 import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -16,14 +17,16 @@ import java.util.Locale;
  */
 public class CommandsUtil {
     PrticlSpawnCommand spawnParticleCommand;
-    PrticlVectorCommand vectorCommand;
+    PrticlLineCommand lineCommand;
     PrticlCreateCommand createCommand;
+    PrticlListCommand listCommand;
     public static BaseMessageComponents messageComponents = new BaseMessageComponents();
 
     public CommandsUtil(Plugin plugin) {
         spawnParticleCommand = new PrticlSpawnCommand(plugin);
-        vectorCommand = new PrticlVectorCommand(plugin);
+        lineCommand = new PrticlLineCommand(plugin);
         createCommand = new PrticlCreateCommand(plugin);
+        listCommand = new PrticlListCommand(plugin);
     }
 
     /**
@@ -45,9 +48,11 @@ public class CommandsUtil {
                 if (args[0].equalsIgnoreCase("spawn"))
                     return spawnParticleCommand.command(args, sender);
                 if (args[0].equalsIgnoreCase("line"))
-                    return vectorCommand.command(args, sender);
+                    return lineCommand.command(args, sender);
                 if (args[0].equalsIgnoreCase("create"))
                     return createCommand.command(args, sender);
+                if (args[0].equalsIgnoreCase("list"))
+                    return listCommand.command(args, sender);
             }
             break;
 

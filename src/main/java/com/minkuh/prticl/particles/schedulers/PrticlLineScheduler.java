@@ -5,7 +5,7 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
-public class PrticlVectorScheduler implements Runnable {
+public class PrticlLineScheduler implements Runnable {
 
     private double length;
     private double distance;
@@ -13,7 +13,7 @@ public class PrticlVectorScheduler implements Runnable {
     private Location p1;
     private Vector vector;
 
-    public PrticlVectorScheduler(double length, double distance, Location p1, Vector vector, double space) {
+    public PrticlLineScheduler(double length, double distance, Location p1, Vector vector, double space) {
         this.length = length;
         this.distance = distance;
         this.p1 = p1;
