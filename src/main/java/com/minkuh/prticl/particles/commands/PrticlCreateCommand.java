@@ -9,12 +9,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.saveNodeToConfig;
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 
 /**
- * Provides a configurable module-based way of creating a PRTICL node before spawning it.
- * <br><br>In-game usage: <b>/prticl create (name) (particle) (repeat delay in ticks) (particle density) (x) (y) (z)</b>
- * <br>- <i>where nothing except for the name is necessary to specify.</i>
- * <br><br>Example: <b>/prticl create leaf_blower CHERRY_LEAVES 5 5</b>
+ * Provides a configurable module-based way of creating a PRTICL node before spawning it.<br><br>
+ * In-game usage: <b>/prticl create (name) (particle) (repeat delay in ticks) (particle density) (x) (y) (z)</b><br><i>
+ * - where nothing except for the name is necessary to specify.</i><br><br>
+ * Example: <b>/prticl create leaf_blower CHERRY_LEAVES 5 5</b>
  */
 public class PrticlCreateCommand extends PrticlCommand {
     private Plugin plugin;
@@ -39,8 +40,8 @@ public class PrticlCreateCommand extends PrticlCommand {
                                                 .setCreatedBy(sender.getName()).build();
 
                     if (!saveNodeToConfig(config, node))
-                        sender.sendMessage(prticlMessage.error("Couldn't save the node to config!"));
-                    sender.sendMessage(prticlMessage.player("Created the node."));
+                        sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
+                    sender.sendMessage(prticlMessage.player(CREATED_NODE));
                 }
                 case 3 -> {
                     PrticlNode node = builder.setName(args[1])
@@ -48,8 +49,8 @@ public class PrticlCreateCommand extends PrticlCommand {
                                                 .setCreatedBy(sender.getName()).build();
 
                     if (!saveNodeToConfig(config, node))
-                        sender.sendMessage(prticlMessage.error("Couldn't save the node to config!"));
-                    sender.sendMessage(prticlMessage.player("Created the node."));
+                        sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
+                    sender.sendMessage(prticlMessage.player(CREATED_NODE));
                 }
                 case 4 -> {
                     try {
@@ -59,12 +60,12 @@ public class PrticlCreateCommand extends PrticlCommand {
                                                     .setCreatedBy(sender.getName()).build();
 
                         if (!saveNodeToConfig(config, node))
-                            sender.sendMessage(prticlMessage.error("Couldn't save the node to config!"));
+                            sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(prticlMessage.error("Incorrect repeat delay! (has to be a number in ticks)"));
+                        sender.sendMessage(prticlMessage.error("Incorrect repeat delay format! (has to be a number in ticks)"));
                         return true;
                     }
-                    sender.sendMessage(prticlMessage.player("Created the node."));
+                    sender.sendMessage(prticlMessage.player(CREATED_NODE));
                 }
                 case 5 -> {
                     try {
@@ -75,18 +76,19 @@ public class PrticlCreateCommand extends PrticlCommand {
                                                     .setCreatedBy(sender.getName()).build();
 
                         if (!saveNodeToConfig(config, node))
-                            sender.sendMessage(prticlMessage.error("Couldn't save the node to config!"));
+                            sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
                     } catch (NumberFormatException e) {
                         sender.sendMessage(prticlMessage.error("Incorrect particle density format! (has to be a number)"));
                         return true;
                     }
-                    sender.sendMessage(prticlMessage.player("Created the node."));
+                    sender.sendMessage(prticlMessage.player(CREATED_NODE));
                 }
                 default -> sender.sendMessage(prticlMessage.error("Unexpected error!"));
             }
             return true;
         }
-        return false;
+        sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
+        return true;
     }
 
     /**
@@ -104,15 +106,14 @@ public class PrticlCreateCommand extends PrticlCommand {
             result = true;
         }
         if (arg.isBlank()) {
-            sender.sendMessage(messageComponents1.error("Prticle node name can't be empty!"));
+            sender.sendMessage(messageComponents1.error("Prticl node name can't be empty!"));
             result = true;
         }
 
         return result;
     }
 
-    @Override
-    String getCommandName() {
-        return "create";
+    public static String getCommandName() {
+        return CREATE_COMMAND;
     }
 }

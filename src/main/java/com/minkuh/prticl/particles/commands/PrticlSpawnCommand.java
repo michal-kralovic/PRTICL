@@ -10,6 +10,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.INCORRECT_COMMAND_SYNTAX_OR_OTHER;
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.SPAWN_COMMAND;
+
 /**
  * A Command for handling the creation of PrticlNodes.
  */
@@ -51,12 +54,11 @@ public class PrticlSpawnCommand extends PrticlCommand {
             Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new PrticlScheduler(node), 0, node.getRepeatDelay());
             return true;
         }
-        sender.sendMessage(prticlMessage.error("Incorrect command syntax."));
+        sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
         return true;
     }
 
-    @Override
-    String getCommandName() {
-        return "spawn";
+    public static String getCommandName() {
+        return SPAWN_COMMAND;
     }
 }

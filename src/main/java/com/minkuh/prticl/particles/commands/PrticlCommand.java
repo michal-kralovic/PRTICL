@@ -4,6 +4,9 @@ import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.PLAYER_COMMAND_ONLY;
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.PRTICL_COMMAND;
+
 
 /**
  * An abstract PRTICL command class.
@@ -23,7 +26,7 @@ public abstract class PrticlCommand {
         boolean result = true;
         if (!(sender instanceof Player)) {
             result = false;
-            sender.sendMessage("This command can only be executed by a player!");
+            sender.sendMessage(PLAYER_COMMAND_ONLY);
         }
         return result;
     }
@@ -36,9 +39,7 @@ public abstract class PrticlCommand {
      */
     abstract public boolean command(String[] args, CommandSender sender);
 
-    /**
-     * A comfy utility method that returns the name of the current Command.
-     * @return This Command's name.
-     */
-    abstract String getCommandName();
+    public static String getCommandName() {
+        return PRTICL_COMMAND;
+    }
 }

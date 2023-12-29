@@ -45,13 +45,13 @@ public class CommandsUtil {
             break;
 
             case "prticl": {
-                if (args[0].equalsIgnoreCase("spawn"))
+                if (args[0].equalsIgnoreCase(PrticlSpawnCommand.getCommandName()))
                     return spawnParticleCommand.command(args, sender);
-                if (args[0].equalsIgnoreCase("line"))
+                if (args[0].equalsIgnoreCase(PrticlLineCommand.getCommandName()))
                     return lineCommand.command(args, sender);
-                if (args[0].equalsIgnoreCase("create"))
+                if (args[0].equalsIgnoreCase(PrticlCreateCommand.getCommandName()))
                     return createCommand.command(args, sender);
-                if (args[0].equalsIgnoreCase("list"))
+                if (args[0].equalsIgnoreCase(PrticlListCommand.getCommandName()))
                     return listCommand.command(args, sender);
             }
             break;

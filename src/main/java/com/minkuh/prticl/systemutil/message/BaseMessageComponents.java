@@ -13,8 +13,8 @@ import static net.kyori.adventure.text.format.TextDecoration.State.FALSE;
 import static net.kyori.adventure.text.format.TextDecoration.State.TRUE;
 
 public class BaseMessageComponents {
-    public @NotNull TextComponent prticlDash() {
-        return text().content("[").color(color(prticlStrong)).decoration(BOLD, TRUE)
+    public @NotNull TextComponent prticlFlair() {
+        return text().decoration(BOLD, TRUE).content("[").color(color(prticlStrong))
                 .append(text().decoration(BOLD, FALSE).content("PRTICL").color(color(prticlLight))
                         .append(text().content("]").color(color(prticlStrong)).decoration(BOLD, TRUE))
                         .append(text(" ")))
@@ -22,7 +22,7 @@ public class BaseMessageComponents {
     }
 
     public @NotNull TextComponent prticlMessage(String message, int color) {
-        return prticlDash().append(text().decoration(BOLD, FALSE).content(message).color(color(color)));
+        return prticlFlair().append(text().decoration(BOLD, FALSE).content(message).color(color(color)));
     }
 
     public @NotNull TextComponent system(String message) {
@@ -41,14 +41,25 @@ public class BaseMessageComponents {
         return prticlMessage("ERROR: " + message, error);
     }
 
-    public @NotNull TextComponent list(List<String[]> content) {
-        TextComponent output = player("List of nodes");
+    /**
+     * Creates a list of nodes message based on the given list and other inputs.
+     * @param content The list to show
+     * @param currentPage The specified page
+     * @param totalPages The total amount of pages
+     * @param nodeAmount The total amount of nodes
+     * @return TextComponent output, the message to be sent to the player.
+     */
+    public @NotNull TextComponent list(List<String[]> content, int currentPage, int totalPages, int nodeAmount) {
+        String nodesMessageEnding = nodeAmount == 1 ? " node" : " nodes";
+        totalPages = totalPages == 0 ? 1 : totalPages;
+
+        TextComponent output = player("List of nodes — Page " + currentPage + " / " + totalPages);
 
         for (String[] entry : content) {
             output = (TextComponent) output.decoration(BOLD, false).appendNewline().append(listEntry(entry));
         }
 
-        output = (TextComponent) output.appendNewline().append(player("List of nodes"));
+        output = (TextComponent) output.appendNewline().append(player("List of nodes — " + nodeAmount + nodesMessageEnding + " total"));
 
         return output;
     }

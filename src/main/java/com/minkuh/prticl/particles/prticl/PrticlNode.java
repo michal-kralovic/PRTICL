@@ -8,13 +8,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
+
 /**
  * The most important element of PRTICL - its Nodes.
  * <br>A model class for a PRTICL node.
  */
 public class PrticlNode implements ConfigurationSerializable {
     private int id;
-    private String name = "node";
+    private String name = NODE_DEFAULT_NAME;
     private int repeatDelay = 20;
     private int particleDensity = 1;
     private org.bukkit.Particle particleType = Particle.HEART;
@@ -109,14 +111,14 @@ public class PrticlNode implements ConfigurationSerializable {
         Map<String, Object> data = new HashMap<>();
 
         if (this.location != null) {
-            data.put("location", this.location.serialize());
+            data.put(NODE_PARAM_LOCATION, this.location.serialize());
         }
-        data.put("particle-density", this.particleDensity);
-        data.put("repeat-delay", this.repeatDelay);
-        data.put("particle-type", this.particleType.toString());
-        data.put("owner", this.createdBy);
-        data.put("name", this.name);
-        data.put("id", this.id);
+        data.put(NODE_PARAM_PARTICLE_DENSITY, this.particleDensity);
+        data.put(NODE_PARAM_REPEAT_DELAY, this.repeatDelay);
+        data.put(NODE_PARAM_PARTICLE_TYPE, this.particleType.toString());
+        data.put(NODE_PARAM_OWNER, this.createdBy);
+        data.put(NODE_PARAM_NAME, this.name);
+        data.put(NODE_PARAM_ID, this.id);
 
         return data;
     }
@@ -129,13 +131,13 @@ public class PrticlNode implements ConfigurationSerializable {
      */
     public static PrticlNode deserialize(Map<String, Object> args) {
         return new PrticlNode(
-                (int) args.get("id"),
-                (String) args.get("name"),
-                (int) args.get("repeat-delay"),
-                (int) args.get("particle-density"),
-                Particle.valueOf((String) args.get("particle-type")),
-                (Location) args.get("location"),
-                (String) args.get("owner")
+                (int) args.get(NODE_PARAM_ID),
+                (String) args.get(NODE_PARAM_NAME),
+                (int) args.get(NODE_PARAM_REPEAT_DELAY),
+                (int) args.get(NODE_PARAM_PARTICLE_DENSITY),
+                Particle.valueOf((String) args.get(NODE_PARAM_PARTICLE_TYPE)),
+                (Location) args.get(NODE_PARAM_LOCATION),
+                (String) args.get(NODE_PARAM_OWNER)
         );
     }
 }

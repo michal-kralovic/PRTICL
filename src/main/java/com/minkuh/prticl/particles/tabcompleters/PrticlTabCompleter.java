@@ -1,5 +1,6 @@
 package com.minkuh.prticl.particles.tabcompleters;
 
+import com.minkuh.prticl.particles.commands.*;
 import org.bukkit.Particle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -16,6 +17,8 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
+
 public class PrticlTabCompleter implements TabCompleter {
 
     List<String> particleCommandList = new ArrayList<>();
@@ -24,16 +27,18 @@ public class PrticlTabCompleter implements TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (sender instanceof Player && label.equalsIgnoreCase("prticl")) {
+        if (sender instanceof Player && label.equalsIgnoreCase(PrticlCommand.getCommandName())) {
             if (args.length == 1) {
                 particleCommandList.clear();
                 return sortedCommands(args[0]);
             }
 
+            // TODO: Manage to figure out how to overcome constants restriction here, to eliminate magic strings
             return switch (args[0].toLowerCase(Locale.ROOT)) {
                 case ("spawn") -> spawnLogic(marker, args);
                 case ("line") -> lineLogic(marker, args);
                 case ("create") -> createLogic(marker, args);
+                case ("list") -> listLogic(marker, args);
                 default -> Collections.emptyList();
             };
         }
@@ -43,7 +48,7 @@ public class PrticlTabCompleter implements TabCompleter {
     private static List<String> spawnLogic(List<String> marker, String[] args) {
         if (args.length == 2) {
             marker.clear();
-            marker.add("node_id");
+            marker.add(NODE_PARAM_ID);
             return marker;
         }
         return Collections.emptyList();
@@ -77,7 +82,7 @@ public class PrticlTabCompleter implements TabCompleter {
             }
             case 8 -> {
                 marker.clear();
-                yield marker(marker, "density");
+                yield marker(marker, NODE_PARAM_PARTICLE_DENSITY);
             }
             default -> Collections.emptyList();
         };
@@ -87,16 +92,16 @@ public class PrticlTabCompleter implements TabCompleter {
         return switch (args.length) {
             case 2 -> {
                 marker.clear();
-                yield marker(marker, "name");
+                yield marker(marker, NODE_PARAM_NAME);
             }
             case 3 -> sortedParticles(args[2]);
             case 4 -> {
                 marker.clear();
-                yield marker(marker, "repeat_delay");
+                yield marker(marker, NODE_PARAM_REPEAT_DELAY);
             }
             case 5 -> {
                 marker.clear();
-                yield marker(marker, "particle_density");
+                yield marker(marker, NODE_PARAM_PARTICLE_DENSITY);
             }
             case 6 -> {
                 marker.clear();
@@ -114,6 +119,15 @@ public class PrticlTabCompleter implements TabCompleter {
         };
     }
 
+    private static List<String> listLogic(List<String> marker, String[] args) {
+        if (args.length == 2) {
+            marker.clear();
+            marker.add("page");
+            return marker;
+        }
+        return Collections.emptyList();
+    }
+
     public static List<String> sortedParticles(String arg) {
         final List<String> completions = new ArrayList<>();
 
@@ -129,9 +143,10 @@ public class PrticlTabCompleter implements TabCompleter {
 
     public List<String> sortedCommands(String arg) {
         final List<String> commands = new ArrayList<>();
-        commands.add("spawn");
-        commands.add("line");
-        commands.add("create");
+        commands.add(PrticlSpawnCommand.getCommandName());
+        commands.add(PrticlLineCommand.getCommandName());
+        commands.add(PrticlCreateCommand.getCommandName());
+        commands.add(PrticlListCommand.getCommandName());
 
         List<String> completions = new ArrayList<>();
 

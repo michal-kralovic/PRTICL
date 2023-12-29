@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
+
 /**
  * A Command for handling the creation of particle lines.
  * <br>TODO: Create logic for creation of particle lines from existing saved PrticlNodes.
@@ -26,6 +28,9 @@ public class PrticlLineCommand extends PrticlCommand {
 
     @Override
     public boolean command(String[] args, CommandSender sender) {
+        if (!isCommandSentByPlayer(sender))
+            return true;
+
         if (allLineInputsAvailable(args)) {
             World world = ((Player) sender).getWorld();
             Player player = (Player) sender;
@@ -44,18 +49,15 @@ public class PrticlLineCommand extends PrticlCommand {
                 );
                 if (args.length == 8) line.setDensity(Double.parseDouble(args[7]));
             } catch (NumberFormatException e) {
-                sender.sendMessage(prticlMessage.error("Incorrect coordinates input!"));
+                sender.sendMessage(prticlMessage.error(INCORRECT_COORDINATES_INPUT));
                 return true;
             }
 
             drawLine(line.getLoc1(), line.getLoc2(), line.getDensity());
             return true;
         }
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("This command can only be executed by a player!");
-            return true;
-        }
-        return false;
+        sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
+        return true;
     }
 
     /**
@@ -137,7 +139,7 @@ public class PrticlLineCommand extends PrticlCommand {
     public void drawLine(Location point1, Location point2, double space) {
         World world = point1.getWorld();
 
-        Validate.isTrue(point2.getWorld().equals(world), "Points cannot be in different worlds!");
+        Validate.isTrue(point2.getWorld().equals(world), MISMATCHING_WORLDS);
 
         double distance = point1.distance(point2);
 
@@ -150,8 +152,7 @@ public class PrticlLineCommand extends PrticlCommand {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new PrticlLineScheduler(length, distance, point1, vector, space), 0, 5);
     }
 
-    @Override
-    String getCommandName() {
-        return "line";
+    public static String getCommandName() {
+        return LINE_COMMAND;
     }
 }

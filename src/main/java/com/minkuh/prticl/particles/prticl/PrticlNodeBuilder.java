@@ -13,6 +13,8 @@ import java.util.logging.Level;
 
 import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.getNodeFromConfigById;
 import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.loadConfigNodes;
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.NODE_DEFAULT_NAME;
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.NODE_PARAM_ID;
 
 /**
  * A builder pattern class for building Prticl nodes.
@@ -23,7 +25,7 @@ public class PrticlNodeBuilder {
     private static List<PrticlNode> nodes = new ArrayList<>();
 
     private int id;
-    private String name = "node";
+    private String name = NODE_DEFAULT_NAME;
     private int repeatDelay = 20;
     private int particleDensity = 1;
     private org.bukkit.Particle particleType = Particle.HEART;
@@ -117,7 +119,7 @@ public class PrticlNodeBuilder {
             MemorySection particle = (MemorySection) entry.getValue();
 
             try {
-                int nodeId = (int) particle.get("id");
+                int nodeId = (int) particle.get(NODE_PARAM_ID);
                 PrticlNode nodeForSaving = getNodeFromConfigById(plugin.getConfig(), nodeId);
 
                 prticlNodes.put(nodeId, nodeForSaving);
