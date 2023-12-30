@@ -51,7 +51,7 @@ public class PrticlCreateCommand extends PrticlCommand {
                 // Node particle type
                 case 2 -> {
                     PrticlNode node = builder.setName(args[0])
-                            .setParticleType(Particle.valueOf(args[1]))
+                            .setParticleType(Particle.valueOf(supportedParticleTypeString(args[1])))
                             .setCreatedBy(sender.getName()).build();
 
                     if (!configUtil.saveNodeToConfig(config, node))
@@ -62,7 +62,7 @@ public class PrticlCreateCommand extends PrticlCommand {
                 case 3 -> {
                     try {
                         PrticlNode node = builder.setName(args[0])
-                                .setParticleType(Particle.valueOf(args[1]))
+                                .setParticleType(Particle.valueOf(supportedParticleTypeString(args[1])))
                                 .setRepeatDelay(Integer.parseInt(args[2]))
                                 .setCreatedBy(sender.getName()).build();
 
@@ -78,7 +78,7 @@ public class PrticlCreateCommand extends PrticlCommand {
                 case 4 -> {
                     try {
                         PrticlNode node = builder.setName(args[0])
-                                .setParticleType(Particle.valueOf(args[1]))
+                                .setParticleType(Particle.valueOf(supportedParticleTypeString(args[1])))
                                 .setRepeatDelay(Integer.parseInt(args[2]))
                                 .setParticleDensity(Integer.parseInt(args[3]))
                                 .setCreatedBy(sender.getName()).build();
@@ -134,6 +134,16 @@ public class PrticlCreateCommand extends PrticlCommand {
         }
 
         return result;
+    }
+
+    private static String supportedParticleTypeString(String arg) {
+        String[] particleWithNamespace;
+        if (arg.contains(":")) {
+            particleWithNamespace = arg.split(":");
+            arg = particleWithNamespace[1];
+        }
+
+        return arg.toUpperCase(Locale.ROOT);
     }
 
     /**

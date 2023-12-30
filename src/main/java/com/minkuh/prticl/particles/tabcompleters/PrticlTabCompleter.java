@@ -10,10 +10,7 @@ import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,7 +32,7 @@ public class PrticlTabCompleter implements TabCompleter {
                 return marker;
             }
 
-            if (args.length == 2) {
+            if (args.length == 2 && args[0].equals("node")) {
                 particleCommandList.clear();
                 return sortedCommands(args[1]);
             }
@@ -53,10 +50,9 @@ public class PrticlTabCompleter implements TabCompleter {
     }
 
     private static List<String> spawnLogic(List<String> marker, String[] args) {
-        if (args.length == 2) {
+        if (args.length == 3) {
             marker.clear();
-            marker.add(NODE_PARAM_ID + "/" + NODE_PARAM_NAME);
-            return marker;
+            return marker(marker, NODE_PARAM_ID + "/" + NODE_PARAM_NAME);
         }
         return Collections.emptyList();
     }
@@ -138,15 +134,17 @@ public class PrticlTabCompleter implements TabCompleter {
     public static List<String> sortedParticles(String arg) {
         final List<String> completions = new ArrayList<>();
 
-        StringUtil.copyPartialMatches(arg, Stream.of(Particle.values()).map(Particle::name).collect(Collectors.toList()), completions);
+        StringUtil.copyPartialMatches(arg, Arrays.stream(Particle.values())
+                .map(p -> "minecraft:" + p.name().toLowerCase())
+                .collect(Collectors.toList()), completions);
         Collections.sort(completions);
 
         particleList.clear();
-
         particleList.addAll(completions);
 
         return particleList;
     }
+
 
     public List<String> sortedCommands(String arg) {
         final List<String> commands = new ArrayList<>();

@@ -4,6 +4,7 @@ import net.kyori.adventure.text.TextComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Locale;
 
 import static com.minkuh.prticl.systemutil.message.MessageColors.*;
 import static net.kyori.adventure.text.Component.text;
@@ -80,7 +81,7 @@ public class BaseMessageComponents {
                 .append(text().content("Node name: ").color(color(system)))
                 .append(text().content(nodeData[2] + ", ").color(color(prticlLight)))
                 .append(text().content("Node type: ").color(color(system)))
-                .append(text().content(nodeData[3]).color(color(prticlLight)))
+                .append(text().content(nodeData[3].toLowerCase(Locale.ROOT)).color(color(prticlLight)))
                 .build();
     }
 }
