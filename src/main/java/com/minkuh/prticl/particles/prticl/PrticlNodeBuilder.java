@@ -1,5 +1,6 @@
 package com.minkuh.prticl.particles.prticl;
 
+import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.configuration.MemorySection;
@@ -11,8 +12,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
-import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.getNodeFromConfigById;
-import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.loadConfigNodes;
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.NODE_DEFAULT_NAME;
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.NODE_PARAM_ID;
 
@@ -23,6 +22,7 @@ public class PrticlNodeBuilder {
     private static Plugin plugin;
     private static Map<Integer, PrticlNode> prticlNodes = new TreeMap<>();
     private static List<PrticlNode> nodes = new ArrayList<>();
+    private static PrticlNodeConfigUtil configUtil;
 
     private int id;
     private String name = NODE_DEFAULT_NAME;
@@ -34,6 +34,7 @@ public class PrticlNodeBuilder {
 
     public PrticlNodeBuilder(Plugin plugin) {
         this.plugin = plugin;
+        this.configUtil = new PrticlNodeConfigUtil(plugin);
     }
 
     /**
@@ -112,15 +113,21 @@ public class PrticlNodeBuilder {
         return addNodeToMapAndReturn(node);
     }
 
+    /**
+     * To manage every created node, we need to save them to an in-memory storage, as well as the one on the drive. <br>
+     *
+     * @param node The node to save
+     * @return The unchanged node that was passed into this method.
+     */
     private static PrticlNode addNodeToMapAndReturn(PrticlNode node) {
 
-        Map<String, Object> nodesInConfig = loadConfigNodes();
+        Map<String, Object> nodesInConfig = configUtil.getConfigNodes();
         for (Map.Entry<String, Object> entry : nodesInConfig.entrySet()) {
             MemorySection particle = (MemorySection) entry.getValue();
 
             try {
                 int nodeId = (int) particle.get(NODE_PARAM_ID);
-                PrticlNode nodeForSaving = getNodeFromConfigById(plugin.getConfig(), nodeId);
+                PrticlNode nodeForSaving = configUtil.getNodeFromConfigById(plugin.getConfig(), nodeId);
 
                 prticlNodes.put(nodeId, nodeForSaving);
             } catch (Exception ignored) {

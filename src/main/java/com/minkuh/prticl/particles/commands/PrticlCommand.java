@@ -9,7 +9,8 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.PRTICL_COMMAN
 
 
 /**
- * An abstract PRTICL command class.
+ * An abstract PRTICL command class. <br>
+ * Extend me for new commands!
  */
 public abstract class PrticlCommand {
     /**

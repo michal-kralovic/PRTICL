@@ -43,10 +43,11 @@ public class BaseMessageComponents {
 
     /**
      * Creates a list of nodes message based on the given list and other inputs.
-     * @param content The list to show
+     *
+     * @param content     The list to show
      * @param currentPage The specified page
-     * @param totalPages The total amount of pages
-     * @param nodeAmount The total amount of nodes
+     * @param totalPages  The total amount of pages
+     * @param nodeAmount  The total amount of nodes
      * @return TextComponent output, the message to be sent to the player.
      */
     public @NotNull TextComponent list(List<String[]> content, int currentPage, int totalPages, int nodeAmount) {
@@ -64,6 +65,12 @@ public class BaseMessageComponents {
         return output;
     }
 
+    /**
+     * Builds a list entry based on the passed data.
+     *
+     * @param nodeData The necessary data to build this entry
+     * @return The TextComponent to use in a list.
+     */
     private @NotNull TextComponent listEntry(String[] nodeData) {
         return text().content("- ")
                 .append(text().content("ID: ").color(color(system)))

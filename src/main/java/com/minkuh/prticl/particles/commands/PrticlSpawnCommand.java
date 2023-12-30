@@ -10,36 +10,35 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import static com.minkuh.prticl.systemutil.resources.PrticlStrings.INCORRECT_COMMAND_SYNTAX_OR_OTHER;
-import static com.minkuh.prticl.systemutil.resources.PrticlStrings.SPAWN_COMMAND;
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 
 /**
- * A Command for handling the creation of PrticlNodes.
+ * A Command for handling the spawning of PrticlNodes.
  */
 public class PrticlSpawnCommand extends PrticlCommand {
     private final Plugin plugin;
     private final FileConfiguration config;
-    private final PrticlNodeConfigUtil configUtil;
+    private PrticlNodeConfigUtil configUtil;
 
     public PrticlSpawnCommand(Plugin plugin) {
         this.plugin = plugin;
-        this.configUtil = new PrticlNodeConfigUtil(plugin);
         this.config = plugin.getConfig();
+        this.configUtil = new PrticlNodeConfigUtil(plugin);
     }
 
     @Override
     public boolean command(String[] args, CommandSender sender) {
-        if (isCommandSentByPlayer(sender) && args.length == 2) {
+        if (isCommandSentByPlayer(sender) && args.length == 1) {
             PrticlNode node;
 
             try {
                 plugin.reloadConfig();
-                node = PrticlNodeConfigUtil.getNodeFromConfigById(config, Integer.parseInt(args[1]));
-            } catch (NumberFormatException e) {
-                sender.sendMessage(prticlMessage.error("Incorrect node ID format!"));
-                return true;
+                node = args[0].startsWith("id:") ? configUtil.getNodeFromConfigById(config, Integer.parseInt(args[0].substring(3))) : configUtil.getNodeFromConfigByName(args[0]);
             } catch (NodeNotFoundException e) {
-                sender.sendMessage(prticlMessage.error("Couldn't find a node with ID " + args[1] + "!"));
+                sender.sendMessage(prticlMessage.error(NODE_WITH_ARGUMENT_NOT_FOUND));
+                return true;
+            } catch (NumberFormatException e) {
+                sender.sendMessage(prticlMessage.error(INCORRECT_NODE_ID));
                 return true;
             } catch (Exception e) {
                 sender.sendMessage(prticlMessage.error(e.getMessage()));

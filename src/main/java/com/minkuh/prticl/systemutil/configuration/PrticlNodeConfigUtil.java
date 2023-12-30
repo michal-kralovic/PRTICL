@@ -9,9 +9,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+import static com.minkuh.prticl.particles.prticl.PrticlNode.deserialize;
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 
 /**
@@ -23,7 +23,7 @@ public class PrticlNodeConfigUtil {
 
     public PrticlNodeConfigUtil(Plugin plugin) {
         this.plugin = plugin;
-        this.config = plugin.getConfig();
+        config = plugin.getConfig();
     }
 
     /**
@@ -31,10 +31,11 @@ public class PrticlNodeConfigUtil {
      *
      * @return TRUE if successful.
      */
-    public static boolean saveNodeToConfig(FileConfiguration config, PrticlNode node) {
+    public boolean saveNodeToConfig(FileConfiguration config, PrticlNode node) {
         config.set(NODE_CONFIGURATION_SECTION + "." + NODE_CHILD + "-" + node.getId(), node.serialize());
         try {
             config.save("plugins/Prticl/config.yml");
+            // plugin.saveConfig();
         } catch (IOException e) {
             return false;
         }
@@ -42,14 +43,47 @@ public class PrticlNodeConfigUtil {
         return true;
     }
 
-    public static Map<String, Object> loadConfigNodes() throws NullPointerException {
+    /**
+     * Loads every single node out of the config file. <br>
+     * The nodes are loaded like: <br><br>
+     * - key: node-1 (automatically generated)<br>
+     * - value (Object): < node parameters ><br><br>
+     * Example:<br><b>
+     * - node-1 -> {id=1, name="my node!", owner="Steve", ...} <br>
+     * - node-2 -> {id=2, name="heart node", owner="Alex", ...} <br> </b>
+     * ...
+     *
+     * @return a Map with the resulting nodes.
+     * @throws NullPointerException if config can't be found
+     */
+    public Map<String, Object> getConfigNodes() throws NullPointerException {
+        Map<String, Object> nodes;
+        nodes = plugin.getConfig().getConfigurationSection(NODE_CONFIGURATION_SECTION).getValues(true);
 
-        Map<String, Object> section;
-        section = plugin.getConfig().getConfigurationSection(NODE_CONFIGURATION_SECTION).getValues(true);
+        nodes.entrySet().removeIf(entry -> !(entry.getValue() instanceof MemorySection));
 
-        section.entrySet().removeIf(entry -> !(entry.getValue() instanceof MemorySection));
+        return nodes;
+    }
 
-        return section;
+    /**
+     * Loads every single node out of the config file. <br>
+     *
+     * @return a List< PrticlNode > with the resulting nodes.
+     * @throws NullPointerException if config can't be found
+     */
+    public List<PrticlNode> getConfigNodesList() throws NullPointerException {
+        Map<String, Object> nodes;
+        nodes = plugin.getConfig().getConfigurationSection(NODE_CONFIGURATION_SECTION).getValues(true);
+
+        nodes.entrySet().removeIf(entry -> !(entry.getValue() instanceof MemorySection));
+
+        List<PrticlNode> listOfNodes = new ArrayList<>();
+
+        for (Map.Entry<String, Object> entry : nodes.entrySet()) {
+            listOfNodes.add(deserialize(entry));
+        }
+
+        return listOfNodes;
     }
 
     /**
@@ -58,9 +92,9 @@ public class PrticlNodeConfigUtil {
      * @param config The config file to look through
      * @param id     The ID to look for
      * @return The Prticl node.
-     * @throws NodeNotFoundException If the node can't be found within the config.
+     * @throws NodeNotFoundException If the node can't be found in the config
      */
-    public static PrticlNode getNodeFromConfigById(FileConfiguration config, int id) throws NodeNotFoundException {
+    public PrticlNode getNodeFromConfigById(FileConfiguration config, int id) throws NodeNotFoundException {
         Object deserializedNode = config.getConfigurationSection(NODE_CONFIGURATION_SECTION).get(NODE_CHILD + "-" + id);
         if (deserializedNode == null) {
             throw new NodeNotFoundException(NODE_NOT_FOUND);
@@ -75,13 +109,35 @@ public class PrticlNodeConfigUtil {
             memorySectionDeserializedNode.put(NODE_PARAM_NAME, ((MemorySection) deserializedNode).get(NODE_PARAM_NAME));
             memorySectionDeserializedNode.put(NODE_PARAM_ID, ((MemorySection) deserializedNode).get(NODE_PARAM_ID));
 
-            return PrticlNode.deserialize(memorySectionDeserializedNode);
+            return deserialize(memorySectionDeserializedNode);
         }
 
-        return PrticlNode.deserialize((Map<String, Object>) deserializedNode);
+        return deserialize((Map<String, Object>) deserializedNode);
     }
 
-    public static boolean configNodeSectionExists() {
+    /**
+     * Gets the Prticl node from the config based on the provided Name of the Node.
+     *
+     * @param name The Name of the Node to look for
+     * @return The PrticlNode, if found.
+     * @throws NodeNotFoundException If the node can't be found in the config
+     */
+    public PrticlNode getNodeFromConfigByName(String name) throws NodeNotFoundException {
+        List<PrticlNode> listOfNodes = getConfigNodesList();
+        Optional<PrticlNode> result = listOfNodes.stream()
+                .filter(p -> p.getName().toLowerCase(Locale.ROOT).equals(name.toLowerCase(Locale.ROOT)))
+                .findFirst();
+        if (result.isEmpty())
+            throw new NodeNotFoundException(NODE_NOT_FOUND);
+        return result.get();
+    }
+
+    /**
+     * Checks for the existence of the configuration section where nodes are stored.
+     *
+     * @return TRUE if exists.
+     */
+    public boolean configNodeSectionExists() {
         boolean result = true;
         if (config.getConfigurationSection(NODE_CONFIGURATION_SECTION) == null) {
             return false;
@@ -89,7 +145,14 @@ public class PrticlNodeConfigUtil {
         return result;
     }
 
-    public static boolean configNodeSectionExists(CommandSender sender) {
+    /**
+     * Checks for the existence of the configuration section where nodes are stored. <br>
+     * Overload for configNodeSectionExists which also sends the command sender an error message.
+     *
+     * @param sender The sender who sent the command
+     * @return TRUE if exists.
+     */
+    public boolean configNodeSectionExists(CommandSender sender) {
         BaseMessageComponents prticlMessage = new BaseMessageComponents();
         boolean result = true;
         if (config.getConfigurationSection(NODE_CONFIGURATION_SECTION) == null) {

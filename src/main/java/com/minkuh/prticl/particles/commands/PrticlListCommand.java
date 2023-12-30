@@ -1,18 +1,15 @@
 package com.minkuh.prticl.particles.commands;
 
+import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.MemorySection;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.configNodeSectionExists;
-import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.loadConfigNodes;
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 
 /**
@@ -21,29 +18,32 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
  */
 public class PrticlListCommand extends PrticlCommand {
     private static Plugin plugin;
+    private static PrticlNodeConfigUtil configUtil;
 
     public PrticlListCommand(Plugin plugin) {
         this.plugin = plugin;
+        this.configUtil = new PrticlNodeConfigUtil(plugin);
     }
 
     @Override
     public boolean command(String[] args, CommandSender sender) {
-        if (sender instanceof Player || sender instanceof ConsoleCommandSender) {
-            if (!configNodeSectionExists(sender)) {
-                return true;
-            }
+        if (!configUtil.configNodeSectionExists(sender))
+            return true;
 
-            if (sender.isOp() || sender instanceof ConsoleCommandSender)
-                return adminListLogic(args, sender);
-            if (!sender.isOp())
-                return playerListLogic(args, sender);
-        }
+        if (args.length == 0 || args.length == 1)
+            return sender.isOp() ? adminListLogic(args, sender) : playerListLogic(args, sender);
+
         sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
         return true;
     }
 
     private static boolean adminListLogic(String[] args, CommandSender sender) {
-        Map<String, Object> allNodes = loadConfigNodes();
+        BaseMessageComponents prticlMessage = new BaseMessageComponents();
+        Map<String, Object> allNodes = configUtil.getConfigNodes();
+        if (allNodes.isEmpty()) {
+            sender.sendMessage(prticlMessage.system("No nodes found."));
+            return true;
+        }
         List<String[]> listOfListableNodeData = new ArrayList<>();
 
         for (Map.Entry<String, Object> entry : allNodes.entrySet()) {
@@ -62,18 +62,23 @@ public class PrticlListCommand extends PrticlCommand {
     }
 
     private static boolean playerListLogic(String[] args, CommandSender sender) {
-        Map<String, Object> allNodes = loadConfigNodes();
+        BaseMessageComponents prticlMessage = new BaseMessageComponents();
+        Map<String, Object> allNodes = configUtil.getConfigNodes();
+        if (allNodes.isEmpty()) {
+            sender.sendMessage(prticlMessage.system("No nodes found."));
+            return true;
+        }
         List<String[]> listOfListableNodeData = new ArrayList<>();
 
         for (Map.Entry<String, Object> entry : allNodes.entrySet()) {
-            MemorySection particle = (MemorySection) entry.getValue();
+            MemorySection node = (MemorySection) entry.getValue();
 
-            if (particle.get(NODE_PARAM_OWNER).toString().equals(sender.getName())) {
+            if (node.get(NODE_PARAM_OWNER).toString().equals(sender.getName())) {
                 String[] nodeValues = new String[]{
-                        particle.get(NODE_PARAM_ID).toString(),
-                        particle.get(NODE_PARAM_OWNER).toString(),
-                        particle.get(NODE_PARAM_NAME).toString(),
-                        particle.get(NODE_PARAM_PARTICLE_TYPE).toString()
+                        node.get(NODE_PARAM_ID).toString(),
+                        node.get(NODE_PARAM_OWNER).toString(),
+                        node.get(NODE_PARAM_NAME).toString(),
+                        node.get(NODE_PARAM_PARTICLE_TYPE).toString()
                 };
                 listOfListableNodeData.add(nodeValues);
             }
@@ -90,14 +95,14 @@ public class PrticlListCommand extends PrticlCommand {
             pageAmount++;
         }
 
-        if (args.length == 1 || args[1].isBlank()) {
+        if (args.length == 0) {
             int maxNode = Math.min(10, visibleNodeAmount);
             sender.sendMessage(prticlMessage.list(listOfListableNodeData.subList(0, maxNode), 1, pageAmount, visibleNodeAmount));
         } else {
             try {
-                int pageNumber = Integer.parseInt(args[1]);
+                int pageNumber = Integer.parseInt(args[0]);
                 if (pageNumber > pageAmount || pageNumber <= 0) {
-                    sender.sendMessage(prticlMessage.error("Invalid page number! (1 - " + pageAmount + ")"));
+                    sender.sendMessage(prticlMessage.error("Invalid page number! (1 to " + pageAmount + ")"));
                     return true;
                 }
 

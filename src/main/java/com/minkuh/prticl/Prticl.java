@@ -5,13 +5,13 @@ import com.minkuh.prticl.particles.commands.PrticlCommand;
 import com.minkuh.prticl.particles.prticl.PrticlNode;
 import com.minkuh.prticl.particles.tabcompleters.PrticlTabCompleter;
 import com.minkuh.prticl.systemutil.CommandsUtil;
+import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import static com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil.configNodeSectionExists;
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.NODE_CONFIGURATION_SECTION;
 
 /**
@@ -19,6 +19,7 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.NODE_CONFIGUR
  */
 public final class Prticl extends JavaPlugin {
     private final CommandsUtil cmdUtil = new CommandsUtil(this);
+    private PrticlNodeConfigUtil configUtil = new PrticlNodeConfigUtil(this);
 
     @Override
     public void onEnable() {
@@ -31,7 +32,7 @@ public final class Prticl extends JavaPlugin {
 
         getResource("config.yml");
 
-        if (!configNodeSectionExists()) {
+        if (!configUtil.configNodeSectionExists()) {
             getConfig().createSection(NODE_CONFIGURATION_SECTION);
             saveConfig();
         }

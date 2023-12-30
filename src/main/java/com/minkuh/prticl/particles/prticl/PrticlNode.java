@@ -2,6 +2,7 @@ package com.minkuh.prticl.particles.prticl;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 
@@ -129,7 +130,7 @@ public class PrticlNode implements ConfigurationSerializable {
      * @param args The node in the config
      * @return The deserialized Prticl node.
      */
-    public static PrticlNode deserialize(Map<String, Object> args) {
+    public static PrticlNode deserialize(Map<String, Object> args) throws NullPointerException {
         return new PrticlNode(
                 (int) args.get(NODE_PARAM_ID),
                 (String) args.get(NODE_PARAM_NAME),
@@ -138,6 +139,25 @@ public class PrticlNode implements ConfigurationSerializable {
                 Particle.valueOf((String) args.get(NODE_PARAM_PARTICLE_TYPE)),
                 (Location) args.get(NODE_PARAM_LOCATION),
                 (String) args.get(NODE_PARAM_OWNER)
+        );
+    }
+
+    /**
+     * Creates a Prticl node from the config.
+     *
+     * @param arg The node in the config
+     * @return The deserialized Prticl node.
+     */
+    public static PrticlNode deserialize(Map.Entry<String, Object> arg) throws NullPointerException {
+        MemorySection node = (MemorySection) arg.getValue();
+        return new PrticlNode(
+                (int) node.get(NODE_PARAM_ID),
+                (String) node.get(NODE_PARAM_NAME),
+                (int) node.get(NODE_PARAM_REPEAT_DELAY),
+                (int) node.get(NODE_PARAM_PARTICLE_DENSITY),
+                Particle.valueOf((String) node.get(NODE_PARAM_PARTICLE_TYPE)),
+                (Location) node.get(NODE_PARAM_LOCATION),
+                (String) node.get(NODE_PARAM_OWNER)
         );
     }
 }

@@ -34,20 +34,21 @@ public class PrticlLineCommand extends PrticlCommand {
         if (allLineInputsAvailable(args)) {
             World world = ((Player) sender).getWorld();
             Player player = (Player) sender;
+
             try {
                 line.setLoc1(
-                        getExactOrRelativeX(args[1], player),
-                        getExactOrRelativeY(args[2], player),
-                        getExactOrRelativeZ(args[3], player),
+                        getExactOrRelativeX(args[0], player),
+                        getExactOrRelativeY(args[1], player),
+                        getExactOrRelativeZ(args[2], player),
                         world
                 );
                 line.setLoc2(
-                        getExactOrRelativeX(args[4], player),
-                        getExactOrRelativeY(args[5], player),
-                        getExactOrRelativeZ(args[6], player),
+                        getExactOrRelativeX(args[3], player),
+                        getExactOrRelativeY(args[4], player),
+                        getExactOrRelativeZ(args[5], player),
                         world
                 );
-                if (args.length == 8) line.setDensity(Double.parseDouble(args[7]));
+                if (args.length == 7) line.setDensity(Double.parseDouble(args[6]));
             } catch (NumberFormatException e) {
                 sender.sendMessage(prticlMessage.error(INCORRECT_COORDINATES_INPUT));
                 return true;

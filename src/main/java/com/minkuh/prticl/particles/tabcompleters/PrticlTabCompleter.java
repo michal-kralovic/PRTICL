@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 
+// TODO: Investigate ditching a common class, instead separate TabCompleter into each class using TabExecutor
 public class PrticlTabCompleter implements TabCompleter {
 
     List<String> particleCommandList = new ArrayList<>();
@@ -29,12 +30,18 @@ public class PrticlTabCompleter implements TabCompleter {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player && label.equalsIgnoreCase(PrticlCommand.getCommandName())) {
             if (args.length == 1) {
+                marker.clear();
+                marker.add("node");
+                return marker;
+            }
+
+            if (args.length == 2) {
                 particleCommandList.clear();
-                return sortedCommands(args[0]);
+                return sortedCommands(args[1]);
             }
 
             // TODO: Manage to figure out how to overcome constants restriction here, to eliminate magic strings
-            return switch (args[0].toLowerCase(Locale.ROOT)) {
+            return switch (args[1].toLowerCase(Locale.ROOT)) {
                 case ("spawn") -> spawnLogic(marker, args);
                 case ("line") -> lineLogic(marker, args);
                 case ("create") -> createLogic(marker, args);
@@ -48,7 +55,7 @@ public class PrticlTabCompleter implements TabCompleter {
     private static List<String> spawnLogic(List<String> marker, String[] args) {
         if (args.length == 2) {
             marker.clear();
-            marker.add(NODE_PARAM_ID);
+            marker.add(NODE_PARAM_ID + "/" + NODE_PARAM_NAME);
             return marker;
         }
         return Collections.emptyList();
@@ -56,31 +63,31 @@ public class PrticlTabCompleter implements TabCompleter {
 
     private static List<String> lineLogic(List<String> marker, String[] args) {
         return switch (args.length) {
-            case 2 -> {
+            case 3 -> {
                 marker.clear();
                 yield marker(marker, "x");
             }
-            case 3 -> {
+            case 4 -> {
                 marker.clear();
                 yield marker(marker, "y");
             }
-            case 4 -> {
+            case 5 -> {
                 marker.clear();
                 yield marker(marker, "z");
             }
-            case 5 -> {
+            case 6 -> {
                 marker.clear();
                 yield marker(marker, "x2");
             }
-            case 6 -> {
+            case 7 -> {
                 marker.clear();
                 yield marker(marker, "y2");
             }
-            case 7 -> {
+            case 8 -> {
                 marker.clear();
                 yield marker(marker, "z2");
             }
-            case 8 -> {
+            case 9 -> {
                 marker.clear();
                 yield marker(marker, NODE_PARAM_PARTICLE_DENSITY);
             }
@@ -90,28 +97,28 @@ public class PrticlTabCompleter implements TabCompleter {
 
     private static List<String> createLogic(List<String> marker, String[] args) {
         return switch (args.length) {
-            case 2 -> {
+            case 3 -> {
                 marker.clear();
                 yield marker(marker, NODE_PARAM_NAME);
             }
-            case 3 -> sortedParticles(args[2]);
-            case 4 -> {
+            case 4 -> sortedParticles(args[3]);
+            case 5 -> {
                 marker.clear();
                 yield marker(marker, NODE_PARAM_REPEAT_DELAY);
             }
-            case 5 -> {
+            case 6 -> {
                 marker.clear();
                 yield marker(marker, NODE_PARAM_PARTICLE_DENSITY);
             }
-            case 6 -> {
+            case 7 -> {
                 marker.clear();
                 yield marker(marker, "x y z");
             }
-            case 7 -> {
+            case 8 -> {
                 marker.clear();
                 yield marker(marker, "y z");
             }
-            case 8 -> {
+            case 9 -> {
                 marker.clear();
                 yield marker(marker, "z");
             }
