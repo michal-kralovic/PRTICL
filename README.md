@@ -1,3 +1,3 @@
-# PRTICL ✨ A smart particle system for Minecraft
+# PRTICL 🎉 A smart particle system for Minecraft
 
 ## WIP
