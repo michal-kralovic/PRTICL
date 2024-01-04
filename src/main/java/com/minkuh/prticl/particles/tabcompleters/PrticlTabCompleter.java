@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 
@@ -57,15 +56,22 @@ public class PrticlTabCompleter implements TabCompleter {
         return Collections.emptyList();
     }
 
+    /**
+     * Returns a List of Strings, a list of relevant parameters for the line command.
+     *
+     * @param marker utility marker input
+     * @param args   the user's input to base the output on
+     * @return A list of relevant tab completions.
+     */
     private static List<String> lineLogic(List<String> marker, String[] args) {
         return switch (args.length) {
             case 3 -> {
                 marker.clear();
-                yield marker(marker, "x");
+                yield marker(marker, "x y z");
             }
             case 4 -> {
                 marker.clear();
-                yield marker(marker, "y");
+                yield marker(marker, "y z");
             }
             case 5 -> {
                 marker.clear();
@@ -73,11 +79,11 @@ public class PrticlTabCompleter implements TabCompleter {
             }
             case 6 -> {
                 marker.clear();
-                yield marker(marker, "x2");
+                yield marker(marker, "x2 y2 z2");
             }
             case 7 -> {
                 marker.clear();
-                yield marker(marker, "y2");
+                yield marker(marker, "y2 z2");
             }
             case 8 -> {
                 marker.clear();
@@ -91,6 +97,13 @@ public class PrticlTabCompleter implements TabCompleter {
         };
     }
 
+    /**
+     * Returns a List of Strings, a list of relevant parameters for the create command.
+     *
+     * @param marker utility marker input
+     * @param args   the user's input to base the output on
+     * @return A list of relevant tab completions.
+     */
     private static List<String> createLogic(List<String> marker, String[] args) {
         return switch (args.length) {
             case 3 -> {
@@ -122,6 +135,13 @@ public class PrticlTabCompleter implements TabCompleter {
         };
     }
 
+    /**
+     * Returns a List of Strings, a list of relevant parameters for the list command.
+     *
+     * @param marker utility marker input
+     * @param args   the user's input to base the output on
+     * @return A list of relevant tab completions.
+     */
     private static List<String> listLogic(List<String> marker, String[] args) {
         if (args.length == 2) {
             marker.clear();
@@ -131,6 +151,14 @@ public class PrticlTabCompleter implements TabCompleter {
         return Collections.emptyList();
     }
 
+    /**
+     * Returns a List of Strings, a list of sorted Minecraft particles taken from the Particle enum class. <br>
+     * Prefixes every particle with "minecraft:" for vanilla MC /particle command parity, but it doesn't support
+     * modded namespaces.
+     *
+     * @param arg the user's input to base the output on (dynamically alters the list to only show relevant particles)
+     * @return A list of all/relevant particles.
+     */
     public static List<String> sortedParticles(String arg) {
         final List<String> completions = new ArrayList<>();
 
@@ -145,8 +173,13 @@ public class PrticlTabCompleter implements TabCompleter {
         return particleList;
     }
 
-
-    public List<String> sortedCommands(String arg) {
+    /**
+     * Returns a List of Strings, a list of sorted PRTICL command names to autocomplete the subcommand parameter.
+     *
+     * @param arg the user's input to base the output on (dynamically alters the list to only show relevant sub-commands)
+     * @return A list of all/relevant sub-commands.
+     */
+    private List<String> sortedCommands(String arg) {
         final List<String> commands = new ArrayList<>();
         commands.add(PrticlSpawnCommand.getCommandName());
         commands.add(PrticlLineCommand.getCommandName());
@@ -163,6 +196,13 @@ public class PrticlTabCompleter implements TabCompleter {
         return particleCommandList;
     }
 
+    /**
+     * A quick utility List of Strings, a marker to simply put a single value into with some operations for QoL-filled code-writing.
+     *
+     * @param marker    utility marker input
+     * @param strMarker what text the marker should contain/display
+     * @return A list with a single value—the chosen input string.
+     */
     private static List<String> marker(List<String> marker, String strMarker) {
         marker.clear();
         marker.add(strMarker);

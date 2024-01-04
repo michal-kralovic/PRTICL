@@ -11,6 +11,8 @@ import org.bukkit.plugin.Plugin;
 import java.util.Arrays;
 import java.util.Locale;
 
+import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
+
 /**
  * A utility class for executing Commands.
  */
@@ -34,21 +36,18 @@ public class CommandsUtil {
      */
     public boolean commandSwitcher(Command command, CommandSender sender, String[] args) {
         switch (command.getName().toLowerCase(Locale.ROOT)) {
-            case "prticl": {
-                if (args[0].equalsIgnoreCase("node")) {
+            case PRTICL_COMMAND -> {
+                if (args[0].equalsIgnoreCase(NODE_DEFAULT_NAME)) {
                     String[] commandArgs = Arrays.stream(args).skip(2).toArray(String[]::new);
 
-                    if (args[1].equalsIgnoreCase(PrticlSpawnCommand.getCommandName()))
-                        return spawnParticleCommand.command(commandArgs, sender);
-                    if (args[1].equalsIgnoreCase(PrticlLineCommand.getCommandName()))
-                        return lineCommand.command(commandArgs, sender);
-                    if (args[1].equalsIgnoreCase(PrticlCreateCommand.getCommandName()))
-                        return createCommand.command(commandArgs, sender);
-                    if (args[1].equalsIgnoreCase(PrticlListCommand.getCommandName()))
-                        return listCommand.command(commandArgs, sender);
+                    switch (args[1].toLowerCase(Locale.ROOT)) {
+                        case SPAWN_COMMAND -> spawnParticleCommand.command(commandArgs, sender);
+                        case LINE_COMMAND -> lineCommand.command(commandArgs, sender);
+                        case CREATE_COMMAND -> createCommand.command(commandArgs, sender);
+                        case LIST_COMMAND -> listCommand.command(commandArgs, sender);
+                    }
                 }
             }
-            break;
         }
         return false;
     }

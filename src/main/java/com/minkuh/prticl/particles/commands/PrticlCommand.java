@@ -20,6 +20,7 @@ public abstract class PrticlCommand {
 
     /**
      * A utility method to handle non-Player command triggers.
+     *
      * @param sender The current sender of the command
      * @return TRUE if sent by the player.
      */
@@ -34,7 +35,8 @@ public abstract class PrticlCommand {
 
     /**
      * The command to be run.
-     * @param args The arguments of the Command
+     *
+     * @param args   The arguments of the Command
      * @param sender The Command sender (usually a Player)
      * @return TRUE if handled.
      */

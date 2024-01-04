@@ -55,7 +55,7 @@ public class PrticlStrings {
     public static final String EMPTY_NODE_NAME = "Prticl node name can't be empty!";
     public static final String NODE_NAME_TOO_LONG = "Prticl node name can't be longer than 50 characters!";
     public static final String NODE_NAME_UNAVAILABLE = "This name isn't available!";
-    public static final String INCORRECT_NODE_ID = "Incorrect node ID format! (expected a valid integer number)";
+    public static final String INCORRECT_NODE_ID_FORMAT = "Incorrect node ID format! (expected a valid integer number)";
 
     //
     // System messages

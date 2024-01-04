@@ -13,10 +13,13 @@ import java.util.Map;
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 
 /**
- * Prticl list command.
- * <br>Displays every single node stored in the config file (limited to the ones made by the calling player if met with insufficient permissions).
+ * Prticl list command.<br>
+ * Displays every single node stored in the config file
+ * (limited to the ones made by the calling player if met with insufficient permissions).<br><br>
+ * This command can be run via the console as well.
  */
 public class PrticlListCommand extends PrticlCommand {
+    private static final BaseMessageComponents prticlMessage = new BaseMessageComponents();
     private static Plugin plugin;
     private static PrticlNodeConfigUtil configUtil;
 
@@ -31,14 +34,21 @@ public class PrticlListCommand extends PrticlCommand {
             return true;
 
         if (args.length == 0 || args.length == 1)
-            return sender.isOp() ? adminListLogic(args, sender) : playerListLogic(args, sender);
+            return sender.isOp() ? listAllNodes(args, sender) : listPlayerOwnedNodes(args, sender);
 
         sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
         return true;
     }
 
-    private static boolean adminListLogic(String[] args, CommandSender sender) {
-        BaseMessageComponents prticlMessage = new BaseMessageComponents();
+    /**
+     * A utility logic method that collects every single node from the config and passes it to the method that
+     * lists these nodes out.
+     *
+     * @param args   Player input to pass to the listing method
+     * @param sender The sender of the command
+     * @return TRUE if succeeded.
+     */
+    private static boolean listAllNodes(String[] args, CommandSender sender) {
         Map<String, Object> allNodes = configUtil.getConfigNodes();
         if (allNodes.isEmpty()) {
             sender.sendMessage(prticlMessage.system("No nodes found."));
@@ -61,8 +71,15 @@ public class PrticlListCommand extends PrticlCommand {
         return mainListLogic(listOfListableNodeData, args, sender);
     }
 
-    private static boolean playerListLogic(String[] args, CommandSender sender) {
-        BaseMessageComponents prticlMessage = new BaseMessageComponents();
+    /**
+     * A utility logic method that collects nodes from the config that are owned by the sender player
+     * and passes it to the method that lists these nodes out.
+     *
+     * @param args   Player input to pass to the listing method
+     * @param sender The sender of the command
+     * @return TRUE if succeeded.
+     */
+    private static boolean listPlayerOwnedNodes(String[] args, CommandSender sender) {
         Map<String, Object> allNodes = configUtil.getConfigNodes();
         if (allNodes.isEmpty()) {
             sender.sendMessage(prticlMessage.system("No nodes found."));
@@ -86,8 +103,15 @@ public class PrticlListCommand extends PrticlCommand {
         return mainListLogic(listOfListableNodeData, args, sender);
     }
 
+    /**
+     * The main utility logic method that lists all the nodes out.
+     *
+     * @param listOfListableNodeData The collected nodes from a previous util method
+     * @param args                   Player input
+     * @param sender                 The sender of the command
+     * @return TRUE if succeeded.
+     */
     private static boolean mainListLogic(List<String[]> listOfListableNodeData, String[] args, CommandSender sender) {
-        BaseMessageComponents prticlMessage = new BaseMessageComponents();
         int visibleNodeAmount = listOfListableNodeData.size();
         int pageAmount = listOfListableNodeData.size() / 10;
 
@@ -95,19 +119,20 @@ public class PrticlListCommand extends PrticlCommand {
             pageAmount++;
         }
 
-        if (args.length == 0) {
+        if (args.length == 0) { // show the first page if no page number arg present
             int maxNode = Math.min(10, visibleNodeAmount);
             sender.sendMessage(prticlMessage.list(listOfListableNodeData.subList(0, maxNode), 1, pageAmount, visibleNodeAmount));
         } else {
             try {
                 int pageNumber = Integer.parseInt(args[0]);
-                if (pageNumber > pageAmount || pageNumber <= 0) {
-                    sender.sendMessage(prticlMessage.error("Invalid page number! (1 to " + pageAmount + ")"));
+                if (pageNumber <= pageAmount && pageNumber > 0) {
+                    int maxNode = Math.min(pageNumber * 10, visibleNodeAmount);
+                    sender.sendMessage(prticlMessage.list(listOfListableNodeData.subList(((pageNumber * 10) - 10), maxNode), pageNumber, pageAmount, visibleNodeAmount));
+                } else {
+                    int noPagesOrFirstPage = pageAmount == 0 ? 0 : 1;
+                    sender.sendMessage(prticlMessage.error("Invalid page number! (" + noPagesOrFirstPage + " to " + pageAmount + ")"));
                     return true;
                 }
-
-                int maxNode = Math.min(pageNumber * 10, visibleNodeAmount);
-                sender.sendMessage(prticlMessage.list(listOfListableNodeData.subList(((pageNumber * 10) - 10), maxNode), pageNumber, pageAmount, visibleNodeAmount));
             } catch (NumberFormatException e) {
                 sender.sendMessage(prticlMessage.error(INCORRECT_PAGE_INPUT));
             }

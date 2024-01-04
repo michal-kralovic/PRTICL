@@ -153,7 +153,11 @@ public class PrticlCreateCommand extends PrticlCommand {
      * @return TRUE if exists.
      */
     private static boolean nameExistsInConfig(String arg) {
-        return configUtil.getConfigNodesList().stream().anyMatch(node -> node.getName().toLowerCase(Locale.ROOT).equals(arg.toLowerCase(Locale.ROOT)));
+        return configUtil.getConfigNodesList()
+                .stream()
+                .anyMatch(
+                        node -> node.getName().toLowerCase(Locale.ROOT).equals(arg.toLowerCase(Locale.ROOT))
+                );
     }
 
     public static String getCommandName() {

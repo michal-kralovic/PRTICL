@@ -38,7 +38,7 @@ public class PrticlSpawnCommand extends PrticlCommand {
                 sender.sendMessage(prticlMessage.error(NODE_WITH_ARGUMENT_NOT_FOUND));
                 return true;
             } catch (NumberFormatException e) {
-                sender.sendMessage(prticlMessage.error(INCORRECT_NODE_ID));
+                sender.sendMessage(prticlMessage.error(INCORRECT_NODE_ID_FORMAT));
                 return true;
             } catch (Exception e) {
                 sender.sendMessage(prticlMessage.error(e.getMessage()));
