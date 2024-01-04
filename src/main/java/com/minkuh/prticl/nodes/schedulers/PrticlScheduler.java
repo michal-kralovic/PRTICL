@@ -1,6 +1,6 @@
-package com.minkuh.prticl.particles.schedulers;
+package com.minkuh.prticl.nodes.schedulers;
 
-import com.minkuh.prticl.particles.prticl.PrticlNode;
+import com.minkuh.prticl.nodes.prticl.PrticlNode;
 import org.bukkit.World;
 
 public class PrticlScheduler implements Runnable {

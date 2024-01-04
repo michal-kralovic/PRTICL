@@ -1,7 +1,7 @@
-package com.minkuh.prticl.particles.commands;
+package com.minkuh.prticl.nodes.commands;
 
-import com.minkuh.prticl.particles.prticl.PrticlNode;
-import com.minkuh.prticl.particles.schedulers.PrticlScheduler;
+import com.minkuh.prticl.nodes.prticl.PrticlNode;
+import com.minkuh.prticl.nodes.schedulers.PrticlScheduler;
 import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import com.minkuh.prticl.systemutil.exceptions.NodeNotFoundException;
 import org.bukkit.Bukkit;

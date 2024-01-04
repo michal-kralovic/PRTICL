@@ -1,4 +1,4 @@
-package com.minkuh.prticl.particles.schedulers;
+package com.minkuh.prticl.nodes.schedulers;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;

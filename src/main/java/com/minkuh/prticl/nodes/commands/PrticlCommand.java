@@ -1,4 +1,4 @@
-package com.minkuh.prticl.particles.commands;
+package com.minkuh.prticl.nodes.commands;
 
 import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
 import org.bukkit.command.CommandSender;

@@ -1,7 +1,7 @@
-package com.minkuh.prticl.particles.commands;
+package com.minkuh.prticl.nodes.commands;
 
-import com.minkuh.prticl.particles.prticl.PrticlLine;
-import com.minkuh.prticl.particles.schedulers.PrticlLineScheduler;
+import com.minkuh.prticl.nodes.prticl.PrticlLine;
+import com.minkuh.prticl.nodes.schedulers.PrticlLineScheduler;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

@@ -1,4 +1,4 @@
-package com.minkuh.prticl.particles.prticl;
+package com.minkuh.prticl.nodes.prticl;
 
 import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import org.bukkit.Location;

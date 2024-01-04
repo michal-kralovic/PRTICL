@@ -1,9 +1,10 @@
-package com.minkuh.prticl.particles.commands;
+package com.minkuh.prticl.nodes.commands;
 
-import com.minkuh.prticl.particles.prticl.PrticlNode;
-import com.minkuh.prticl.particles.prticl.PrticlNodeBuilder;
+import com.minkuh.prticl.nodes.prticl.PrticlNode;
+import com.minkuh.prticl.nodes.prticl.PrticlNodeBuilder;
 import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
+import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,6 +25,7 @@ public class PrticlCreateCommand extends PrticlCommand {
     private FileConfiguration config;
     private PrticlNodeBuilder builder;
     private static PrticlNodeConfigUtil configUtil;
+    BaseMessageComponents prticlMessage = new BaseMessageComponents();
 
     public PrticlCreateCommand(Plugin plugin) {
         this.plugin = plugin;
@@ -38,29 +40,29 @@ public class PrticlCreateCommand extends PrticlCommand {
             if (nodeNameValidation(args[0], sender))
                 return true;
 
-            switch (args.length) {
-                // Node name
-                case 1 -> {
-                    PrticlNode node = builder.setName(args[0])
-                            .setCreatedBy(sender.getName()).build();
+            try {
+                switch (args.length) {
+                    // Node name
+                    case 1 -> {
+                        PrticlNode node = builder.setName(args[0])
+                                .setCreatedBy(sender.getName()).build();
 
-                    if (!configUtil.saveNodeToConfig(config, node))
-                        sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
-                    sender.sendMessage(prticlMessage.player(CREATED_NODE));
-                }
-                // Node particle type
-                case 2 -> {
-                    PrticlNode node = builder.setName(args[0])
-                            .setParticleType(Particle.valueOf(supportedParticleTypeString(args[1])))
-                            .setCreatedBy(sender.getName()).build();
+                        if (!configUtil.saveNodeToConfig(config, node))
+                            sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
+                        sender.sendMessage(prticlMessage.player(CREATED_NODE));
+                    }
+                    // Node particle type
+                    case 2 -> {
+                        PrticlNode node = builder.setName(args[0])
+                                .setParticleType(Particle.valueOf(supportedParticleTypeString(args[1])))
+                                .setCreatedBy(sender.getName()).build();
 
-                    if (!configUtil.saveNodeToConfig(config, node))
-                        sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
-                    sender.sendMessage(prticlMessage.player(CREATED_NODE));
-                }
-                // Node repeat delay
-                case 3 -> {
-                    try {
+                        if (!configUtil.saveNodeToConfig(config, node))
+                            sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
+                        sender.sendMessage(prticlMessage.player(CREATED_NODE));
+                    }
+                    // Node repeat delay
+                    case 3 -> {
                         PrticlNode node = builder.setName(args[0])
                                 .setParticleType(Particle.valueOf(supportedParticleTypeString(args[1])))
                                 .setRepeatDelay(Integer.parseInt(args[2]))
@@ -68,15 +70,10 @@ public class PrticlCreateCommand extends PrticlCommand {
 
                         if (!configUtil.saveNodeToConfig(config, node))
                             sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
-                    } catch (NumberFormatException e) {
-                        sender.sendMessage(prticlMessage.error("Incorrect repeat delay format! (expected a valid integer number (ticks))"));
-                        return true;
+                        sender.sendMessage(prticlMessage.player(CREATED_NODE));
                     }
-                    sender.sendMessage(prticlMessage.player(CREATED_NODE));
-                }
-                // Node particle density
-                case 4 -> {
-                    try {
+                    // Node particle density
+                    case 4 -> {
                         PrticlNode node = builder.setName(args[0])
                                 .setParticleType(Particle.valueOf(supportedParticleTypeString(args[1])))
                                 .setRepeatDelay(Integer.parseInt(args[2]))
@@ -87,14 +84,16 @@ public class PrticlCreateCommand extends PrticlCommand {
                             sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
                         if (Integer.parseInt(args[3]) > 25)
                             sender.sendMessage(prticlMessage.warning(HIGH_PARTICLE_DENSITY));
-                    } catch (NumberFormatException e) {
-                        sender.sendMessage(prticlMessage.error("Incorrect particle density format! (expected a valid integer number)"));
-                        return true;
+                        sender.sendMessage(prticlMessage.player(CREATED_NODE));
                     }
-                    sender.sendMessage(prticlMessage.player(CREATED_NODE));
+                    default -> sender.sendMessage(prticlMessage.error("Unexpected error!"));
                 }
-                default -> sender.sendMessage(prticlMessage.error("Unexpected error!"));
+            } catch (NumberFormatException e) {
+                sender.sendMessage(prticlMessage.error(INCORRECT_NUMBER_INPUT_FORMAT));
+            } catch (Exception e) {
+                sender.sendMessage(prticlMessage.error(e.getMessage()));
             }
+
             return true;
         }
         sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
@@ -112,36 +111,47 @@ public class PrticlCreateCommand extends PrticlCommand {
      * @param sender The sender that sent the command
      * @return TRUE if handled.
      */
-    private static boolean nodeNameValidation(String arg, CommandSender sender) {
-        BaseMessageComponents messageComponents1 = new BaseMessageComponents();
+    private boolean nodeNameValidation(String arg, CommandSender sender) {
         boolean result = false;
 
         if (arg.equalsIgnoreCase("id:")) {
-            sender.sendMessage(messageComponents1.error(NODE_NAME_UNAVAILABLE));
+            sender.sendMessage(prticlMessage.error(NODE_NAME_UNAVAILABLE));
             result = true;
         }
         if (arg.length() > 50) {
-            sender.sendMessage(messageComponents1.error(NODE_NAME_TOO_LONG));
+            sender.sendMessage(prticlMessage.error(NODE_NAME_TOO_LONG));
             result = true;
         }
         if (nameExistsInConfig(arg)) {
-            sender.sendMessage(messageComponents1.error(DUPLICATE_NODE_NAME));
+            sender.sendMessage(prticlMessage.error(DUPLICATE_NODE_NAME));
             result = true;
         }
         if (arg.isBlank()) {
-            sender.sendMessage(messageComponents1.error(EMPTY_NODE_NAME));
+            sender.sendMessage(prticlMessage.error(EMPTY_NODE_NAME));
             result = true;
         }
 
         return result;
     }
 
-    private static String supportedParticleTypeString(String arg) {
+    /**
+     * A utility method to convert the input particle argument into one the code can work with.<br><br>
+     * E.g.:<br>
+     * - input: "minecraft:cloud", "cLoUd"<br>
+     * - output (of this method): "CLOUD", "CLOUD"
+     *
+     * @param arg The input particle from the Player
+     * @return The Particle as a support String.
+     */
+    private String supportedParticleTypeString(String arg) throws IllegalArgumentException {
         String[] particleWithNamespace;
         if (arg.contains(":")) {
             particleWithNamespace = arg.split(":");
             arg = particleWithNamespace[1];
         }
+
+        if(!EnumUtils.isValidEnum(Particle.class, arg))
+            throw new IllegalArgumentException("The " + Particle.class.getName() + " enum doesn't contain the input particle \"" + arg + "\"");
 
         return arg.toUpperCase(Locale.ROOT);
     }
@@ -152,7 +162,7 @@ public class PrticlCreateCommand extends PrticlCommand {
      * @param arg The name to check for in the list of existing nodes
      * @return TRUE if exists.
      */
-    private static boolean nameExistsInConfig(String arg) {
+    private boolean nameExistsInConfig(String arg) {
         return configUtil.getConfigNodesList()
                 .stream()
                 .anyMatch(

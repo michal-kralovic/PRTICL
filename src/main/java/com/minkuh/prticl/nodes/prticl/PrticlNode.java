@@ -1,4 +1,4 @@
-package com.minkuh.prticl.particles.prticl;
+package com.minkuh.prticl.nodes.prticl;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;

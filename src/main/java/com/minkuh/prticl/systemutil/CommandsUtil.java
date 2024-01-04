@@ -1,9 +1,9 @@
 package com.minkuh.prticl.systemutil;
 
-import com.minkuh.prticl.particles.commands.PrticlCreateCommand;
-import com.minkuh.prticl.particles.commands.PrticlLineCommand;
-import com.minkuh.prticl.particles.commands.PrticlListCommand;
-import com.minkuh.prticl.particles.commands.PrticlSpawnCommand;
+import com.minkuh.prticl.nodes.commands.PrticlCreateCommand;
+import com.minkuh.prticl.nodes.commands.PrticlLineCommand;
+import com.minkuh.prticl.nodes.commands.PrticlListCommand;
+import com.minkuh.prticl.nodes.commands.PrticlSpawnCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -17,13 +17,13 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
  * A utility class for executing Commands.
  */
 public class CommandsUtil {
-    PrticlSpawnCommand spawnParticleCommand;
+    PrticlSpawnCommand spawnCommand;
     PrticlLineCommand lineCommand;
     PrticlCreateCommand createCommand;
     PrticlListCommand listCommand;
 
     public CommandsUtil(Plugin plugin) {
-        spawnParticleCommand = new PrticlSpawnCommand(plugin);
+        spawnCommand = new PrticlSpawnCommand(plugin);
         lineCommand = new PrticlLineCommand(plugin);
         createCommand = new PrticlCreateCommand(plugin);
         listCommand = new PrticlListCommand(plugin);
@@ -41,7 +41,7 @@ public class CommandsUtil {
                     String[] commandArgs = Arrays.stream(args).skip(2).toArray(String[]::new);
 
                     switch (args[1].toLowerCase(Locale.ROOT)) {
-                        case SPAWN_COMMAND -> spawnParticleCommand.command(commandArgs, sender);
+                        case SPAWN_COMMAND -> spawnCommand.command(commandArgs, sender);
                         case LINE_COMMAND -> lineCommand.command(commandArgs, sender);
                         case CREATE_COMMAND -> createCommand.command(commandArgs, sender);
                         case LIST_COMMAND -> listCommand.command(commandArgs, sender);

@@ -1,9 +1,9 @@
 package com.minkuh.prticl;
 
 import com.minkuh.prticl.eventlisteners.RightClickEventListener;
-import com.minkuh.prticl.particles.commands.PrticlCommand;
-import com.minkuh.prticl.particles.prticl.PrticlNode;
-import com.minkuh.prticl.particles.tabcompleters.PrticlTabCompleter;
+import com.minkuh.prticl.nodes.commands.PrticlCommand;
+import com.minkuh.prticl.nodes.prticl.PrticlNode;
+import com.minkuh.prticl.nodes.tabcompleters.PrticlTabCompleter;
 import com.minkuh.prticl.systemutil.CommandsUtil;
 import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import org.bukkit.command.Command;

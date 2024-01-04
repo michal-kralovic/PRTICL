@@ -1,6 +1,6 @@
 package com.minkuh.prticl.systemutil.configuration;
 
-import com.minkuh.prticl.particles.prticl.PrticlNode;
+import com.minkuh.prticl.nodes.prticl.PrticlNode;
 import com.minkuh.prticl.systemutil.exceptions.NodeNotFoundException;
 import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
 import org.bukkit.command.CommandSender;
@@ -11,7 +11,7 @@ import org.bukkit.plugin.Plugin;
 import java.io.IOException;
 import java.util.*;
 
-import static com.minkuh.prticl.particles.prticl.PrticlNode.deserialize;
+import static com.minkuh.prticl.nodes.prticl.PrticlNode.deserialize;
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 
 /**
