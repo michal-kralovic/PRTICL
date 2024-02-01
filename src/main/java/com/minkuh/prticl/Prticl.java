@@ -4,7 +4,7 @@ import com.minkuh.prticl.eventlisteners.RightClickEventListener;
 import com.minkuh.prticl.nodes.commands.PrticlCommand;
 import com.minkuh.prticl.nodes.prticl.PrticlNode;
 import com.minkuh.prticl.nodes.tabcompleters.PrticlTabCompleter;
-import com.minkuh.prticl.systemutil.CommandsUtil;
+import com.minkuh.prticl.systemutil.PrticlCommandsUtil;
 import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,7 +18,7 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.NODE_CONFIGUR
  * PRTICL 🎉
  */
 public final class Prticl extends JavaPlugin {
-    private final CommandsUtil cmdUtil = new CommandsUtil(this);
+    private final PrticlCommandsUtil cmdUtil = new PrticlCommandsUtil(this);
     private PrticlNodeConfigUtil configUtil = new PrticlNodeConfigUtil(this);
 
     @Override

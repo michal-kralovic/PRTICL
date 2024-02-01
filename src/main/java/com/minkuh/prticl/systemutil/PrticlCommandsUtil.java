@@ -16,13 +16,13 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 /**
  * A utility class for executing Commands.
  */
-public class CommandsUtil {
+public class PrticlCommandsUtil {
     PrticlSpawnCommand spawnCommand;
     PrticlLineCommand lineCommand;
     PrticlCreateCommand createCommand;
     PrticlListCommand listCommand;
 
-    public CommandsUtil(Plugin plugin) {
+    public PrticlCommandsUtil(Plugin plugin) {
         spawnCommand = new PrticlSpawnCommand(plugin);
         lineCommand = new PrticlLineCommand(plugin);
         createCommand = new PrticlCreateCommand(plugin);

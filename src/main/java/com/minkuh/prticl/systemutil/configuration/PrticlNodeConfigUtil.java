@@ -8,8 +8,12 @@ import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.minkuh.prticl.nodes.prticl.PrticlNode.deserialize;
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
@@ -34,8 +38,7 @@ public class PrticlNodeConfigUtil {
     public boolean saveNodeToConfig(FileConfiguration config, PrticlNode node) {
         config.set(NODE_CONFIGURATION_SECTION + "." + NODE_CHILD + "-" + node.getId(), node.serialize());
         try {
-            config.save("plugins/Prticl/config.yml");
-            // plugin.saveConfig();
+            config.save("plugins" + File.separator + "Prticl" + File.separator + "config.yml");
         } catch (IOException e) {
             return false;
         }
@@ -57,12 +60,10 @@ public class PrticlNodeConfigUtil {
      * @throws NullPointerException if config can't be found
      */
     public Map<String, Object> getConfigNodes() throws NullPointerException {
-        Map<String, Object> nodes;
-        nodes = plugin.getConfig().getConfigurationSection(NODE_CONFIGURATION_SECTION).getValues(true);
-
-        nodes.entrySet().removeIf(entry -> !(entry.getValue() instanceof MemorySection));
-
-        return nodes;
+        return plugin.getConfig().getConfigurationSection(NODE_CONFIGURATION_SECTION)
+                .getValues(true).entrySet().stream()
+                .filter(entry -> entry.getValue() instanceof MemorySection)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /**
@@ -72,18 +73,12 @@ public class PrticlNodeConfigUtil {
      * @throws NullPointerException if config can't be found
      */
     public List<PrticlNode> getConfigNodesList() throws NullPointerException {
-        Map<String, Object> nodes;
-        nodes = plugin.getConfig().getConfigurationSection(NODE_CONFIGURATION_SECTION).getValues(true);
+        Map<String, Object> nodes = plugin.getConfig().getConfigurationSection(NODE_CONFIGURATION_SECTION).getValues(true);
 
-        nodes.entrySet().removeIf(entry -> !(entry.getValue() instanceof MemorySection));
-
-        List<PrticlNode> listOfNodes = new ArrayList<>();
-
-        for (Map.Entry<String, Object> entry : nodes.entrySet()) {
-            listOfNodes.add(deserialize(entry));
-        }
-
-        return listOfNodes;
+        return nodes.entrySet().stream()
+                .filter(entry -> entry.getValue() instanceof MemorySection)
+                .map(PrticlNode::deserialize)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -100,19 +95,9 @@ public class PrticlNodeConfigUtil {
             throw new NodeNotFoundException(NODE_NOT_FOUND);
         }
 
-        if (deserializedNode instanceof MemorySection) {
-            Map<String, Object> memorySectionDeserializedNode = new HashMap<>();
-            memorySectionDeserializedNode.put(NODE_PARAM_OWNER, ((MemorySection) deserializedNode).get(NODE_PARAM_OWNER));
-            memorySectionDeserializedNode.put(NODE_PARAM_PARTICLE_DENSITY, ((MemorySection) deserializedNode).get(NODE_PARAM_PARTICLE_DENSITY));
-            memorySectionDeserializedNode.put(NODE_PARAM_PARTICLE_TYPE, ((MemorySection) deserializedNode).get(NODE_PARAM_PARTICLE_TYPE));
-            memorySectionDeserializedNode.put(NODE_PARAM_REPEAT_DELAY, ((MemorySection) deserializedNode).get(NODE_PARAM_REPEAT_DELAY));
-            memorySectionDeserializedNode.put(NODE_PARAM_NAME, ((MemorySection) deserializedNode).get(NODE_PARAM_NAME));
-            memorySectionDeserializedNode.put(NODE_PARAM_ID, ((MemorySection) deserializedNode).get(NODE_PARAM_ID));
-
-            return deserialize(memorySectionDeserializedNode);
-        }
-
-        return deserialize((Map<String, Object>) deserializedNode);
+        return deserialize(deserializedNode instanceof MemorySection
+                ? extractMemorySection((MemorySection) deserializedNode)
+                : (Map<String, Object>) deserializedNode);
     }
 
     /**
@@ -123,13 +108,10 @@ public class PrticlNodeConfigUtil {
      * @throws NodeNotFoundException If the node can't be found in the config
      */
     public PrticlNode getNodeFromConfigByName(String name) throws NodeNotFoundException {
-        List<PrticlNode> listOfNodes = getConfigNodesList();
-        Optional<PrticlNode> result = listOfNodes.stream()
-                .filter(p -> p.getName().toLowerCase(Locale.ROOT).equals(name.toLowerCase(Locale.ROOT)))
-                .findFirst();
-        if (result.isEmpty())
-            throw new NodeNotFoundException(NODE_NOT_FOUND);
-        return result.get();
+        return getConfigNodesList().stream()
+                .filter(node -> node.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseThrow(() -> new NodeNotFoundException(NODE_NOT_FOUND));
     }
 
     /**
@@ -138,11 +120,7 @@ public class PrticlNodeConfigUtil {
      * @return TRUE if exists.
      */
     public boolean configNodeSectionExists() {
-        boolean result = true;
-        if (config.getConfigurationSection(NODE_CONFIGURATION_SECTION) == null) {
-            return false;
-        }
-        return result;
+        return config.getConfigurationSection(NODE_CONFIGURATION_SECTION) != null;
     }
 
     /**
@@ -154,11 +132,21 @@ public class PrticlNodeConfigUtil {
      */
     public boolean configNodeSectionExists(CommandSender sender) {
         BaseMessageComponents prticlMessage = new BaseMessageComponents();
-        boolean result = true;
         if (config.getConfigurationSection(NODE_CONFIGURATION_SECTION) == null) {
             sender.sendMessage(prticlMessage.error(CONFIG_SECTION_NOT_FOUND));
             return false;
         }
-        return result;
+        return true;
+    }
+
+    private Map<String, Object> extractMemorySection(MemorySection memorySection) {
+        Map<String, Object> memorySectionDeserializedNode = new HashMap<>();
+        memorySectionDeserializedNode.put(NODE_PARAM_OWNER, memorySection.get(NODE_PARAM_OWNER));
+        memorySectionDeserializedNode.put(NODE_PARAM_PARTICLE_DENSITY, memorySection.get(NODE_PARAM_PARTICLE_DENSITY));
+        memorySectionDeserializedNode.put(NODE_PARAM_PARTICLE_TYPE, memorySection.get(NODE_PARAM_PARTICLE_TYPE));
+        memorySectionDeserializedNode.put(NODE_PARAM_REPEAT_DELAY, memorySection.get(NODE_PARAM_REPEAT_DELAY));
+        memorySectionDeserializedNode.put(NODE_PARAM_NAME, memorySection.get(NODE_PARAM_NAME));
+        memorySectionDeserializedNode.put(NODE_PARAM_ID, memorySection.get(NODE_PARAM_ID));
+        return memorySectionDeserializedNode;
     }
 }
