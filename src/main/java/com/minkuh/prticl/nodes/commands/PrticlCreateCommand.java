@@ -82,7 +82,7 @@ public class PrticlCreateCommand extends PrticlCommand {
      * @return TRUE if handled.
      */
     private boolean isNodeNameCompatible(String arg, CommandSender sender) {
-        if (arg.equalsIgnoreCase("id:")) {
+        if (arg.toLowerCase(Locale.ROOT).startsWith("id:".toLowerCase(Locale.ROOT))) {
             sender.sendMessage(prticlMessage.error(NODE_NAME_UNAVAILABLE));
             return true;
         }

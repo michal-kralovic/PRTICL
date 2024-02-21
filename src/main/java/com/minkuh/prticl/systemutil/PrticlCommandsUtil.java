@@ -39,7 +39,8 @@ public class PrticlCommandsUtil {
         BaseMessageComponents prticlMessage = new BaseMessageComponents();
         switch (command.getName().toLowerCase(Locale.ROOT)) {
             case PRTICL_COMMAND -> {
-                if (args[0].equalsIgnoreCase(NODE_DEFAULT_NAME)) {
+                if (args.length > 1 && (args[0].equalsIgnoreCase(NODE_DEFAULT_NAME) ||
+                        args[0].equalsIgnoreCase(String.valueOf(NODE_DEFAULT_NAME.charAt(0))))) {
                     String[] commandArgs = Arrays.stream(args).skip(2).toArray(String[]::new);
 
                     switch (args[1].toLowerCase(Locale.ROOT)) {

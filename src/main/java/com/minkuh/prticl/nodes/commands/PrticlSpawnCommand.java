@@ -64,6 +64,6 @@ public class PrticlSpawnCommand extends PrticlCommand {
     }
 
     private static boolean isAnId(String arg) {
-        return (arg.startsWith("id:") || arg.startsWith("id") || arg.startsWith("i"));
+        return (arg.startsWith("id:"));
     }
 }
