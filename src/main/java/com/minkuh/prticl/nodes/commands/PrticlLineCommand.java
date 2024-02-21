@@ -1,5 +1,6 @@
 package com.minkuh.prticl.nodes.commands;
 
+import com.minkuh.prticl.data.PrticlLineCommandArguments;
 import com.minkuh.prticl.nodes.prticl.PrticlLine;
 import com.minkuh.prticl.nodes.schedulers.PrticlLineScheduler;
 import org.apache.commons.lang3.Validate;
@@ -10,6 +11,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 
@@ -18,7 +21,6 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
  * <br>TODO: Create logic for creation of particle lines from existing saved PrticlNodes.
  */
 public class PrticlLineCommand extends PrticlCommand {
-
     PrticlLine line = new PrticlLine();
     private final Plugin plugin;
 
@@ -35,20 +37,21 @@ public class PrticlLineCommand extends PrticlCommand {
             World world = ((Player) sender).getWorld();
             Player player = (Player) sender;
 
+            PrticlLineCommandArguments cmdArgsObject = turnIntoCommandArgumentsObject(args);
             try {
                 line.setLoc1(
-                        getExactOrRelativeX(args[0], player),
-                        getExactOrRelativeY(args[1], player),
-                        getExactOrRelativeZ(args[2], player),
+                        getExactOrRelativeX(cmdArgsObject.getX1(), player),
+                        getExactOrRelativeY(cmdArgsObject.getY1(), player),
+                        getExactOrRelativeZ(cmdArgsObject.getZ1(), player),
                         world
                 );
                 line.setLoc2(
-                        getExactOrRelativeX(args[3], player),
-                        getExactOrRelativeY(args[4], player),
-                        getExactOrRelativeZ(args[5], player),
+                        getExactOrRelativeX(cmdArgsObject.getX2(), player),
+                        getExactOrRelativeY(cmdArgsObject.getY2(), player),
+                        getExactOrRelativeZ(cmdArgsObject.getZ2(), player),
                         world
                 );
-                if (args.length == 7) line.setDensity(Double.parseDouble(args[6]));
+                if (cmdArgsObject.getParticleDensity() != null) line.setDensity(cmdArgsObject.getParticleDensity());
             } catch (NumberFormatException e) {
                 sender.sendMessage(prticlMessage.error(INCORRECT_COORDINATES_INPUT));
                 return true;
@@ -112,12 +115,9 @@ public class PrticlLineCommand extends PrticlCommand {
      * @param args The array of arguments to check
      * @return TRUE if all necessary args are present.
      */
+    @Contract(pure = true)
     private boolean allLineInputsAvailable(String[] args) {
-        int result = 0;
-        for (int i = 1; i <= args.length; i++) {
-            result++;
-        }
-        return result >= 7;
+        return args.length >= 7;
     }
 
     /**
@@ -126,6 +126,7 @@ public class PrticlLineCommand extends PrticlCommand {
      * @param arg The given coordinate
      * @return TRUE if the given argument is a relative coordinate.
      */
+    @Contract(pure = true)
     private boolean isRelative(String arg) {
         return arg.charAt(0) == '~';
     }
@@ -152,6 +153,12 @@ public class PrticlLineCommand extends PrticlCommand {
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new PrticlLineScheduler(length, distance, point1, vector, space), 0, 5);
     }
+
+    @Contract("_ -> new")
+    private static @NotNull PrticlLineCommandArguments turnIntoCommandArgumentsObject(String[] args) {
+        return new PrticlLineCommandArguments(args);
+    }
+
 
     public static String getCommandName() {
         return LINE_COMMAND;

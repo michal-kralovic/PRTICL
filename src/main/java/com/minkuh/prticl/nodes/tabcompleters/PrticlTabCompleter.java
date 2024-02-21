@@ -27,21 +27,20 @@ public class PrticlTabCompleter implements TabCompleter {
         if (sender instanceof Player && label.equalsIgnoreCase(PrticlCommand.getCommandName())) {
             if (args.length == 1) {
                 marker.clear();
-                marker.add("node");
+                marker.add(NODE_DEFAULT_NAME);
                 return marker;
             }
 
-            if (args.length == 2 && args[0].equals("node")) {
+            if (args.length == 2 && args[0].equals(NODE_DEFAULT_NAME)) {
                 particleCommandList.clear();
-                return sortedCommands(args[1]);
+                return getSortedCommands(args[1]);
             }
 
-            // TODO: Manage to figure out how to overcome constants restriction here, to eliminate magic strings
             return switch (args[1].toLowerCase(Locale.ROOT)) {
-                case ("spawn") -> spawnLogic(marker, args);
-                case ("line") -> lineLogic(marker, args);
-                case ("create") -> createLogic(marker, args);
-                case ("list") -> listLogic(marker, args);
+                case (SPAWN_COMMAND) -> spawnLogic(marker, args);
+                case (LINE_COMMAND) -> lineLogic(marker, args);
+                case (CREATE_COMMAND) -> createLogic(marker, args);
+                case (LIST_COMMAND) -> listLogic(marker, args);
                 default -> Collections.emptyList();
             };
         }
@@ -179,7 +178,7 @@ public class PrticlTabCompleter implements TabCompleter {
      * @param arg the user's input to base the output on (dynamically alters the list to only show relevant sub-commands)
      * @return A list of all/relevant sub-commands.
      */
-    private List<String> sortedCommands(String arg) {
+    private List<String> getSortedCommands(String arg) {
         final List<String> commands = new ArrayList<>();
         commands.add(PrticlSpawnCommand.getCommandName());
         commands.add(PrticlLineCommand.getCommandName());

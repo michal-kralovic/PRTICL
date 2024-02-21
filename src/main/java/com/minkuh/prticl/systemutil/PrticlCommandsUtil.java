@@ -4,6 +4,7 @@ import com.minkuh.prticl.nodes.commands.PrticlCreateCommand;
 import com.minkuh.prticl.nodes.commands.PrticlLineCommand;
 import com.minkuh.prticl.nodes.commands.PrticlListCommand;
 import com.minkuh.prticl.nodes.commands.PrticlSpawnCommand;
+import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -35,6 +36,7 @@ public class PrticlCommandsUtil {
      * @return TRUE if handled.
      */
     public boolean commandSwitcher(Command command, CommandSender sender, String[] args) {
+        BaseMessageComponents prticlMessage = new BaseMessageComponents();
         switch (command.getName().toLowerCase(Locale.ROOT)) {
             case PRTICL_COMMAND -> {
                 if (args[0].equalsIgnoreCase(NODE_DEFAULT_NAME)) {
@@ -48,6 +50,7 @@ public class PrticlCommandsUtil {
                     }
                 }
             }
+            default -> sender.sendMessage(prticlMessage.error(UNKNOWN_COMMAND));
         }
         return false;
     }

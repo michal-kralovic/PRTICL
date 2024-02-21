@@ -25,12 +25,11 @@ public abstract class PrticlCommand {
      * @return TRUE if sent by the player.
      */
     public boolean isCommandSentByPlayer(CommandSender sender) {
-        boolean result = true;
         if (!(sender instanceof Player)) {
-            result = false;
             sender.sendMessage(PLAYER_COMMAND_ONLY);
+            return false;
         }
-        return result;
+        return true;
     }
 
     /**

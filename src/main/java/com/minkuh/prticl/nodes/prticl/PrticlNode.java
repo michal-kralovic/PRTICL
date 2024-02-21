@@ -20,7 +20,7 @@ public class PrticlNode implements ConfigurationSerializable {
     private String name = NODE_DEFAULT_NAME;
     private int repeatDelay = 20;
     private int particleDensity = 1;
-    private org.bukkit.Particle particleType = Particle.HEART;
+    private Particle particleType = Particle.HEART;
     private Location location;
     private String createdBy;
 

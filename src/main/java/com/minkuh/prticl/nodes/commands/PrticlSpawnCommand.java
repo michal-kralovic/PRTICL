@@ -33,7 +33,9 @@ public class PrticlSpawnCommand extends PrticlCommand {
 
             try {
                 plugin.reloadConfig();
-                node = args[0].startsWith("id:") ? configUtil.getNodeFromConfigById(config, Integer.parseInt(args[0].substring(3))) : configUtil.getNodeFromConfigByName(args[0]);
+                node = isAnId(args[0])
+                        ? configUtil.getNodeFromConfigById(config, Integer.parseInt(args[0].substring(3)))
+                        : configUtil.getNodeFromConfigByName(args[0]);
             } catch (NodeNotFoundException e) {
                 sender.sendMessage(prticlMessage.error(NODE_WITH_ARGUMENT_NOT_FOUND));
                 return true;
@@ -59,5 +61,9 @@ public class PrticlSpawnCommand extends PrticlCommand {
 
     public static String getCommandName() {
         return SPAWN_COMMAND;
+    }
+
+    private static boolean isAnId(String arg) {
+        return (arg.startsWith("id:") || arg.startsWith("id") || arg.startsWith("i"));
     }
 }

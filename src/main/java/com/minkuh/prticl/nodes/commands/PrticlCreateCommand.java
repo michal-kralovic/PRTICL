@@ -1,11 +1,9 @@
 package com.minkuh.prticl.nodes.commands;
 
-import com.minkuh.prticl.nodes.prticl.PrticlNode;
+import com.minkuh.prticl.data.PrticlCreateCommandArguments;
 import com.minkuh.prticl.nodes.prticl.PrticlNodeBuilder;
 import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
-import org.apache.commons.lang3.EnumUtils;
-import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -37,61 +35,33 @@ public class PrticlCreateCommand extends PrticlCommand {
     @Override
     public boolean command(String[] args, CommandSender sender) {
         if (isCommandSentByPlayer(sender)) {
-            if (nodeNameValidation(args[0], sender))
+            if (isNodeNameCompatible(args[0], sender))
                 return true;
 
+            PrticlCreateCommandArguments cmdArgsObject = turnIntoCommandArgumentsObject(args);
             try {
-                switch (args.length) {
-                    // Node name
-                    case 1 -> {
-                        PrticlNode node = builder.setName(args[0])
-                                .setCreatedBy(sender.getName()).build();
-
-                        if (!configUtil.saveNodeToConfig(config, node))
-                            sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
-                        sender.sendMessage(prticlMessage.player(CREATED_NODE));
-                    }
-                    // Node particle type
-                    case 2 -> {
-                        PrticlNode node = builder.setName(args[0])
-                                .setParticleType(Particle.valueOf(supportedParticleTypeString(args[1])))
-                                .setCreatedBy(sender.getName()).build();
-
-                        if (!configUtil.saveNodeToConfig(config, node))
-                            sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
-                        sender.sendMessage(prticlMessage.player(CREATED_NODE));
-                    }
-                    // Node repeat delay
-                    case 3 -> {
-                        PrticlNode node = builder.setName(args[0])
-                                .setParticleType(Particle.valueOf(supportedParticleTypeString(args[1])))
-                                .setRepeatDelay(Integer.parseInt(args[2]))
-                                .setCreatedBy(sender.getName()).build();
-
-                        if (!configUtil.saveNodeToConfig(config, node))
-                            sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
-                        sender.sendMessage(prticlMessage.player(CREATED_NODE));
-                    }
-                    // Node particle density
-                    case 4 -> {
-                        PrticlNode node = builder.setName(args[0])
-                                .setParticleType(Particle.valueOf(supportedParticleTypeString(args[1])))
-                                .setRepeatDelay(Integer.parseInt(args[2]))
-                                .setParticleDensity(Integer.parseInt(args[3]))
-                                .setCreatedBy(sender.getName()).build();
-
-                        if (!configUtil.saveNodeToConfig(config, node))
-                            sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
-                        if (Integer.parseInt(args[3]) > 25)
-                            sender.sendMessage(prticlMessage.warning(HIGH_PARTICLE_DENSITY));
-                        sender.sendMessage(prticlMessage.player(CREATED_NODE));
-                    }
-                    default -> sender.sendMessage(prticlMessage.error("Unexpected error!"));
+                if (cmdArgsObject.getName() != null)
+                    builder.setName(cmdArgsObject.getName());
+                if (cmdArgsObject.getParticleType() != null)
+                    builder.setParticleType(cmdArgsObject.getParticleType());
+                if (cmdArgsObject.getRepeatDelay() != null)
+                    builder.setRepeatDelay(cmdArgsObject.getRepeatDelay());
+                if (cmdArgsObject.getParticleDensity() != null) {
+                    if (cmdArgsObject.getParticleDensity() > 25)
+                        sender.sendMessage(prticlMessage.warning(HIGH_PARTICLE_DENSITY));
+                    builder.setParticleDensity(cmdArgsObject.getParticleDensity());
                 }
+
+                builder.setCreatedBy(sender.getName());
+
+                if (!configUtil.trySaveNodeToConfig(config, builder.build()))
+                    sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
+
+                sender.sendMessage(prticlMessage.player(CREATED_NODE));
             } catch (NumberFormatException e) {
                 sender.sendMessage(prticlMessage.error(INCORRECT_NUMBER_INPUT_FORMAT));
             } catch (Exception e) {
-                sender.sendMessage(prticlMessage.error(e.getMessage()));
+                sender.sendMessage(prticlMessage.error("Unexpected error!\nError: " + e.getMessage()));
             }
 
             return true;
@@ -111,49 +81,24 @@ public class PrticlCreateCommand extends PrticlCommand {
      * @param sender The sender that sent the command
      * @return TRUE if handled.
      */
-    private boolean nodeNameValidation(String arg, CommandSender sender) {
-        boolean result = false;
-
+    private boolean isNodeNameCompatible(String arg, CommandSender sender) {
         if (arg.equalsIgnoreCase("id:")) {
             sender.sendMessage(prticlMessage.error(NODE_NAME_UNAVAILABLE));
-            result = true;
+            return true;
         }
         if (arg.length() > 50) {
             sender.sendMessage(prticlMessage.error(NODE_NAME_TOO_LONG));
-            result = true;
+            return true;
         }
         if (nameExistsInConfig(arg)) {
             sender.sendMessage(prticlMessage.error(DUPLICATE_NODE_NAME));
-            result = true;
+            return true;
         }
         if (arg.isBlank()) {
             sender.sendMessage(prticlMessage.error(EMPTY_NODE_NAME));
-            result = true;
+            return true;
         }
-
-        return result;
-    }
-
-    /**
-     * A utility method to convert the input particle argument into one the code can work with.<br><br>
-     * E.g.:<br>
-     * - input: "minecraft:cloud", "cLoUd"<br>
-     * - output (of this method): "CLOUD", "CLOUD"
-     *
-     * @param arg The input particle from the Player
-     * @return The Particle as a support String.
-     */
-    private String supportedParticleTypeString(String arg) throws IllegalArgumentException {
-        String[] particleWithNamespace;
-        if (arg.contains(":")) {
-            particleWithNamespace = arg.split(":");
-            arg = particleWithNamespace[1];
-        }
-
-        if(!EnumUtils.isValidEnum(Particle.class, arg))
-            throw new IllegalArgumentException("The " + Particle.class.getName() + " enum doesn't contain the input particle \"" + arg + "\"");
-
-        return arg.toUpperCase(Locale.ROOT);
+        return false;
     }
 
     /**
@@ -165,9 +110,17 @@ public class PrticlCreateCommand extends PrticlCommand {
     private boolean nameExistsInConfig(String arg) {
         return configUtil.getConfigNodesList()
                 .stream()
-                .anyMatch(
-                        node -> node.getName().toLowerCase(Locale.ROOT).equals(arg.toLowerCase(Locale.ROOT))
-                );
+                .anyMatch(node -> node.getName().toLowerCase(Locale.ROOT).equals(arg.toLowerCase(Locale.ROOT)));
+    }
+
+    /**
+     * Utility method to create an object with variables for easier command arguments manipulation.
+     *
+     * @param args The arguments of the executed command
+     * @return A new PrticlCreateCommandArguments object with the arguments usable via variables.
+     */
+    private static PrticlCreateCommandArguments turnIntoCommandArgumentsObject(String[] args) {
+        return new PrticlCreateCommandArguments(args);
     }
 
     public static String getCommandName() {

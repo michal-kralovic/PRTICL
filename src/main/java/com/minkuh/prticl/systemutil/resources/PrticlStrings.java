@@ -51,12 +51,13 @@ public class PrticlStrings {
     public static final String INCORRECT_COMMAND_SYNTAX_OR_OTHER = "Incorrect command syntax or other error!";
     public static final String NODE_NOT_FOUND = "The specified node couldn't be found!";
     public static final String NODE_WITH_ARGUMENT_NOT_FOUND = "Couldn't find a node with the given argument!";
-    public static final String DUPLICATE_NODE_NAME = "Prticl node name can't be duplicate!";
+    public static final String DUPLICATE_NODE_NAME = "A Prticl node with this name already exists!";
     public static final String EMPTY_NODE_NAME = "Prticl node name can't be empty!";
     public static final String NODE_NAME_TOO_LONG = "Prticl node name can't be longer than 50 characters!";
     public static final String NODE_NAME_UNAVAILABLE = "This name isn't available!";
     public static final String INCORRECT_NODE_ID_FORMAT = "Incorrect node ID format! (expected a valid integer number)";
     public static final String INCORRECT_NUMBER_INPUT_FORMAT = "Incorrect number input format!";
+    public static final String UNKNOWN_COMMAND = "Unknown command!";
     //
     // System messages
     //

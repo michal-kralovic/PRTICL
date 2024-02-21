@@ -35,7 +35,7 @@ public class PrticlNodeConfigUtil {
      *
      * @return TRUE if successful.
      */
-    public boolean saveNodeToConfig(FileConfiguration config, PrticlNode node) {
+    public boolean trySaveNodeToConfig(FileConfiguration config, PrticlNode node) {
         config.set(NODE_CONFIGURATION_SECTION + "." + NODE_CHILD + "-" + node.getId(), node.serialize());
         try {
             config.save("plugins" + File.separator + "Prticl" + File.separator + "config.yml");
