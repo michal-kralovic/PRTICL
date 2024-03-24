@@ -1,13 +1,19 @@
 package com.minkuh.prticl.nodes.commands;
 
-import com.minkuh.prticl.data.PrticlCreateCommandArguments;
+import com.minkuh.prticl.Prticl;
+import com.minkuh.prticl.data.commandargs.PrticlCreateCommandArguments;
+import com.minkuh.prticl.data.database.PrticlDatabase;
+import com.minkuh.prticl.nodes.prticl.PrticlLocationObject;
+import com.minkuh.prticl.nodes.prticl.PrticlLocationObjectBuilder;
 import com.minkuh.prticl.nodes.prticl.PrticlNodeBuilder;
 import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.sql.SQLException;
 import java.util.Locale;
 
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
@@ -20,16 +26,16 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
  */
 public class PrticlCreateCommand extends PrticlCommand {
     private Plugin plugin;
-    private FileConfiguration config;
-    private PrticlNodeBuilder builder;
+    private PrticlNodeBuilder nodeBuilder;
     private static PrticlNodeConfigUtil configUtil;
     BaseMessageComponents prticlMessage = new BaseMessageComponents();
+    private PrticlDatabase prticlDatabase;
 
-    public PrticlCreateCommand(Plugin plugin) {
+    public PrticlCreateCommand(Prticl plugin) throws SQLException {
         this.plugin = plugin;
-        this.config = plugin.getConfig();
-        this.builder = new PrticlNodeBuilder(plugin);
+        this.nodeBuilder = new PrticlNodeBuilder(plugin);
         this.configUtil = new PrticlNodeConfigUtil(plugin);
+        this.prticlDatabase = new PrticlDatabase(plugin);
     }
 
     @Override
@@ -41,21 +47,34 @@ public class PrticlCreateCommand extends PrticlCommand {
             PrticlCreateCommandArguments cmdArgsObject = turnIntoCommandArgumentsObject(args);
             try {
                 if (cmdArgsObject.getName() != null)
-                    builder.setName(cmdArgsObject.getName());
+                    nodeBuilder.setName(cmdArgsObject.getName());
+
                 if (cmdArgsObject.getParticleType() != null)
-                    builder.setParticleType(cmdArgsObject.getParticleType());
+                    nodeBuilder.setParticleType(cmdArgsObject.getParticleType());
+
                 if (cmdArgsObject.getRepeatDelay() != null)
-                    builder.setRepeatDelay(cmdArgsObject.getRepeatDelay());
+                    nodeBuilder.setRepeatDelay(cmdArgsObject.getRepeatDelay());
+
                 if (cmdArgsObject.getParticleDensity() != null) {
                     if (cmdArgsObject.getParticleDensity() > 25)
                         sender.sendMessage(prticlMessage.warning(HIGH_PARTICLE_DENSITY));
-                    builder.setParticleDensity(cmdArgsObject.getParticleDensity());
+
+                    nodeBuilder.setParticleDensity(cmdArgsObject.getParticleDensity());
                 }
 
-                builder.setCreatedBy(sender.getName());
+                Location playerLocation = ((Player) sender).getLocation();
+                if (!prticlDatabase.getLocationFunctions().isLocationInDatabase(playerLocation))
+                    prticlDatabase.getLocationFunctions().createLocation(playerLocation);
 
-                if (!configUtil.trySaveNodeToConfig(config, builder.build()))
+                int dbLocationId = prticlDatabase.getLocationFunctions().getLocationId(playerLocation);
+
+                nodeBuilder.setLocationObject(new PrticlLocationObjectBuilder().withLocation(playerLocation).withId(dbLocationId).build());
+                nodeBuilder.setCreatedBy(sender.getName());
+
+                if (!prticlDatabase.getNodeFunctions().addNodeToDatabase((Player) sender, nodeBuilder.build())) {
                     sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_CONFIG));
+                    return true;
+                }
 
                 sender.sendMessage(prticlMessage.player(CREATED_NODE));
             } catch (NumberFormatException e) {
@@ -66,6 +85,7 @@ public class PrticlCreateCommand extends PrticlCommand {
 
             return true;
         }
+
         sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
         return true;
     }
@@ -104,13 +124,13 @@ public class PrticlCreateCommand extends PrticlCommand {
     /**
      * Utility method to check for duplicate names in nodes. Ignores case-sensitivity.
      *
-     * @param arg The name to check for in the list of existing nodes
+     * @param nodeName The name to check for in the list of existing nodes
      * @return TRUE if exists.
      */
-    private boolean nameExistsInConfig(String arg) {
+    private boolean nameExistsInConfig(String nodeName) {
         return configUtil.getConfigNodesList()
                 .stream()
-                .anyMatch(node -> node.getName().toLowerCase(Locale.ROOT).equals(arg.toLowerCase(Locale.ROOT)));
+                .anyMatch(node -> node.getName().toLowerCase(Locale.ROOT).equals(nodeName.toLowerCase(Locale.ROOT)));
     }
 
     /**

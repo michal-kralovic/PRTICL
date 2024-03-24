@@ -1,7 +1,6 @@
 package com.minkuh.prticl.nodes.prticl;
 
 import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.plugin.Plugin;
@@ -29,7 +28,7 @@ public class PrticlNodeBuilder {
     private int repeatDelay = 20;
     private int particleDensity = 1;
     private org.bukkit.Particle particleType = Particle.HEART;
-    private Location location;
+    private PrticlLocationObject location;
     private String createdBy;
 
     public PrticlNodeBuilder(Plugin plugin) {
@@ -65,7 +64,7 @@ public class PrticlNodeBuilder {
      * @param location The location to assign to the new Prticl node
      * @return This builder.
      */
-    public PrticlNodeBuilder setLocation(Location location) {
+    public PrticlNodeBuilder setLocationObject(PrticlLocationObject location) {
         this.location = location;
         return this;
     }

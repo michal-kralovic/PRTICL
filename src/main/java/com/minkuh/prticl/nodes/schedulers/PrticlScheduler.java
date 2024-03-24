@@ -13,7 +13,7 @@ public class PrticlScheduler implements Runnable {
 
     @Override
     public void run() {
-        World world = node.getLocation().getWorld();
-        world.spawnParticle(node.getParticleType(), node.getLocation(), node.getParticleDensity());
+        World world = node.getLocationObject().getLocation().getWorld();
+        world.spawnParticle(node.getParticleType(), node.getLocationObject().getLocation(), node.getParticleDensity());
     }
 }

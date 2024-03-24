@@ -2,7 +2,6 @@ package com.minkuh.prticl.nodes.prticl;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,19 +20,19 @@ public class PrticlNode implements ConfigurationSerializable {
     private int repeatDelay = 20;
     private int particleDensity = 1;
     private Particle particleType = Particle.HEART;
-    private Location location;
+    private PrticlLocationObject locationObject;
     private String createdBy;
 
     public PrticlNode() {
     }
 
-    public PrticlNode(int id, String name, int repeatDelay, int particleDensity, Particle particleType, Location location, String createdBy) {
+    public PrticlNode(int id, String name, int repeatDelay, int particleDensity, Particle particleType, PrticlLocationObject locationObject, String createdBy) {
         this.id = id;
         this.name = name;
         this.repeatDelay = repeatDelay;
         this.particleDensity = particleDensity;
         this.particleType = particleType;
-        this.location = location;
+        this.locationObject = locationObject;
         this.createdBy = createdBy;
     }
 
@@ -70,12 +69,12 @@ public class PrticlNode implements ConfigurationSerializable {
         this.particleType = particleType;
     }
 
-    public Location getLocation() {
-        return location;
+    public PrticlLocationObject getLocationObject() {
+        return locationObject;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLocationObject(PrticlLocationObject locationObject) {
+        this.locationObject = locationObject;
     }
 
     public int getParticleDensity() {
@@ -102,7 +101,7 @@ public class PrticlNode implements ConfigurationSerializable {
                 ", repeatDelay=" + repeatDelay +
                 ", particleDensity=" + particleDensity +
                 ", particleType=" + particleType +
-                ", location=" + location +
+                ", location=" + locationObject +
                 ", createdBy='" + createdBy + '\'' +
                 '}';
     }
@@ -111,8 +110,8 @@ public class PrticlNode implements ConfigurationSerializable {
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> data = new HashMap<>();
 
-        if (this.location != null) {
-            data.put(NODE_PARAM_LOCATION, this.location.serialize());
+        if (this.locationObject != null) {
+            data.put(NODE_PARAM_LOCATION, this.locationObject.getLocation().serialize());
         }
         data.put(NODE_PARAM_PARTICLE_DENSITY, this.particleDensity);
         data.put(NODE_PARAM_REPEAT_DELAY, this.repeatDelay);
@@ -131,33 +130,18 @@ public class PrticlNode implements ConfigurationSerializable {
      * @return The deserialized Prticl node.
      */
     public static PrticlNode deserialize(Map<String, Object> args) throws NullPointerException {
+        PrticlLocationObject locationDto = new PrticlLocationObject();
+        locationDto.setLocation((Location) args.get(NODE_PARAM_LOCATION));
+        locationDto.setId((int) args.get("location_id"));
+
         return new PrticlNode(
                 (int) args.get(NODE_PARAM_ID),
                 (String) args.get(NODE_PARAM_NAME),
                 (int) args.get(NODE_PARAM_REPEAT_DELAY),
                 (int) args.get(NODE_PARAM_PARTICLE_DENSITY),
                 Particle.valueOf((String) args.get(NODE_PARAM_PARTICLE_TYPE)),
-                (Location) args.get(NODE_PARAM_LOCATION),
+                locationDto,
                 (String) args.get(NODE_PARAM_OWNER)
-        );
-    }
-
-    /**
-     * Creates a Prticl node from the config.
-     *
-     * @param arg The node in the config
-     * @return The deserialized Prticl node.
-     */
-    public static PrticlNode deserialize(Map.Entry<String, Object> arg) throws NullPointerException {
-        MemorySection node = (MemorySection) arg.getValue();
-        return new PrticlNode(
-                (int) node.get(NODE_PARAM_ID),
-                (String) node.get(NODE_PARAM_NAME),
-                (int) node.get(NODE_PARAM_REPEAT_DELAY),
-                (int) node.get(NODE_PARAM_PARTICLE_DENSITY),
-                Particle.valueOf((String) node.get(NODE_PARAM_PARTICLE_TYPE)),
-                (Location) node.get(NODE_PARAM_LOCATION),
-                (String) node.get(NODE_PARAM_OWNER)
         );
     }
 }

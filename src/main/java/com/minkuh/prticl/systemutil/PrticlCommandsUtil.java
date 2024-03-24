@@ -1,5 +1,6 @@
 package com.minkuh.prticl.systemutil;
 
+import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.nodes.commands.PrticlCreateCommand;
 import com.minkuh.prticl.nodes.commands.PrticlLineCommand;
 import com.minkuh.prticl.nodes.commands.PrticlListCommand;
@@ -9,6 +10,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -23,7 +25,7 @@ public class PrticlCommandsUtil {
     PrticlCreateCommand createCommand;
     PrticlListCommand listCommand;
 
-    public PrticlCommandsUtil(Plugin plugin) {
+    public PrticlCommandsUtil(Prticl plugin) throws SQLException {
         spawnCommand = new PrticlSpawnCommand(plugin);
         lineCommand = new PrticlLineCommand(plugin);
         createCommand = new PrticlCreateCommand(plugin);

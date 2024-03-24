@@ -77,7 +77,11 @@ public class PrticlNodeConfigUtil {
 
         return nodes.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof MemorySection)
-                .map(PrticlNode::deserialize)
+                .map(entry -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put(entry.getKey(), entry.getValue());
+                    return PrticlNode.deserialize(map);
+                })
                 .collect(Collectors.toList());
     }
 

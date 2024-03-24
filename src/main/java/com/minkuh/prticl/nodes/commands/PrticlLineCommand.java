@@ -1,6 +1,6 @@
 package com.minkuh.prticl.nodes.commands;
 
-import com.minkuh.prticl.data.PrticlLineCommandArguments;
+import com.minkuh.prticl.data.commandargs.PrticlLineCommandArguments;
 import com.minkuh.prticl.nodes.prticl.PrticlLine;
 import com.minkuh.prticl.nodes.schedulers.PrticlLineScheduler;
 import org.apache.commons.lang3.Validate;
@@ -33,7 +33,7 @@ public class PrticlLineCommand extends PrticlCommand {
         if (!isCommandSentByPlayer(sender))
             return true;
 
-        if (allLineInputsAvailable(args)) {
+        if (checkPresenceOfAllInputs(args)) {
             World world = ((Player) sender).getWorld();
             Player player = (Player) sender;
 
@@ -51,7 +51,8 @@ public class PrticlLineCommand extends PrticlCommand {
                         getExactOrRelativeZ(cmdArgsObject.getZ2(), player),
                         world
                 );
-                if (cmdArgsObject.getParticleDensity() != null) line.setDensity(cmdArgsObject.getParticleDensity());
+                if (cmdArgsObject.getParticleDensity() != null)
+                    line.setDensity(cmdArgsObject.getParticleDensity());
             } catch (NumberFormatException e) {
                 sender.sendMessage(prticlMessage.error(INCORRECT_COORDINATES_INPUT));
                 return true;
@@ -60,6 +61,7 @@ public class PrticlLineCommand extends PrticlCommand {
             drawLine(line.getLoc1(), line.getLoc2(), line.getDensity());
             return true;
         }
+
         sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
         return true;
     }
@@ -116,7 +118,7 @@ public class PrticlLineCommand extends PrticlCommand {
      * @return TRUE if all necessary args are present.
      */
     @Contract(pure = true)
-    private boolean allLineInputsAvailable(String[] args) {
+    private boolean checkPresenceOfAllInputs(String[] args) {
         return args.length >= 7;
     }
 
@@ -143,14 +145,9 @@ public class PrticlLineCommand extends PrticlCommand {
 
         Validate.isTrue(point2.getWorld().equals(world), MISMATCHING_WORLDS);
 
-        double distance = point1.distance(point2);
+        double distance = point1.distance(point2), length = 0;
 
-        Vector p1 = point1.toVector();
-        Vector p2 = point2.toVector();
-        Vector vector = p2.clone().subtract(p1).normalize().multiply(space);
-
-        double length = 0;
-
+        Vector vector = point2.toVector().clone().subtract(point1.toVector()).normalize().multiply(space);
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new PrticlLineScheduler(length, distance, point1, vector, space), 0, 5);
     }
 
@@ -160,6 +157,7 @@ public class PrticlLineCommand extends PrticlCommand {
     }
 
 
+    @Contract(pure = true)
     public static String getCommandName() {
         return LINE_COMMAND;
     }

@@ -1,4 +1,4 @@
-package com.minkuh.prticl.data;
+package com.minkuh.prticl.data.commandargs;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Location;

@@ -34,6 +34,7 @@ public class PrticlListCommand extends PrticlCommand {
             return true;
 
         if (args.length == 0 || args.length == 1)
+            // TODO: Change once permissions are implemented
             return sender.isOp() ? listAllNodes(args, sender) : listPlayerOwnedNodes(args, sender);
 
         sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
@@ -100,6 +101,7 @@ public class PrticlListCommand extends PrticlCommand {
                 listOfListableNodeData.add(nodeValues);
             }
         }
+
         return mainListLogic(listOfListableNodeData, args, sender);
     }
 
