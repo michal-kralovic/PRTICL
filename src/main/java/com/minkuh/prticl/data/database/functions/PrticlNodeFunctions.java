@@ -28,7 +28,7 @@ public class PrticlNodeFunctions {
      * Additionally, creates a Player entry if non-existent, and a Location entry.
      *
      * @param player A player to create the node for
-     * @param node The node to create
+     * @param node   The node to create
      * @return TRUE, if the operation was successful.
      */
     public boolean addNodeToDatabase(Player player, PrticlNode node) throws SQLException {

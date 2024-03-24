@@ -1,8 +1,5 @@
 package com.minkuh.prticl.data.database.databasescripts;
 
-import com.minkuh.prticl.nodes.prticl.PrticlNode;
-import com.minkuh.prticl.nodes.prticl.PrticlNodeBuilder;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

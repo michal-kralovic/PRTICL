@@ -3,7 +3,6 @@ package com.minkuh.prticl.nodes.commands;
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.data.commandargs.PrticlCreateCommandArguments;
 import com.minkuh.prticl.data.database.PrticlDatabase;
-import com.minkuh.prticl.nodes.prticl.PrticlLocationObject;
 import com.minkuh.prticl.nodes.prticl.PrticlLocationObjectBuilder;
 import com.minkuh.prticl.nodes.prticl.PrticlNodeBuilder;
 import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
