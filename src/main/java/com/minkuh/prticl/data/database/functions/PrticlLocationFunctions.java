@@ -7,11 +7,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class PrticlLocationFunctions {
-    private final Connection connection;
     private final PrticlLocationDbScripts locationDbScripts;
 
     public PrticlLocationFunctions(Connection connection) {
-        this.connection = connection;
         this.locationDbScripts = new PrticlLocationDbScripts(connection);
     }
 

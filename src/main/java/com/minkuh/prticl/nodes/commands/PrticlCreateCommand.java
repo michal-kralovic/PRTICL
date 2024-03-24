@@ -110,8 +110,13 @@ public class PrticlCreateCommand extends PrticlCommand {
             sender.sendMessage(prticlMessage.error(NODE_NAME_TOO_LONG));
             return true;
         }
-        if (nameExistsInConfig(arg)) {
-            sender.sendMessage(prticlMessage.error(DUPLICATE_NODE_NAME));
+        try {
+            if (nameExistsInConfig(arg)) {
+                sender.sendMessage(prticlMessage.error(DUPLICATE_NODE_NAME));
+                return true;
+            }
+        } catch (SQLException e) {
+            sender.sendMessage(prticlMessage.error("An SQL error occurred!"));
             return true;
         }
         if (arg.isBlank()) {
@@ -127,10 +132,10 @@ public class PrticlCreateCommand extends PrticlCommand {
      * @param nodeName The name to check for in the list of existing nodes
      * @return TRUE if exists.
      */
-    private boolean nameExistsInConfig(String nodeName) {
-        return configUtil.getConfigNodesList()
+    private boolean nameExistsInConfig(String nodeName) throws SQLException {
+        return prticlDatabase.getNodeFunctions().getNodesList()
                 .stream()
-                .anyMatch(node -> node.getName().toLowerCase(Locale.ROOT).equals(nodeName.toLowerCase(Locale.ROOT)));
+                .anyMatch(node -> node.toLowerCase(Locale.ROOT).equals(nodeName.toLowerCase(Locale.ROOT)));
     }
 
     /**

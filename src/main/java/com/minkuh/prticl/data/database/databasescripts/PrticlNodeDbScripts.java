@@ -1,8 +1,14 @@
 package com.minkuh.prticl.data.database.databasescripts;
 
+import com.minkuh.prticl.nodes.prticl.PrticlNode;
+import com.minkuh.prticl.nodes.prticl.PrticlNodeBuilder;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PrticlNodeDbScripts {
     private final Connection connection;
@@ -26,6 +32,21 @@ public class PrticlNodeDbScripts {
             // TODO: Handle better exception output
             System.out.println(ex);
             return false;
+        }
+    }
+
+    public List<String> getNodesList() throws SQLException {
+        String query = "SELECT name FROM nodes";
+        List<String> nodesNamesList = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                nodesNamesList.add(rs.getString("name"));
+            }
+
+            return nodesNamesList;
         }
     }
 }

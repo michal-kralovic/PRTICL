@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public class PrticlNodeFunctions {
     private final Connection connection;
@@ -41,5 +42,9 @@ public class PrticlNodeFunctions {
         int locationId = locationScripts.getLocationId(node.getLocationObject().getLocation());
 
         return nodeScripts.createNode(node.getName(), node.getRepeatDelay(), node.getParticleDensity(), node.getParticleType().toString(), locationId, playerId);
+    }
+
+    public List<String> getNodesList() throws SQLException {
+        return nodeScripts.getNodesList();
     }
 }
