@@ -14,14 +14,18 @@ import java.sql.SQLException;
  */
 public final class Prticl extends JavaPlugin {
     private final PrticlCommandsUtil cmdUtil = new PrticlCommandsUtil(this);
-    private PrticlPluginMainFunctionsConfigUtil pluginOnEnableConfig = new PrticlPluginMainFunctionsConfigUtil(this);
+    private final PrticlPluginMainFunctionsConfigUtil pluginOnEnableConfig = new PrticlPluginMainFunctionsConfigUtil(this);
 
     public Prticl() throws SQLException {
     }
 
     @Override
     public void onEnable() {
-        pluginOnEnableConfig.startPrticl();
+        try {
+            pluginOnEnableConfig.startPrticl();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

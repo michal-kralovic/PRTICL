@@ -20,11 +20,9 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
  */
 public class PrticlListCommand extends PrticlCommand {
     private static final BaseMessageComponents prticlMessage = new BaseMessageComponents();
-    private static Plugin plugin;
     private static PrticlNodeConfigUtil configUtil;
 
     public PrticlListCommand(Plugin plugin) {
-        this.plugin = plugin;
         this.configUtil = new PrticlNodeConfigUtil(plugin);
     }
 
@@ -123,13 +121,13 @@ public class PrticlListCommand extends PrticlCommand {
 
         if (args.length == 0) { // show the first page if no page number arg present
             int maxNode = Math.min(10, visibleNodeAmount);
-            sender.sendMessage(prticlMessage.list(listOfListableNodeData.subList(0, maxNode), 1, pageAmount, visibleNodeAmount));
+            sender.sendMessage(prticlMessage.listNodes(listOfListableNodeData.subList(0, maxNode), 1, pageAmount, visibleNodeAmount));
         } else {
             try {
                 int pageNumber = Integer.parseInt(args[0]);
                 if (pageNumber <= pageAmount && pageNumber > 0) {
                     int maxNode = Math.min(pageNumber * 10, visibleNodeAmount);
-                    sender.sendMessage(prticlMessage.list(listOfListableNodeData.subList(((pageNumber * 10) - 10), maxNode), pageNumber, pageAmount, visibleNodeAmount));
+                    sender.sendMessage(prticlMessage.listNodes(listOfListableNodeData.subList(((pageNumber * 10) - 10), maxNode), pageNumber, pageAmount, visibleNodeAmount));
                 } else {
                     int noPagesOrFirstPage = pageAmount == 0 ? 0 : 1;
                     sender.sendMessage(prticlMessage.error("Invalid page number! (" + noPagesOrFirstPage + " to " + pageAmount + ")"));

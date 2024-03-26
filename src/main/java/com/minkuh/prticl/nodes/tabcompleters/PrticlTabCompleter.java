@@ -28,6 +28,7 @@ public class PrticlTabCompleter implements TabCompleter {
             if (args.length == 1) {
                 marker.clear();
                 marker.add(NODE_DEFAULT_NAME);
+                marker.add(HELP_COMMAND);
                 return marker;
             }
 

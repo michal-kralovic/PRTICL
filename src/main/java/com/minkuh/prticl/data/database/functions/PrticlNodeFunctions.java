@@ -4,6 +4,8 @@ import com.minkuh.prticl.data.database.databasescripts.PrticlLocationDbScripts;
 import com.minkuh.prticl.data.database.databasescripts.PrticlNodeDbScripts;
 import com.minkuh.prticl.data.database.databasescripts.PrticlPlayerDbScripts;
 import com.minkuh.prticl.nodes.prticl.PrticlNode;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.sql.Connection;
@@ -23,6 +25,26 @@ public class PrticlNodeFunctions {
         this.playerScripts = new PrticlPlayerDbScripts(connection);
     }
 
+    public PrticlNode getNodeById(int nodeId) throws SQLException {
+        return nodeScripts.getNodeById(nodeId);
+    }
+
+    public PrticlNode getNodeByName(String nodeName) throws SQLException {
+        return nodeScripts.getNodeByName(nodeName);
+    }
+
+    public List<String> getNodesList() throws SQLException {
+        return nodeScripts.getNodeNamesList();
+    }
+
+    public List<PrticlNode> getNodesListByWorld(World world) throws SQLException {
+        return nodeScripts.getNodesListByWorld(world);
+    }
+
+    public List<PrticlNode> getNodesListByWorld(String worldName) throws SQLException {
+        return nodeScripts.getNodesListByWorld(Bukkit.getWorld(worldName));
+    }
+
     /**
      * Creates an entry for a node in the database.<br>
      * Additionally, creates a Player entry if non-existent, and a Location entry.
@@ -35,16 +57,9 @@ public class PrticlNodeFunctions {
         if (!playerScripts.isPlayerInDatabase(player))
             playerScripts.createPlayer(player);
 
-        if (!locationScripts.isLocationInDatabase(node.getLocationObject().getLocation()))
-            locationScripts.createLocation(node.getLocationObject().getLocation());
-
+        int locationId = locationScripts.createLocation(node.getLocationObject().getLocation());
         int playerId = playerScripts.getPlayerIdByPlayerUuid(player.getUniqueId().toString());
-        int locationId = locationScripts.getLocationId(node.getLocationObject().getLocation());
 
         return nodeScripts.createNode(node.getName(), node.getRepeatDelay(), node.getParticleDensity(), node.getParticleType().toString(), locationId, playerId);
-    }
-
-    public List<String> getNodesList() throws SQLException {
-        return nodeScripts.getNodesList();
     }
 }

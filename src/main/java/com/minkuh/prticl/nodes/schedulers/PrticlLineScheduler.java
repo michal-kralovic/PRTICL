@@ -8,10 +8,10 @@ import org.bukkit.util.Vector;
 public class PrticlLineScheduler implements Runnable {
 
     private double length;
-    private double distance;
-    private double space;
-    private Location p1;
-    private Vector vector;
+    private final double distance;
+    private final double space;
+    private final Location p1;
+    private final Vector vector;
 
     public PrticlLineScheduler(double length, double distance, Location p1, Vector vector, double space) {
         this.length = length;

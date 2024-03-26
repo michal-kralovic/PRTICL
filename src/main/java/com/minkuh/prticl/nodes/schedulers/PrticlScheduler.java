@@ -5,7 +5,7 @@ import org.bukkit.World;
 
 public class PrticlScheduler implements Runnable {
 
-    private PrticlNode node;
+    private final PrticlNode node;
 
     public PrticlScheduler(PrticlNode node) {
         this.node = node;

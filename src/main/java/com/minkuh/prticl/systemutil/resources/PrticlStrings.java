@@ -15,6 +15,7 @@ public class PrticlStrings {
 
     public static final String PRTICL_COMMAND = "prticl";
     public static final String CREATE_COMMAND = "create";
+    public static final String HELP_COMMAND = "help";
     public static final String LINE_COMMAND = "line";
     public static final String LIST_COMMAND = "list";
     public static final String SPAWN_COMMAND = "spawn";
@@ -42,7 +43,7 @@ public class PrticlStrings {
     // Error messages
     //
 
-    public static final String FAILED_SAVE_TO_CONFIG = "Couldn't save the node to config!";
+    public static final String FAILED_SAVE_TO_DATABASE = "Couldn't save the node to the database!";
     public static final String CONFIG_SECTION_NOT_FOUND = "Couldn't find the configuration file!";
     public static final String MISMATCHING_WORLDS = "Points cannot be in different worlds!";
     public static final String PLAYER_COMMAND_ONLY = "This command can only be executed by a player!";
@@ -50,7 +51,6 @@ public class PrticlStrings {
     public static final String INCORRECT_PAGE_INPUT = "Incorrect page number!";
     public static final String INCORRECT_COMMAND_SYNTAX_OR_OTHER = "Incorrect command syntax or other error!";
     public static final String NODE_NOT_FOUND = "The specified node couldn't be found!";
-    public static final String NODE_WITH_ARGUMENT_NOT_FOUND = "Couldn't find a node with the given argument!";
     public static final String DUPLICATE_NODE_NAME = "A Prticl node with this name already exists!";
     public static final String EMPTY_NODE_NAME = "Prticl node name can't be empty!";
     public static final String NODE_NAME_TOO_LONG = "Prticl node name can't be longer than 50 characters!";

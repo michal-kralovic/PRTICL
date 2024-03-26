@@ -12,14 +12,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class PrticlDatabase {
-    private Prticl plugin;
     private final PrticlPlayerDbScripts playerScripts;
     private final PrticlNodeDbScripts nodeScripts;
     private final PrticlNodeFunctions nodeFunctions;
     private final PrticlLocationFunctions locationFunctions;
 
     public PrticlDatabase(Prticl plugin) throws SQLException {
-        this.plugin = plugin;
 
         Connection connection = DriverManager.getConnection("jdbc:sqlite:" + plugin.getDataFolder().getAbsolutePath() + File.separator + "prticl.db");
         this.playerScripts = new PrticlPlayerDbScripts(connection);

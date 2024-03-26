@@ -13,7 +13,7 @@ public class PrticlLocationFunctions {
         this.locationDbScripts = new PrticlLocationDbScripts(connection);
     }
 
-    public boolean createLocation(Location location) {
+    public int createLocation(Location location) throws SQLException {
         return locationDbScripts.createLocation(location);
     }
 

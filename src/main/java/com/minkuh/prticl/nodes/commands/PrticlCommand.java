@@ -12,7 +12,7 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.PRTICL_COMMAN
  * An abstract PRTICL command class. <br>
  * Extend me for new commands!
  */
-public abstract class PrticlCommand {
+public abstract class PrticlCommand implements IPrticlCommand {
     /**
      * Allows access to PRTICL system messages.
      */
@@ -33,7 +33,7 @@ public abstract class PrticlCommand {
     }
 
     /**
-     * The command to be run.
+     * Defines the implementation of a Prticl command.
      *
      * @param args   The arguments of the Command
      * @param sender The Command sender (usually a Player)

@@ -1,4 +1,5 @@
 name: Prticl
+load: STARTUP
 version: '${project.version}'
 main: com.minkuh.prticl.Prticl
 api-version: '1.20'

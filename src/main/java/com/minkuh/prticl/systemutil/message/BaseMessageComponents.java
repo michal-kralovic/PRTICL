@@ -52,13 +52,13 @@ public class BaseMessageComponents {
      * @param nodeAmount  The total amount of nodes
      * @return TextComponent output, the message to be sent to the player.
      */
-    public @NotNull TextComponent list(List<String[]> content, int currentPage, int totalPages, int nodeAmount) {
+    public @NotNull TextComponent listNodes(List<String[]> content, int currentPage, int totalPages, int nodeAmount) {
         String nodesMessageEnding = nodeAmount == 1 ? " node" : " nodes";
         totalPages = totalPages == 0 ? 1 : totalPages;
         TextComponent output = player("List of nodes — Page " + currentPage + " / " + totalPages);
 
         for (String[] entry : content)
-            output = (TextComponent) output.decoration(BOLD, false).appendNewline().append(listEntry(entry));
+            output = (TextComponent) output.decoration(BOLD, false).appendNewline().append(listEntryOfNode(entry));
 
         output = (TextComponent) output.appendNewline().append(player("List of nodes — " + nodeAmount + nodesMessageEnding + " total"));
         return output;
@@ -70,7 +70,7 @@ public class BaseMessageComponents {
      * @param nodeData The necessary data to build this entry
      * @return The TextComponent to use in a list.
      */
-    private @NotNull TextComponent listEntry(String[] nodeData) {
+    private @NotNull TextComponent listEntryOfNode(String[] nodeData) {
         return text().content("- ")
                 .append(text().content("ID: ").color(color(MessageColors.system)))
                 .append(text().content(nodeData[0] + ", ").color(color(MessageColors.prticlLight)))
