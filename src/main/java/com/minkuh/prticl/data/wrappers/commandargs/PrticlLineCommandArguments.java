@@ -1,4 +1,4 @@
-package com.minkuh.prticl.data.commandargs;
+package com.minkuh.prticl.data.wrappers.commandargs;
 
 public class PrticlLineCommandArguments {
     private String x1;

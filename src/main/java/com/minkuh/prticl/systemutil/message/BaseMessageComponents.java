@@ -1,9 +1,11 @@
 package com.minkuh.prticl.systemutil.message;
 
+import com.minkuh.prticl.data.wrappers.PaginatedResult;
+import com.minkuh.prticl.nodes.prticl.PrticlNode;
 import net.kyori.adventure.text.TextComponent;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Locale;
 
 import static net.kyori.adventure.text.Component.text;
@@ -52,12 +54,12 @@ public class BaseMessageComponents {
      * @param nodeAmount  The total amount of nodes
      * @return TextComponent output, the message to be sent to the player.
      */
-    public @NotNull TextComponent listNodes(List<String[]> content, int currentPage, int totalPages, int nodeAmount) {
+    public @NotNull TextComponent listNodes(PaginatedResult<PrticlNode> content, int currentPage, int totalPages) {
+        int nodeAmount = content.getList().size();
         String nodesMessageEnding = nodeAmount == 1 ? " node" : " nodes";
-        totalPages = totalPages == 0 ? 1 : totalPages;
         TextComponent output = player("List of nodes — Page " + currentPage + " / " + totalPages);
 
-        for (String[] entry : content)
+        for (var entry : content.getList())
             output = (TextComponent) output.decoration(BOLD, false).appendNewline().append(listEntryOfNode(entry));
 
         output = (TextComponent) output.appendNewline().append(player("List of nodes — " + nodeAmount + nodesMessageEnding + " total"));
@@ -67,19 +69,20 @@ public class BaseMessageComponents {
     /**
      * Builds a list entry based on the passed data.
      *
-     * @param nodeData The necessary data to build this entry
+     * @param node The node to build this entry with
      * @return The TextComponent to use in a list.
      */
-    private @NotNull TextComponent listEntryOfNode(String[] nodeData) {
+    @Contract("_ -> new")
+    private @NotNull TextComponent listEntryOfNode(@NotNull PrticlNode node) {
         return text().content("- ")
                 .append(text().content("ID: ").color(color(MessageColors.system)))
-                .append(text().content(nodeData[0] + ", ").color(color(MessageColors.prticlLight)))
+                .append(text().content(node.getId() + ", ").color(color(MessageColors.prticlLight)))
                 .append(text().content("Owner: ").color(color(MessageColors.system)))
-                .append(text().content(nodeData[1] + ", ").color(color(MessageColors.prticlLight)))
+                .append(text().content(node.getCreatedBy() + ", ").color(color(MessageColors.prticlLight)))
                 .append(text().content("Node name: ").color(color(MessageColors.system)))
-                .append(text().content(nodeData[2] + ", ").color(color(MessageColors.prticlLight)))
+                .append(text().content(node.getName() + ", ").color(color(MessageColors.prticlLight)))
                 .append(text().content("Node type: ").color(color(MessageColors.system)))
-                .append(text().content(nodeData[3].toLowerCase(Locale.ROOT)).color(color(MessageColors.prticlLight)))
+                .append(text().content(node.getParticleType().toString().toLowerCase(Locale.ROOT)).color(color(MessageColors.prticlLight)))
                 .build();
     }
 }

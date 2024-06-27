@@ -1,6 +1,6 @@
 package com.minkuh.prticl.nodes.commands;
 
-import com.minkuh.prticl.data.commandargs.PrticlLineCommandArguments;
+import com.minkuh.prticl.data.wrappers.commandargs.PrticlLineCommandArguments;
 import com.minkuh.prticl.nodes.prticl.PrticlLine;
 import com.minkuh.prticl.nodes.schedulers.PrticlLineScheduler;
 import org.apache.commons.lang3.Validate;
@@ -29,7 +29,7 @@ public class PrticlLineCommand extends PrticlCommand {
     }
 
     @Override
-    public boolean command(String[] args, CommandSender sender) {
+    public boolean execute(String[] args, CommandSender sender) {
         if (!isCommandSentByPlayer(sender))
             return true;
 

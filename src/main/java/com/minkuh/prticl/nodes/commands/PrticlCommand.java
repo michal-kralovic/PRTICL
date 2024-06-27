@@ -39,7 +39,7 @@ public abstract class PrticlCommand implements IPrticlCommand {
      * @param sender The Command sender (usually a Player)
      * @return TRUE if handled.
      */
-    abstract public boolean command(String[] args, CommandSender sender);
+    abstract public boolean execute(String[] args, CommandSender sender);
 
     public static String getCommandName() {
         return PRTICL_COMMAND;

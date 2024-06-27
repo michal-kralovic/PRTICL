@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class PrticlPlayerDbScripts {
     private final Connection connection;
@@ -13,11 +14,11 @@ public class PrticlPlayerDbScripts {
         this.connection = connection;
     }
 
-    public int getPlayerIdByPlayerUuid(String playerUuid) throws SQLException {
+    public int getPlayerIdByPlayerUuid(UUID playerUUID) throws SQLException {
         String query = "SELECT id FROM players WHERE uuid = ? LIMIT 1";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, playerUuid);
+            statement.setString(1, playerUUID.toString());
             return statement.executeQuery().getInt("id");
         }
     }

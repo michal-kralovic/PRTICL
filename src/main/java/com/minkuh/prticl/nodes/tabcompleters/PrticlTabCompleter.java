@@ -22,17 +22,14 @@ public class PrticlTabCompleter implements TabCompleter {
     static List<String> particleList = new ArrayList<>();
     List<String> marker = new ArrayList<>();
 
+
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player && label.equalsIgnoreCase(PrticlCommand.getCommandName())) {
-            if (args.length == 1) {
-                marker.clear();
-                marker.add(NODE_DEFAULT_NAME);
-                marker.add(HELP_COMMAND);
-                return marker;
-            }
+            if (args.length == 1)
+                return getSortedSubcommands(args[0]);
 
-            if (args.length == 2 && args[0].equals(NODE_DEFAULT_NAME)) {
+            if (args.length == 2 && (args[0].equalsIgnoreCase(NODE_DEFAULT_NAME) || args[0].equalsIgnoreCase(NODE_DEFAULT_NAME.substring(0, 1)))) {
                 particleCommandList.clear();
                 return getSortedCommands(args[1]);
             }
@@ -54,6 +51,24 @@ public class PrticlTabCompleter implements TabCompleter {
             return marker(marker, NODE_PARAM_ID + "/" + NODE_PARAM_NAME);
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * Returns a list of the main prticl subcommands (e.g. help, node)
+     *
+     * @param arg the user's input to base the output on (dynamically alters the list to only show relevant particles)
+     * @return A list of all/relevant particles.
+     */
+    public static List<String> getSortedSubcommands(String arg) {
+        final List<String> subcommands = new ArrayList<>(){{
+            add(NODE_DEFAULT_NAME);
+            add(HELP_COMMAND);
+        }};
+        List<String> completions = new ArrayList<>();
+
+        StringUtil.copyPartialMatches(arg, subcommands, completions);
+
+        return completions;
     }
 
     /**
@@ -152,7 +167,7 @@ public class PrticlTabCompleter implements TabCompleter {
     }
 
     /**
-     * Returns a List of Strings, a list of sorted Minecraft particles taken from the Particle enum class. <br>
+     * Returns a List of Strings - a list of sorted Minecraft particles taken from the Particle enum class. <br>
      * Prefixes every particle with "minecraft:" for vanilla MC /particle command parity, but it doesn't support
      * modded namespaces.
      *
@@ -197,7 +212,7 @@ public class PrticlTabCompleter implements TabCompleter {
     }
 
     /**
-     * A quick utility List of Strings, a marker to simply put a single value into with some operations for QoL-filled code-writing.
+     * A quick utility List of Strings, a marker to simply put a single value into with some operations for QoL-filled code writing.
      *
      * @param marker    utility marker input
      * @param strMarker what text the marker should contain/display

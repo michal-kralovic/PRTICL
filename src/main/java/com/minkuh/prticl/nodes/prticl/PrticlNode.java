@@ -151,10 +151,10 @@ public class PrticlNode implements ConfigurationSerializable {
      * @return The deserialized Prticl node.
      */
     public static PrticlNode deserialize(int id, String name, int repeatDelay, int particleDensity, String nameOfParticleType, PrticlLocationObject locationObject, String createdBy) throws NullPointerException {
-        PrticlLocationObject locationDto = new PrticlLocationObject();
-        locationDto.setLocation(locationObject.getLocation());
-        locationDto.setId(locationObject.getId());
+        PrticlLocationObject locationObj = new PrticlLocationObject();
+        locationObj.setLocation(locationObject.getLocation());
+        locationObj.setId(locationObject.getId());
 
-        return new PrticlNode(id, name, repeatDelay, particleDensity, Particle.valueOf(nameOfParticleType), locationDto, createdBy);
+        return new PrticlNode(id, name, repeatDelay, particleDensity, Particle.valueOf(nameOfParticleType), locationObj, createdBy);
     }
 }

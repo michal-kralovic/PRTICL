@@ -35,7 +35,7 @@ public class PrticlCommandsUtil {
      *
      * @return TRUE if handled.
      */
-    public boolean commandSwitcher(Command command, CommandSender sender, String[] args) {
+    public boolean commandExecutor(Command command, CommandSender sender, String[] args) {
         BaseMessageComponents prticlMessage = new BaseMessageComponents();
         switch (command.getName().toLowerCase(Locale.ROOT)) {
 
@@ -47,22 +47,22 @@ public class PrticlCommandsUtil {
                     String[] commandArgs = Arrays.stream(args).skip(2).toArray(String[]::new);
 
                     switch (args[1].toLowerCase(Locale.ROOT)) {
-                        case SPAWN_COMMAND -> spawnCommand.command(commandArgs, sender);
-                        case LINE_COMMAND -> lineCommand.command(commandArgs, sender);
-                        case CREATE_COMMAND -> createCommand.command(commandArgs, sender);
-                        case LIST_COMMAND -> listCommand.command(commandArgs, sender);
+                        case SPAWN_COMMAND -> spawnCommand.execute(commandArgs, sender);
+                        case LINE_COMMAND -> lineCommand.execute(commandArgs, sender);
+                        case CREATE_COMMAND -> createCommand.execute(commandArgs, sender);
+                        case LIST_COMMAND -> listCommand.execute(commandArgs, sender);
                     }
                 }
 
                 if (args[0].equalsIgnoreCase(PrticlHelpCommand.getCommandName()) // if arg is "help" OR "h"
                         || args[0].equalsIgnoreCase(String.valueOf(PrticlHelpCommand.getCommandName().charAt(0)))) {
-                    helpCommand.command(Arrays.stream(args).skip(1).toArray(String[]::new), sender);
+                    helpCommand.execute(Arrays.stream(args).skip(1).toArray(String[]::new), sender);
                 }
 
             }
 
             default -> sender.sendMessage(prticlMessage.error(UNKNOWN_COMMAND));
         }
-        return false;
+        return true;
     }
 }

@@ -30,12 +30,11 @@ public final class Prticl extends JavaPlugin {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return cmdUtil.commandSwitcher(command, sender, args);
+        return cmdUtil.commandExecutor(command, sender, args);
     }
 
     @Override
     public void onDisable() {
         saveConfig();
-
     }
 }

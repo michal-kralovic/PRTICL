@@ -1,14 +1,15 @@
 package com.minkuh.prticl.nodes.commands;
 
+import com.minkuh.prticl.Prticl;
+import com.minkuh.prticl.data.database.PrticlDatabase;
+import com.minkuh.prticl.data.wrappers.PaginatedResult;
+import com.minkuh.prticl.nodes.prticl.PrticlNode;
 import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.MemorySection;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.sql.SQLException;
 
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 
@@ -21,19 +22,18 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 public class PrticlListCommand extends PrticlCommand {
     private static final BaseMessageComponents prticlMessage = new BaseMessageComponents();
     private static PrticlNodeConfigUtil configUtil;
+    private final PrticlDatabase prticlDatabase;
 
-    public PrticlListCommand(Plugin plugin) {
+    public PrticlListCommand(Prticl plugin) throws SQLException {
         this.configUtil = new PrticlNodeConfigUtil(plugin);
+        this.prticlDatabase = new PrticlDatabase(plugin);
     }
 
     @Override
-    public boolean command(String[] args, CommandSender sender) {
-        if (!configUtil.configNodeSectionExists(sender))
-            return true;
-
+    public boolean execute(String[] args, CommandSender sender) {
         if (args.length == 0 || args.length == 1)
             // TODO: Change once permissions are implemented
-            return sender.isOp() ? listAllNodes(args, sender) : listPlayerOwnedNodes(args, sender);
+            return sender.isOp() ? listAllNodes(args, sender) : listOwnNodes(args, sender);
 
         sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
         return true;
@@ -47,27 +47,26 @@ public class PrticlListCommand extends PrticlCommand {
      * @param sender The sender of the command
      * @return TRUE if succeeded.
      */
-    private static boolean listAllNodes(String[] args, CommandSender sender) {
-        Map<String, Object> allNodes = configUtil.getConfigNodes();
-        if (allNodes.isEmpty()) {
-            sender.sendMessage(prticlMessage.system("No nodes found."));
+    private boolean listAllNodes(String[] args, CommandSender sender) {
+        int page;
+        try {
+            page = args.length == 1
+                    ? Integer.parseInt(args[0])
+                    : 0;
+        } catch (NumberFormatException ex) {
+            sender.sendMessage(prticlMessage.error(INCORRECT_PAGE_INPUT));
             return true;
         }
-        List<String[]> listOfListableNodeData = new ArrayList<>();
 
-        for (Map.Entry<String, Object> entry : allNodes.entrySet()) {
-            MemorySection particle = (MemorySection) entry.getValue();
-
-            String[] nodeValues = new String[]{
-                    particle.get(NODE_PARAM_ID).toString(),
-                    particle.get(NODE_PARAM_OWNER).toString(),
-                    particle.get(NODE_PARAM_NAME).toString(),
-                    particle.get(NODE_PARAM_PARTICLE_TYPE).toString()
-            };
-
-            listOfListableNodeData.add(nodeValues);
+        PaginatedResult<PrticlNode> nodesOfPage;
+        try {
+            nodesOfPage = prticlDatabase.getNodeFunctions().getNodesByPage(page);
+        } catch (SQLException ex) {
+            sender.sendMessage(prticlMessage.error("Unexpected error while retrieving nodes from the database!"));
+            return true;
         }
-        return mainListLogic(listOfListableNodeData, args, sender);
+
+        return mainListLogic(nodesOfPage, sender);
     }
 
     /**
@@ -78,64 +77,45 @@ public class PrticlListCommand extends PrticlCommand {
      * @param sender The sender of the command
      * @return TRUE if succeeded.
      */
-    private static boolean listPlayerOwnedNodes(String[] args, CommandSender sender) {
-        Map<String, Object> allNodes = configUtil.getConfigNodes();
-        if (allNodes.isEmpty()) {
-            sender.sendMessage(prticlMessage.system("No nodes found."));
+    private boolean listOwnNodes(String[] args, CommandSender sender) {
+        int page;
+        try {
+            page = args.length == 1
+                    ? Integer.parseInt(args[0])
+                    : 0;
+        } catch (NumberFormatException ex) {
+            sender.sendMessage(prticlMessage.error(INCORRECT_PAGE_INPUT));
             return true;
         }
-        List<String[]> listOfListableNodeData = new ArrayList<>();
 
-        for (Map.Entry<String, Object> entry : allNodes.entrySet()) {
-            MemorySection node = (MemorySection) entry.getValue();
-
-            if (node.get(NODE_PARAM_OWNER).toString().equals(sender.getName())) {
-                String[] nodeValues = new String[]{
-                        node.get(NODE_PARAM_ID).toString(),
-                        node.get(NODE_PARAM_OWNER).toString(),
-                        node.get(NODE_PARAM_NAME).toString(),
-                        node.get(NODE_PARAM_PARTICLE_TYPE).toString()
-                };
-                listOfListableNodeData.add(nodeValues);
-            }
+        PaginatedResult<PrticlNode> nodesOfPage;
+        try {
+            nodesOfPage = prticlDatabase.getNodeFunctions().getNodesByPageByPlayer(page, ((Player) sender).getUniqueId());
+        } catch (SQLException ex) {
+            sender.sendMessage(prticlMessage.error("Unexpected error while retrieving nodes from the database!"));
+            return true;
         }
 
-        return mainListLogic(listOfListableNodeData, args, sender);
+        return mainListLogic(nodesOfPage, sender);
     }
 
     /**
      * The main utility logic method that lists all the nodes out.
      *
-     * @param listOfListableNodeData The collected nodes from a previous util method
-     * @param args                   Player input
-     * @param sender                 The sender of the command
+     * @param paginatedNodes The collected nodes from a previous util method
+     * @param sender         The sender of the command
      * @return TRUE if succeeded.
      */
-    private static boolean mainListLogic(List<String[]> listOfListableNodeData, String[] args, CommandSender sender) {
-        int visibleNodeAmount = listOfListableNodeData.size();
-        int pageAmount = listOfListableNodeData.size() / 10;
+    @SuppressWarnings("SameReturnValue")
+    private static boolean mainListLogic(PaginatedResult<PrticlNode> paginatedNodes, CommandSender sender) {
+        var page = paginatedNodes.getPage() == 0 ? 1 : paginatedNodes.getPage();
+        int pageAmount = paginatedNodes.getTotalPages();
 
-        if (listOfListableNodeData.size() % 10 > 0) {
-            pageAmount++;
-        }
-
-        if (args.length == 0) { // show the first page if no page number arg present
-            int maxNode = Math.min(10, visibleNodeAmount);
-            sender.sendMessage(prticlMessage.listNodes(listOfListableNodeData.subList(0, maxNode), 1, pageAmount, visibleNodeAmount));
+        if (page <= pageAmount && page > 0) {
+            sender.sendMessage(prticlMessage.listNodes(paginatedNodes, page, pageAmount));
         } else {
-            try {
-                int pageNumber = Integer.parseInt(args[0]);
-                if (pageNumber <= pageAmount && pageNumber > 0) {
-                    int maxNode = Math.min(pageNumber * 10, visibleNodeAmount);
-                    sender.sendMessage(prticlMessage.listNodes(listOfListableNodeData.subList(((pageNumber * 10) - 10), maxNode), pageNumber, pageAmount, visibleNodeAmount));
-                } else {
-                    int noPagesOrFirstPage = pageAmount == 0 ? 0 : 1;
-                    sender.sendMessage(prticlMessage.error("Invalid page number! (" + noPagesOrFirstPage + " to " + pageAmount + ")"));
-                    return true;
-                }
-            } catch (NumberFormatException e) {
-                sender.sendMessage(prticlMessage.error(INCORRECT_PAGE_INPUT));
-            }
+            int noPagesOrFirstPage = pageAmount == 0 ? 0 : 1;
+            sender.sendMessage(prticlMessage.error("Invalid page number! (" + noPagesOrFirstPage + " to " + pageAmount + ")"));
         }
         return true;
     }

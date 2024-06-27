@@ -3,26 +3,35 @@ package com.minkuh.prticl.data.database.functions;
 import com.minkuh.prticl.data.database.databasescripts.PrticlLocationDbScripts;
 import com.minkuh.prticl.data.database.databasescripts.PrticlNodeDbScripts;
 import com.minkuh.prticl.data.database.databasescripts.PrticlPlayerDbScripts;
+import com.minkuh.prticl.data.wrappers.PaginatedResult;
 import com.minkuh.prticl.nodes.prticl.PrticlNode;
-import org.bukkit.Bukkit;
+import com.minkuh.prticl.systemutil.exceptions.NodeNotFoundException;
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 public class PrticlNodeFunctions {
-    private final Connection connection;
     private final PrticlLocationDbScripts locationScripts;
     private final PrticlNodeDbScripts nodeScripts;
     private final PrticlPlayerDbScripts playerScripts;
 
     public PrticlNodeFunctions(Connection connection) {
-        this.connection = connection;
         this.locationScripts = new PrticlLocationDbScripts(connection);
         this.nodeScripts = new PrticlNodeDbScripts(connection);
         this.playerScripts = new PrticlPlayerDbScripts(connection);
+    }
+
+    public PaginatedResult<PrticlNode> getNodesByPage(int page) throws SQLException {
+        return nodeScripts.getNodesByPage(page);
+    }
+
+    public PaginatedResult<PrticlNode> getNodesByPageByPlayer(int page, UUID playerUUID) throws SQLException {
+        return nodeScripts.getNodesByPageByPlayer(page, playerUUID);
     }
 
     public PrticlNode getNodeById(int nodeId) throws SQLException {
@@ -33,16 +42,23 @@ public class PrticlNodeFunctions {
         return nodeScripts.getNodeByName(nodeName);
     }
 
-    public List<String> getNodesList() throws SQLException {
+    public List<String> getNodeNames() throws SQLException {
         return nodeScripts.getNodeNamesList();
     }
 
-    public List<PrticlNode> getNodesListByWorld(World world) throws SQLException {
-        return nodeScripts.getNodesListByWorld(world);
+    public List<PrticlNode> getNodesByWorld(World world) throws SQLException {
+        return nodeScripts.getNodesByWorld(world);
     }
 
-    public List<PrticlNode> getNodesListByWorld(String worldName) throws SQLException {
-        return nodeScripts.getNodesListByWorld(Bukkit.getWorld(worldName));
+    public List<PrticlNode> getNodesByCoordinates(int x, int z, World world) throws SQLException {
+        return nodeScripts.getNodesByCoordinates(x, z, world);
+    }
+
+    public List<PrticlNode> getNodesListByChunk(Chunk chunk) throws SQLException, NodeNotFoundException {
+        if (!nodeScripts.chunkHasNodes(chunk))
+            return null;
+
+        return nodeScripts.getNodesListByChunk(chunk);
     }
 
     /**
@@ -58,7 +74,7 @@ public class PrticlNodeFunctions {
             playerScripts.createPlayer(player);
 
         int locationId = locationScripts.createLocation(node.getLocationObject().getLocation());
-        int playerId = playerScripts.getPlayerIdByPlayerUuid(player.getUniqueId().toString());
+        int playerId = playerScripts.getPlayerIdByPlayerUuid(player.getUniqueId());
 
         return nodeScripts.createNode(node.getName(), node.getRepeatDelay(), node.getParticleDensity(), node.getParticleType().toString(), locationId, playerId);
     }

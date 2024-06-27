@@ -1,7 +1,7 @@
 package com.minkuh.prticl.nodes.commands;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.data.commandargs.PrticlCreateCommandArguments;
+import com.minkuh.prticl.data.wrappers.commandargs.PrticlCreateCommandArguments;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.nodes.prticl.PrticlLocationObjectBuilder;
 import com.minkuh.prticl.nodes.prticl.PrticlNodeBuilder;
@@ -32,7 +32,7 @@ public class PrticlCreateCommand extends PrticlCommand {
     }
 
     @Override
-    public boolean command(String[] args, CommandSender sender) {
+    public boolean execute(String[] args, CommandSender sender) {
         if (isCommandSentByPlayer(sender)) {
             if (isNodeNameCompatible(args[0], sender))
                 return true;
@@ -56,7 +56,6 @@ public class PrticlCreateCommand extends PrticlCommand {
                 }
 
                 Location playerLocation = ((Player) sender).getLocation();
-
                 int dbLocationId = prticlDatabase.getLocationFunctions().getLocationId(playerLocation);
 
                 nodeBuilder.setLocationObject(new PrticlLocationObjectBuilder().withLocation(playerLocation).withId(dbLocationId).build());
@@ -136,7 +135,7 @@ public class PrticlCreateCommand extends PrticlCommand {
      * @return TRUE if exists.
      */
     private boolean nameExistsInDatabase(String nodeName) throws SQLException {
-        return prticlDatabase.getNodeFunctions().getNodesList()
+        return prticlDatabase.getNodeFunctions().getNodeNames()
                 .stream()
                 .anyMatch(node -> node.toLowerCase(Locale.ROOT).equals(nodeName.toLowerCase(Locale.ROOT)));
     }

@@ -4,7 +4,7 @@ import org.bukkit.command.CommandSender;
 
 public interface IPrticlCommand {
 
-    public boolean isCommandSentByPlayer(CommandSender sender);
+    boolean isCommandSentByPlayer(CommandSender sender);
 
-    abstract public boolean command(String[] args, CommandSender sender);
+    boolean execute(String[] args, CommandSender sender);
 }

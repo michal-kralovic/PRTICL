@@ -2,7 +2,7 @@ package com.minkuh.prticl.systemutil;
 
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.eventlisteners.RightClickEventListener;
-import com.minkuh.prticl.eventlisteners.WorldLoadEventListener;
+import com.minkuh.prticl.eventlisteners.TerrainStateChangeEventListener;
 import com.minkuh.prticl.nodes.commands.PrticlCommand;
 import com.minkuh.prticl.nodes.prticl.PrticlNode;
 import com.minkuh.prticl.nodes.tabcompleters.PrticlTabCompleter;
@@ -24,14 +24,14 @@ public class PrticlPluginMainFunctionsConfigUtil {
 
     public void startPrticl() throws SQLException {
         plugin.getServer().getPluginManager().registerEvents(new RightClickEventListener(), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new WorldLoadEventListener(plugin), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new TerrainStateChangeEventListener(plugin), plugin);
         plugin.getCommand(PrticlCommand.getCommandName()).setTabCompleter(new PrticlTabCompleter());
 
+        // serialization
         ConfigurationSerialization.registerClass(PrticlNode.class);
 
         setupDirectoriesIfNonexistent();
         plugin.saveDefaultConfig();
-        plugin.getResource("config.yml");
 
         if (!configUtil.configNodeSectionExists()) {
             plugin.getConfig().createSection(NODE_CONFIGURATION_SECTION);

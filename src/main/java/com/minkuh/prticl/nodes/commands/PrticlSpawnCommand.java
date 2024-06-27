@@ -26,7 +26,7 @@ public class PrticlSpawnCommand extends PrticlCommand {
     }
 
     @Override
-    public boolean command(String[] args, CommandSender sender) {
+    public boolean execute(String[] args, CommandSender sender) {
         if (isCommandSentByPlayer(sender) && args.length == 1) {
             PrticlNode node;
 

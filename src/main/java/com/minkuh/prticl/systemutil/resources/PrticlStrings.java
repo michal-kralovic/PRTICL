@@ -58,6 +58,7 @@ public class PrticlStrings {
     public static final String INCORRECT_NODE_ID_FORMAT = "Incorrect node ID format! (expected a valid integer number)";
     public static final String INCORRECT_NUMBER_INPUT_FORMAT = "Incorrect number input format!";
     public static final String UNKNOWN_COMMAND = "Unknown command!";
+
     //
     // System messages
     //

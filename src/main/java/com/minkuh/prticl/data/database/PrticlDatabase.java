@@ -29,16 +29,6 @@ public class PrticlDatabase {
             plugin.getDataFolder().mkdirs();
     }
 
-    @Deprecated
-    public PrticlPlayerDbScripts getPlayerScripts() {
-        return playerScripts;
-    }
-
-    @Deprecated
-    public PrticlNodeDbScripts getNodeScripts() {
-        return nodeScripts;
-    }
-
     public PrticlNodeFunctions getNodeFunctions() {
         return nodeFunctions;
     }
