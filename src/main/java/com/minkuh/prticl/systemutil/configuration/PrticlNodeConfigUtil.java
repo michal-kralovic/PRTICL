@@ -1,8 +1,7 @@
 package com.minkuh.prticl.systemutil.configuration;
 
 import com.minkuh.prticl.nodes.prticl.PrticlNode;
-import com.minkuh.prticl.systemutil.exceptions.NodeNotFoundException;
-import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
+import com.minkuh.prticl.systemutil.message.PrticlMessages;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -11,11 +10,9 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.minkuh.prticl.nodes.prticl.PrticlNode.deserialize;
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
 
 /**
@@ -67,58 +64,6 @@ public class PrticlNodeConfigUtil {
     }
 
     /**
-     * Loads every single node out of the config file. <br>
-     *
-     * @return a List< PrticlNode > with the resulting nodes.
-     * @throws NullPointerException if config can't be found
-     */
-    public List<PrticlNode> getConfigNodesList() throws NullPointerException {
-        Map<String, Object> nodes = plugin.getConfig().getConfigurationSection(NODE_CONFIGURATION_SECTION).getValues(true);
-
-        return nodes.entrySet().stream()
-                .filter(entry -> entry.getValue() instanceof MemorySection)
-                .map(entry -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put(entry.getKey(), entry.getValue());
-                    return PrticlNode.deserialize(map);
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Gets the Prticl node from the config based on the provided ID of the Node.
-     *
-     * @param config The config file to look through
-     * @param id     The ID to look for
-     * @return The Prticl node.
-     * @throws NodeNotFoundException If the node can't be found in the config
-     */
-    public PrticlNode getNodeFromConfigById(FileConfiguration config, int id) throws NodeNotFoundException {
-        Object deserializedNode = config.getConfigurationSection(NODE_CONFIGURATION_SECTION).get(NODE_CHILD + "-" + id);
-        if (deserializedNode == null) {
-            throw new NodeNotFoundException(NODE_NOT_FOUND);
-        }
-
-        return deserialize(deserializedNode instanceof MemorySection
-                ? extractMemorySection((MemorySection) deserializedNode)
-                : (Map<String, Object>) deserializedNode);
-    }
-
-    /**
-     * Gets the Prticl node from the config based on the provided Name of the Node.
-     *
-     * @param name The Name of the Node to look for
-     * @return The PrticlNode, if found.
-     * @throws NodeNotFoundException If the node can't be found in the config
-     */
-    public PrticlNode getNodeFromConfigByName(String name) throws NodeNotFoundException {
-        return getConfigNodesList().stream()
-                .filter(node -> node.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElseThrow(() -> new NodeNotFoundException(NODE_NOT_FOUND));
-    }
-
-    /**
      * Checks for the existence of the configuration section where nodes are stored.
      *
      * @return TRUE if exists.
@@ -135,7 +80,7 @@ public class PrticlNodeConfigUtil {
      * @return TRUE if exists.
      */
     public boolean configNodeSectionExists(CommandSender sender) {
-        BaseMessageComponents prticlMessage = new BaseMessageComponents();
+        PrticlMessages prticlMessage = new PrticlMessages();
         if (config.getConfigurationSection(NODE_CONFIGURATION_SECTION) == null) {
             sender.sendMessage(prticlMessage.error(CONFIG_SECTION_NOT_FOUND));
             return false;

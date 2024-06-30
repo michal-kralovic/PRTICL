@@ -2,7 +2,7 @@ package com.minkuh.prticl.systemutil;
 
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.nodes.commands.*;
-import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
+import com.minkuh.prticl.systemutil.message.PrticlMessages;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -36,7 +36,7 @@ public class PrticlCommandsUtil {
      * @return TRUE if handled.
      */
     public boolean commandExecutor(Command command, CommandSender sender, String[] args) {
-        BaseMessageComponents prticlMessage = new BaseMessageComponents();
+        PrticlMessages prticlMessage = new PrticlMessages();
         switch (command.getName().toLowerCase(Locale.ROOT)) {
 
             case PRTICL_COMMAND -> {

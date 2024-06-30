@@ -5,7 +5,7 @@ import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.data.wrappers.PaginatedResult;
 import com.minkuh.prticl.nodes.prticl.PrticlNode;
 import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
-import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
+import com.minkuh.prticl.systemutil.message.PrticlMessages;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -20,7 +20,7 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
  * This command can be run via the console as well.
  */
 public class PrticlListCommand extends PrticlCommand {
-    private static final BaseMessageComponents prticlMessage = new BaseMessageComponents();
+    private static final PrticlMessages prticlMessage = new PrticlMessages();
     private static PrticlNodeConfigUtil configUtil;
     private final PrticlDatabase prticlDatabase;
 
@@ -33,7 +33,7 @@ public class PrticlListCommand extends PrticlCommand {
     public boolean execute(String[] args, CommandSender sender) {
         if (args.length == 0 || args.length == 1)
             // TODO: Change once permissions are implemented
-            return sender.isOp() ? listAllNodes(args, sender) : listOwnNodes(args, sender);
+            return listNodes(args, sender);
 
         sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
         return true;
@@ -41,18 +41,21 @@ public class PrticlListCommand extends PrticlCommand {
 
     /**
      * A utility logic method that collects every single node from the config and passes it to the method that
-     * lists these nodes out.
+     * lists these nodes out. Contains conditional logic for OP player checking.
      *
      * @param args   Player input to pass to the listing method
      * @param sender The sender of the command
      * @return TRUE if succeeded.
      */
-    private boolean listAllNodes(String[] args, CommandSender sender) {
+    private boolean listNodes(String[] args, CommandSender sender) {
         int page;
         try {
-            page = args.length == 1
-                    ? Integer.parseInt(args[0])
-                    : 0;
+            if (args.length == 1) {
+                page = Integer.parseInt(args[0]);
+                page = page == 1 ? 0 : page;
+            } else {
+                page = 0;
+            }
         } catch (NumberFormatException ex) {
             sender.sendMessage(prticlMessage.error(INCORRECT_PAGE_INPUT));
             return true;
@@ -60,37 +63,9 @@ public class PrticlListCommand extends PrticlCommand {
 
         PaginatedResult<PrticlNode> nodesOfPage;
         try {
-            nodesOfPage = prticlDatabase.getNodeFunctions().getNodesByPage(page);
-        } catch (SQLException ex) {
-            sender.sendMessage(prticlMessage.error("Unexpected error while retrieving nodes from the database!"));
-            return true;
-        }
-
-        return mainListLogic(nodesOfPage, sender);
-    }
-
-    /**
-     * A utility logic method that collects nodes from the config that are owned by the sender player
-     * and passes it to the method that lists these nodes out.
-     *
-     * @param args   Player input to pass to the listing method
-     * @param sender The sender of the command
-     * @return TRUE if succeeded.
-     */
-    private boolean listOwnNodes(String[] args, CommandSender sender) {
-        int page;
-        try {
-            page = args.length == 1
-                    ? Integer.parseInt(args[0])
-                    : 0;
-        } catch (NumberFormatException ex) {
-            sender.sendMessage(prticlMessage.error(INCORRECT_PAGE_INPUT));
-            return true;
-        }
-
-        PaginatedResult<PrticlNode> nodesOfPage;
-        try {
-            nodesOfPage = prticlDatabase.getNodeFunctions().getNodesByPageByPlayer(page, ((Player) sender).getUniqueId());
+            nodesOfPage = sender.isOp()
+                    ? prticlDatabase.getNodeFunctions().getNodesByPage(page)
+                    : prticlDatabase.getNodeFunctions().getNodesByPageByPlayer(page, ((Player) sender).getUniqueId());
         } catch (SQLException ex) {
             sender.sendMessage(prticlMessage.error("Unexpected error while retrieving nodes from the database!"));
             return true;
@@ -102,20 +77,19 @@ public class PrticlListCommand extends PrticlCommand {
     /**
      * The main utility logic method that lists all the nodes out.
      *
-     * @param paginatedNodes The collected nodes from a previous util method
-     * @param sender         The sender of the command
+     * @param nodes  The page of nodes from the DB
+     * @param sender The sender of the command
      * @return TRUE if succeeded.
      */
     @SuppressWarnings("SameReturnValue")
-    private static boolean mainListLogic(PaginatedResult<PrticlNode> paginatedNodes, CommandSender sender) {
-        var page = paginatedNodes.getPage() == 0 ? 1 : paginatedNodes.getPage();
-        int pageAmount = paginatedNodes.getTotalPages();
+    private static boolean mainListLogic(PaginatedResult<PrticlNode> nodes, CommandSender sender) {
+        int page = nodes.getPage();
+        int pageAmount = nodes.getTotalPages();
 
-        if (page <= pageAmount && page > 0) {
-            sender.sendMessage(prticlMessage.listNodes(paginatedNodes, page, pageAmount));
+        if (page <= pageAmount && page >= 0) {
+            sender.sendMessage(prticlMessage.listNodes(nodes, page, pageAmount));
         } else {
-            int noPagesOrFirstPage = pageAmount == 0 ? 0 : 1;
-            sender.sendMessage(prticlMessage.error("Invalid page number! (" + noPagesOrFirstPage + " to " + pageAmount + ")"));
+            sender.sendMessage(prticlMessage.error("Invalid page number! (" + (pageAmount == 0 ? 0 : 1) + " to " + pageAmount + ")"));
         }
         return true;
     }

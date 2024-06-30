@@ -14,7 +14,7 @@ import static net.kyori.adventure.text.format.TextDecoration.BOLD;
 import static net.kyori.adventure.text.format.TextDecoration.State.FALSE;
 import static net.kyori.adventure.text.format.TextDecoration.State.TRUE;
 
-public class BaseMessageComponents {
+public class PrticlMessages {
     private static final TextComponent PRTICL_FLAIR = text().decoration(BOLD, TRUE).content("[").color(color(MessageColors.prticlStrong))
             .append(text().decoration(BOLD, FALSE).content("PRTICL").color(color(MessageColors.prticlLight))
                     .append(text().content("]").color(color(MessageColors.prticlStrong)).decoration(BOLD, TRUE))
@@ -51,7 +51,6 @@ public class BaseMessageComponents {
      * @param content     The list to show
      * @param currentPage The specified page
      * @param totalPages  The total amount of pages
-     * @param nodeAmount  The total amount of nodes
      * @return TextComponent output, the message to be sent to the player.
      */
     public @NotNull TextComponent listNodes(PaginatedResult<PrticlNode> content, int currentPage, int totalPages) {

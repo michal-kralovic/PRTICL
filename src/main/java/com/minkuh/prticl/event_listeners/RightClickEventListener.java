@@ -1,6 +1,6 @@
-package com.minkuh.prticl.eventlisteners;
+package com.minkuh.prticl.event_listeners;
 
-import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
+import com.minkuh.prticl.systemutil.message.PrticlMessages;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class RightClickEventListener implements Listener {
 
-    BaseMessageComponents messageComponents = new BaseMessageComponents();
+    PrticlMessages messageComponents = new PrticlMessages();
 
     public RightClickEventListener() {
     }

@@ -1,38 +1,41 @@
-package com.minkuh.prticl.data.database.databasescripts;
+package com.minkuh.prticl.data.database.queries;
 
 import org.bukkit.Location;
+import org.postgresql.ds.PGSimpleDataSource;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
 
-public class PrticlLocationDbScripts {
-    private final Connection connection;
+public class PrticlLocationQueries {
+    private final PGSimpleDataSource pgDataSource;
 
-    public PrticlLocationDbScripts(Connection connection) {
-        this.connection = connection;
+    public PrticlLocationQueries(PGSimpleDataSource pgDataSource) {
+        this.pgDataSource = pgDataSource;
     }
 
     private static final String GET_LOCATION_ID_QUERY = "SELECT id FROM locations WHERE x = ? AND y = ? AND z = ? AND world = ?";
-    private static final String IS_LOCATION_IN_DATABASE_QUERY = "SELECT 1 FROM locations WHERE x = ? AND y = ? AND z = ? AND world = ? LIMIT 1";
-    private static final String CREATE_LOCATION_QUERY = "INSERT INTO locations (x, y, z, world) VALUES (?, ?, ?, ?)";
-
 
     public int getLocationId(Location location) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(GET_LOCATION_ID_QUERY)) {
+        try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(GET_LOCATION_ID_QUERY)) {
             statement.setDouble(1, location.x());
             statement.setDouble(2, location.y());
             statement.setDouble(3, location.z());
             statement.setString(4, location.getWorld().toString());
 
-            return statement.executeQuery().getInt(1);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next())
+                    return rs.getInt(1);
+                else throw new NoSuchElementException();
+            }
         }
     }
 
+    private static final String IS_LOCATION_IN_DATABASE_QUERY = "SELECT 1 FROM locations WHERE x = ? AND y = ? AND z = ? AND world = ? LIMIT 1";
 
     public boolean isLocationInDatabase(Location location) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(IS_LOCATION_IN_DATABASE_QUERY)) {
+        try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(IS_LOCATION_IN_DATABASE_QUERY)) {
             statement.setDouble(1, location.x());
             statement.setDouble(2, location.y());
             statement.setDouble(3, location.z());
@@ -42,23 +45,27 @@ public class PrticlLocationDbScripts {
         }
     }
 
+    private static final String CREATE_LOCATION_QUERY = "INSERT INTO locations (x, y, z, world) VALUES (?, ?, ?, ?)";
+
     public int createLocation(Location location) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(CREATE_LOCATION_QUERY)) {
+        try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(CREATE_LOCATION_QUERY, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setDouble(1, location.x());
             statement.setDouble(2, location.y());
             statement.setDouble(3, location.z());
             statement.setString(4, location.getWorld().getName());
 
             statement.executeUpdate();
-            var keys = statement.getGeneratedKeys();
-            if (keys.next()) return keys.getInt(1);
-
-            throw new NoSuchElementException("Column ID not returned!");
+            try (ResultSet rs = statement.getGeneratedKeys()) {
+                if (rs.next())
+                    return rs.getInt(1);
+                else
+                    throw new NoSuchElementException("Column ID not returned!");
+            }
         }
     }
 
     public boolean createLocation(double x, double y, double z, String world) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(CREATE_LOCATION_QUERY)) {
+        try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(CREATE_LOCATION_QUERY)) {
             statement.setDouble(1, x);
             statement.setDouble(2, y);
             statement.setDouble(3, z);

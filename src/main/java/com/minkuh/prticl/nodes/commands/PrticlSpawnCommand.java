@@ -2,7 +2,6 @@ package com.minkuh.prticl.nodes.commands;
 
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.data.database.PrticlDatabase;
-import com.minkuh.prticl.nodes.logic.PrticlNodeValidation;
 import com.minkuh.prticl.nodes.prticl.PrticlNode;
 import com.minkuh.prticl.nodes.schedulers.PrticlScheduler;
 import org.bukkit.Bukkit;
@@ -31,7 +30,7 @@ public class PrticlSpawnCommand extends PrticlCommand {
             PrticlNode node;
 
             try {
-                node = PrticlNodeValidation.isArgAnId(args[0])
+                node = args[0].startsWith("id:")
                         ? prticlDb.getNodeFunctions().getNodeById(Integer.parseInt(args[0].substring("id:".length())))
                         : prticlDb.getNodeFunctions().getNodeByName(args[0]);
             } catch (NumberFormatException e) {
@@ -45,7 +44,13 @@ public class PrticlSpawnCommand extends PrticlCommand {
             if (node.getLocationObject().getLocation() == null)
                 node.getLocationObject().setLocation(((Player) sender).getLocation());
 
-            sender.sendMessage(prticlMessage.player("Spawned '" + node.getName() + "', ID " + node.getId() + "in world: " + node.getLocationObject().getLocation().getWorld() + "\nAvailable worlds: " + Bukkit.getServer().getWorlds()));
+            try {
+                prticlDb.getNodeFunctions().setSpawnedAndEnabled(node, true);
+            } catch (SQLException e) {
+                sender.sendMessage(prticlMessage.warning("Couldn't set the spawned node's isSpawned and isEnabled values to true! (continuing...)"));
+            }
+
+            sender.sendMessage(prticlMessage.player("Spawned '" + node.getName()));
             Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new PrticlScheduler(node), 0, node.getRepeatDelay());
             return true;
         }

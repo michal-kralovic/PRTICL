@@ -1,6 +1,6 @@
 package com.minkuh.prticl.nodes.commands;
 
-import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
+import com.minkuh.prticl.systemutil.message.PrticlMessages;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -16,7 +16,7 @@ public abstract class PrticlCommand implements IPrticlCommand {
     /**
      * Allows access to PRTICL system messages.
      */
-    BaseMessageComponents prticlMessage = new BaseMessageComponents();
+    PrticlMessages prticlMessage = new PrticlMessages();
 
     /**
      * A utility method to handle non-Player command triggers.

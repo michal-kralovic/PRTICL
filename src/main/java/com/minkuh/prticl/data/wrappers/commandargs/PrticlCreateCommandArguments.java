@@ -14,8 +14,10 @@ public class PrticlCreateCommandArguments {
     private Location location;
 
     public PrticlCreateCommandArguments(String[] args) throws IllegalArgumentException {
+        Particle particle = Particle.valueOf(getSupportedParticle(args[1]));
+
         setName(args[0]);
-        setParticleType(Particle.valueOf(supportedParticleTypeString(args[1])));
+        setParticleType(particle);
         try {
             setRepeatDelay(Integer.parseInt(args[2]));
             setParticleDensity(Integer.parseInt(args[3]));
@@ -73,7 +75,7 @@ public class PrticlCreateCommandArguments {
      * @param arg The input particle from the Player
      * @return The Particle as a support String.
      */
-    private String supportedParticleTypeString(String arg) throws IllegalArgumentException {
+    private String getSupportedParticle(String arg) throws IllegalArgumentException {
         arg = arg.contains(":") ? arg.split(":")[1].toUpperCase(Locale.ROOT) : arg.toUpperCase(Locale.ROOT);
 
         if(!EnumUtils.isValidEnum(Particle.class, arg))

@@ -1,11 +1,12 @@
 package com.minkuh.prticl.nodes.commands;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.data.wrappers.commandargs.PrticlCreateCommandArguments;
 import com.minkuh.prticl.data.database.PrticlDatabase;
+import com.minkuh.prticl.data.wrappers.commandargs.PrticlCreateCommandArguments;
 import com.minkuh.prticl.nodes.prticl.PrticlLocationObjectBuilder;
+import com.minkuh.prticl.nodes.prticl.PrticlNode;
 import com.minkuh.prticl.nodes.prticl.PrticlNodeBuilder;
-import com.minkuh.prticl.systemutil.message.BaseMessageComponents;
+import com.minkuh.prticl.systemutil.message.PrticlMessages;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,61 +24,68 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.*;
  */
 public class PrticlCreateCommand extends PrticlCommand {
     private final PrticlNodeBuilder nodeBuilder;
-    BaseMessageComponents prticlMessage = new BaseMessageComponents();
+    PrticlMessages prticlMessage = new PrticlMessages();
     private final PrticlDatabase prticlDatabase;
 
     public PrticlCreateCommand(Prticl plugin) throws SQLException {
-        this.nodeBuilder = new PrticlNodeBuilder(plugin);
+        this.nodeBuilder = new PrticlNodeBuilder();
         this.prticlDatabase = new PrticlDatabase(plugin);
     }
 
     @Override
     public boolean execute(String[] args, CommandSender sender) {
-        if (isCommandSentByPlayer(sender)) {
-            if (isNodeNameCompatible(args[0], sender))
-                return true;
-
-            try {
-                PrticlCreateCommandArguments cmdArgsObject = turnIntoCommandArgumentsObject(args);
-                if (cmdArgsObject.getName() != null)
-                    nodeBuilder.setName(cmdArgsObject.getName());
-
-                if (cmdArgsObject.getParticleType() != null)
-                    nodeBuilder.setParticleType(cmdArgsObject.getParticleType());
-
-                if (cmdArgsObject.getRepeatDelay() != null)
-                    nodeBuilder.setRepeatDelay(cmdArgsObject.getRepeatDelay());
-
-                if (cmdArgsObject.getParticleDensity() != null) {
-                    if (cmdArgsObject.getParticleDensity() > 25)
-                        sender.sendMessage(prticlMessage.warning(HIGH_PARTICLE_DENSITY));
-
-                    nodeBuilder.setParticleDensity(cmdArgsObject.getParticleDensity());
-                }
-
-                Location playerLocation = ((Player) sender).getLocation();
-                int dbLocationId = prticlDatabase.getLocationFunctions().getLocationId(playerLocation);
-
-                nodeBuilder.setLocationObject(new PrticlLocationObjectBuilder().withLocation(playerLocation).withId(dbLocationId).build());
-                nodeBuilder.setCreatedBy(sender.getName());
-
-                if (!prticlDatabase.getNodeFunctions().addNodeToDatabase((Player) sender, nodeBuilder.build())) {
-                    sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_DATABASE));
-                    return true;
-                }
-                sender.sendMessage(prticlMessage.player(CREATED_NODE));
-
-            } catch (NumberFormatException e) {
-                sender.sendMessage(prticlMessage.error(INCORRECT_NUMBER_INPUT_FORMAT));
-            } catch (Exception e) {
-                sender.sendMessage(prticlMessage.error("Unexpected error!\nError: " + e.getMessage()));
-            }
-
+        if (!isCommandSentByPlayer(sender)) {
+            sender.sendMessage(prticlMessage.error(PLAYER_COMMAND_ONLY));
             return true;
         }
 
-        sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
+        if (!isNodeNameCompatible(args[0], sender))
+            return true;
+
+        try {
+            PrticlCreateCommandArguments cmdArgsObject = cmdArgsObjectify(args);
+            if (cmdArgsObject.getName() != null) {
+                nodeBuilder.setName(cmdArgsObject.getName());
+            }
+
+            if (cmdArgsObject.getParticleType() != null) {
+                nodeBuilder.setParticleType(cmdArgsObject.getParticleType());
+            }
+
+            if (cmdArgsObject.getRepeatDelay() != null) {
+                nodeBuilder.setRepeatDelay(cmdArgsObject.getRepeatDelay());
+            }
+
+            if (cmdArgsObject.getParticleDensity() != null) {
+                if (cmdArgsObject.getParticleDensity() > 25)
+                    sender.sendMessage(prticlMessage.warning(HIGH_PARTICLE_DENSITY));
+
+                nodeBuilder.setParticleDensity(cmdArgsObject.getParticleDensity());
+            }
+
+
+            Location playerLocation = ((Player) sender).getLocation();
+            int dbLocationId = prticlDatabase.getLocationFunctions().createLocation(playerLocation);
+            nodeBuilder.setLocationObject(new PrticlLocationObjectBuilder().withLocation(playerLocation).withId(dbLocationId).build());
+            nodeBuilder.setCreatedBy(sender.getName());
+
+
+            PrticlNode node = nodeBuilder.build();
+            if (!prticlDatabase.getNodeFunctions().addNodeToDatabase((Player) sender, node)) {
+                sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_DATABASE));
+                return true;
+            }
+
+            sender.sendMessage(prticlMessage.player(CREATED_NODE));
+
+        } catch (NumberFormatException e) {
+            sender.sendMessage(prticlMessage.error(INCORRECT_NUMBER_INPUT_FORMAT));
+        } catch (Exception e) {
+            sender.sendMessage(prticlMessage.error("Unexpected error!\nError: " + e.getMessage()));
+        }
+
         return true;
+
     }
 
     /**
@@ -86,7 +94,7 @@ public class PrticlCreateCommand extends PrticlCommand {
      * @param args The arguments of the executed command
      * @return A new PrticlCreateCommandArguments object with the arguments usable via variables.
      */
-    private static PrticlCreateCommandArguments turnIntoCommandArgumentsObject(String[] args) {
+    private static PrticlCreateCommandArguments cmdArgsObjectify(String[] args) {
         return new PrticlCreateCommandArguments(args);
     }
 
@@ -99,33 +107,37 @@ public class PrticlCreateCommand extends PrticlCommand {
      *
      * @param arg    The name to be checked
      * @param sender The sender that sent the command
-     * @return TRUE if handled.
+     * @return TRUE if compatbiel.
      */
     private boolean isNodeNameCompatible(String arg, CommandSender sender) {
-        BaseMessageComponents messageComponents = new BaseMessageComponents();
+        PrticlMessages messages = new PrticlMessages();
 
         if (arg.toLowerCase(Locale.ROOT).startsWith("id:".toLowerCase(Locale.ROOT))) {
-            sender.sendMessage(messageComponents.error(NODE_NAME_UNAVAILABLE));
-            return true;
+            sender.sendMessage(messages.error(NODE_NAME_UNAVAILABLE));
+            return false;
         }
+
         if (arg.length() > 50) {
-            sender.sendMessage(messageComponents.error(NODE_NAME_TOO_LONG));
-            return true;
+            sender.sendMessage(messages.error(NODE_NAME_TOO_LONG));
+            return false;
         }
+
         try {
             if (nameExistsInDatabase(arg)) {
-                sender.sendMessage(messageComponents.error(DUPLICATE_NODE_NAME));
-                return true;
+                sender.sendMessage(messages.error(DUPLICATE_NODE_NAME));
+                return false;
             }
         } catch (SQLException e) {
-            sender.sendMessage(messageComponents.error("An SQL error occurred!"));
-            return true;
+            sender.sendMessage(messages.error("An SQL error occurred!"));
+            return false;
         }
+
         if (arg.isBlank()) {
-            sender.sendMessage(messageComponents.error(EMPTY_NODE_NAME));
-            return true;
+            sender.sendMessage(messages.error(EMPTY_NODE_NAME));
+            return false;
         }
-        return false;
+
+        return true;
     }
 
     /**

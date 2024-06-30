@@ -1,4 +1,4 @@
-package com.minkuh.prticl.nodes.tabcompleters;
+package com.minkuh.prticl.nodes.tab_completers;
 
 import com.minkuh.prticl.nodes.commands.*;
 import org.bukkit.Particle;

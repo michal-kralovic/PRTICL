@@ -1,13 +1,6 @@
 package com.minkuh.prticl.nodes.prticl;
 
-import com.minkuh.prticl.systemutil.configuration.PrticlNodeConfigUtil;
 import org.bukkit.Particle;
-import org.bukkit.plugin.Plugin;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import static com.minkuh.prticl.systemutil.resources.PrticlStrings.NODE_DEFAULT_NAME;
 
@@ -15,27 +8,17 @@ import static com.minkuh.prticl.systemutil.resources.PrticlStrings.NODE_DEFAULT_
  * A builder pattern class for building Prticl nodes.
  */
 public class PrticlNodeBuilder {
-    private static Plugin plugin;
-    private static Map<Integer, PrticlNode> prticlNodes = new TreeMap<>();
-    private static List<PrticlNode> nodes = new ArrayList<>();
-    private static PrticlNodeConfigUtil configUtil;
-
     private int id;
-
     private String name = NODE_DEFAULT_NAME;
-
     private int repeatDelay = 20;
     private int particleDensity = 1;
+    private boolean isSpawned = false;
+    private boolean isEnabled = false;
     private org.bukkit.Particle particleType = Particle.HEART;
     private PrticlLocationObject location;
     private String createdBy;
 
     public PrticlNodeBuilder() {
-    }
-
-    public PrticlNodeBuilder(Plugin plugin) {
-        this.plugin = plugin;
-        this.configUtil = new PrticlNodeConfigUtil(plugin);
     }
 
     public PrticlNodeBuilder setId(int id) {
@@ -109,7 +92,17 @@ public class PrticlNodeBuilder {
         return this;
     }
 
+    public PrticlNodeBuilder setIsSpawned(boolean isSpawned) {
+        this.isSpawned = isSpawned;
+        return this;
+    }
+
+    public PrticlNodeBuilder setIsEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
+        return this;
+    }
+
     public PrticlNode build() {
-        return new PrticlNode(id, name, repeatDelay, particleDensity, particleType, location, createdBy);
+        return new PrticlNode(id, name, repeatDelay, particleDensity, isSpawned, isEnabled, particleType, location, createdBy);
     }
 }

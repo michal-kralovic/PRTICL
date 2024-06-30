@@ -1,29 +1,25 @@
 package com.minkuh.prticl.data.database.functions;
 
-import com.minkuh.prticl.data.database.databasescripts.PrticlLocationDbScripts;
-import com.minkuh.prticl.data.database.databasescripts.PrticlNodeDbScripts;
-import com.minkuh.prticl.data.database.databasescripts.PrticlPlayerDbScripts;
+import com.minkuh.prticl.data.database.queries.PrticlNodeQueries;
+import com.minkuh.prticl.data.database.queries.PrticlPlayerQueries;
 import com.minkuh.prticl.data.wrappers.PaginatedResult;
 import com.minkuh.prticl.nodes.prticl.PrticlNode;
-import com.minkuh.prticl.systemutil.exceptions.NodeNotFoundException;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.postgresql.ds.PGSimpleDataSource;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
 public class PrticlNodeFunctions {
-    private final PrticlLocationDbScripts locationScripts;
-    private final PrticlNodeDbScripts nodeScripts;
-    private final PrticlPlayerDbScripts playerScripts;
+    private final PrticlNodeQueries nodeScripts;
+    private final PrticlPlayerQueries playerScripts;
 
-    public PrticlNodeFunctions(Connection connection) {
-        this.locationScripts = new PrticlLocationDbScripts(connection);
-        this.nodeScripts = new PrticlNodeDbScripts(connection);
-        this.playerScripts = new PrticlPlayerDbScripts(connection);
+    public PrticlNodeFunctions(PGSimpleDataSource pgDataSource) {
+        this.nodeScripts = new PrticlNodeQueries(pgDataSource);
+        this.playerScripts = new PrticlPlayerQueries(pgDataSource);
     }
 
     public PaginatedResult<PrticlNode> getNodesByPage(int page) throws SQLException {
@@ -54,11 +50,19 @@ public class PrticlNodeFunctions {
         return nodeScripts.getNodesByCoordinates(x, z, world);
     }
 
-    public List<PrticlNode> getNodesListByChunk(Chunk chunk) throws SQLException, NodeNotFoundException {
+    public List<PrticlNode> getNodesListByChunk(Chunk chunk) throws SQLException {
         if (!nodeScripts.chunkHasNodes(chunk))
             return null;
 
         return nodeScripts.getNodesListByChunk(chunk);
+    }
+
+    public boolean setSpawnedAndEnabled(PrticlNode node, boolean newState) throws SQLException {
+        return nodeScripts.setSpawnedAndEnabled(node, newState);
+    }
+
+    public boolean isNodeNameTaken(String nodeName) throws SQLException {
+        return nodeScripts.isNodeNameTaken(nodeName);
     }
 
     /**
@@ -73,9 +77,18 @@ public class PrticlNodeFunctions {
         if (!playerScripts.isPlayerInDatabase(player))
             playerScripts.createPlayer(player);
 
-        int locationId = locationScripts.createLocation(node.getLocationObject().getLocation());
-        int playerId = playerScripts.getPlayerIdByPlayerUuid(player.getUniqueId());
+        int locationId = node.getLocationObject().getId();
+        int playerId = playerScripts.getPlayerIdByPlayerUUID(player.getUniqueId());
 
-        return nodeScripts.createNode(node.getName(), node.getRepeatDelay(), node.getParticleDensity(), node.getParticleType().toString(), locationId, playerId);
+        return nodeScripts.createNode(
+                node.getName(),
+                node.getRepeatDelay(),
+                node.getParticleDensity(),
+                node.getParticleType().toString(),
+                node.isSpawned(),
+                node.isEnabled(),
+                locationId,
+                playerId
+        );
     }
 }

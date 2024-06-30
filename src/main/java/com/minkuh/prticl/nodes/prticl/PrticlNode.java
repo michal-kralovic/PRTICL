@@ -1,6 +1,5 @@
 package com.minkuh.prticl.nodes.prticl;
 
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +18,8 @@ public class PrticlNode implements ConfigurationSerializable {
     private String name = NODE_DEFAULT_NAME;
     private int repeatDelay = 20;
     private int particleDensity = 1;
+    private boolean isSpawned = false;
+    private boolean isEnabled = false;
     private Particle particleType = Particle.HEART;
     private PrticlLocationObject locationObject;
     private String createdBy;
@@ -26,11 +27,21 @@ public class PrticlNode implements ConfigurationSerializable {
     public PrticlNode() {
     }
 
-    public PrticlNode(int id, String name, int repeatDelay, int particleDensity, Particle particleType, PrticlLocationObject locationObject, String createdBy) {
+    public PrticlNode(int id,
+                      String name,
+                      int repeatDelay,
+                      int particleDensity,
+                      boolean isSpawned,
+                      boolean isEnabled,
+                      Particle particleType,
+                      PrticlLocationObject locationObject,
+                      String createdBy) {
         this.id = id;
         this.name = name;
         this.repeatDelay = repeatDelay;
         this.particleDensity = particleDensity;
+        this.isSpawned = isSpawned;
+        this.isEnabled = isEnabled;
         this.particleType = particleType;
         this.locationObject = locationObject;
         this.createdBy = createdBy;
@@ -43,6 +54,22 @@ public class PrticlNode implements ConfigurationSerializable {
     public void setName(String name) {
         if (name.length() <= 50 && !name.isBlank())
             this.name = name;
+    }
+
+    public boolean isSpawned() {
+        return isSpawned;
+    }
+
+    public void setSpawned(boolean spawned) {
+        isSpawned = spawned;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
     }
 
     public String getCreatedBy() {
@@ -124,37 +151,23 @@ public class PrticlNode implements ConfigurationSerializable {
     }
 
     /**
-     * Creates a Prticl node from the config.
-     *
-     * @param args The node in the config
-     * @return The deserialized Prticl node.
-     */
-    public static PrticlNode deserialize(Map<String, Object> args) throws NullPointerException {
-        PrticlLocationObject locationDto = new PrticlLocationObject();
-        locationDto.setLocation((Location) args.get(NODE_PARAM_LOCATION));
-        locationDto.setId((int) args.get("location_id"));
-
-        return new PrticlNode(
-                (int) args.get(NODE_PARAM_ID),
-                (String) args.get(NODE_PARAM_NAME),
-                (int) args.get(NODE_PARAM_REPEAT_DELAY),
-                (int) args.get(NODE_PARAM_PARTICLE_DENSITY),
-                Particle.valueOf((String) args.get(NODE_PARAM_PARTICLE_TYPE)),
-                locationDto,
-                (String) args.get(NODE_PARAM_OWNER)
-        );
-    }
-
-    /**
      * Creates a Prticl node from the passed arguments.
      *
      * @return The deserialized Prticl node.
      */
-    public static PrticlNode deserialize(int id, String name, int repeatDelay, int particleDensity, String nameOfParticleType, PrticlLocationObject locationObject, String createdBy) throws NullPointerException {
+    public static PrticlNode deserialize(int id,
+                                         String name,
+                                         int repeatDelay,
+                                         int particleDensity,
+                                         boolean isSpawned,
+                                         boolean isEnabled,
+                                         String nameOfParticleType,
+                                         PrticlLocationObject locationObject,
+                                         String createdBy) throws NullPointerException {
         PrticlLocationObject locationObj = new PrticlLocationObject();
         locationObj.setLocation(locationObject.getLocation());
         locationObj.setId(locationObject.getId());
 
-        return new PrticlNode(id, name, repeatDelay, particleDensity, Particle.valueOf(nameOfParticleType), locationObj, createdBy);
+        return new PrticlNode(id, name, repeatDelay, particleDensity, isSpawned, isEnabled, Particle.valueOf(nameOfParticleType), locationObj, createdBy);
     }
 }
