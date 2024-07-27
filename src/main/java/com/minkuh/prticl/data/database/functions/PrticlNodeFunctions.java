@@ -11,6 +11,7 @@ import org.postgresql.ds.PGSimpleDataSource;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class PrticlNodeFunctions {
@@ -34,11 +35,11 @@ public class PrticlNodeFunctions {
         return nodeQueries.getNodesByPageByPlayer(page, playerUUID);
     }
 
-    public PrticlNode getNodeById(int nodeId) throws SQLException {
+    public Optional<PrticlNode> getNodeById(int nodeId) throws SQLException {
         return nodeQueries.getNodeById(nodeId);
     }
 
-    public PrticlNode getNodeByName(String nodeName) throws SQLException {
+    public Optional<PrticlNode> getNodeByName(String nodeName) throws SQLException {
         return nodeQueries.getNodeByName(nodeName);
     }
 

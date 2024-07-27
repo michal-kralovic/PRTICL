@@ -38,7 +38,7 @@ public class PrticlDespawnCommand extends PrticlCommand {
             var nodeOpt = getNodeFromCache(args[0]);
             if (nodeOpt.isEmpty()) {
                 var argStrippedOfIdIfPresent = args[0].startsWith("id:") ? args[0].substring("id:".length()) : args[0];
-                sender.sendMessage(prticlMessage.error("Unable to find node in cache using id/name: " + argStrippedOfIdIfPresent));
+                sender.sendMessage(prticlMessage.error("Unable to find a node in cache using id/name: " + argStrippedOfIdIfPresent));
                 return true;
             }
             var node = nodeOpt.get();

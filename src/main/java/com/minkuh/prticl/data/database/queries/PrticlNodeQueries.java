@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -200,7 +201,7 @@ public class PrticlNodeQueries {
         }
     }
 
-    public PrticlNode getNodeById(int nodeId) throws SQLException {
+    public Optional<PrticlNode> getNodeById(int nodeId) throws SQLException {
         try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(
                 getAllNodes("WHERE %s.%s = ?".formatted(PrticlDbConstants.NODES_TABLE, PrticlDbConstants.NODE_ID))
         )) {
@@ -208,14 +209,14 @@ public class PrticlNodeQueries {
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next())
-                    return deserializeNodeFromResultSet(rs);
+                    return Optional.of(deserializeNodeFromResultSet(rs));
                 else
-                    throw new SQLException("Couldn't obtain the node!");
+                    return Optional.empty();
             }
         }
     }
 
-    public PrticlNode getNodeByName(String nodeName) throws SQLException {
+    public Optional<PrticlNode> getNodeByName(String nodeName) throws SQLException {
         try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(
                 getAllNodes("WHERE %s.%s = ?".formatted(PrticlDbConstants.NODES_TABLE, PrticlDbConstants.NODE_NAME))
         )) {
@@ -223,9 +224,9 @@ public class PrticlNodeQueries {
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next())
-                    return deserializeNodeFromResultSet(rs);
+                    return Optional.of(deserializeNodeFromResultSet(rs));
                 else
-                    throw new SQLException("Couldn't obtain the node!");
+                    return Optional.empty();
             }
         }
     }

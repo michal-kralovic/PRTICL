@@ -35,10 +35,10 @@ public class PrticlHelpCommand extends PrticlCommand {
 
     private final TextComponent listPrticlCategories = helpMenuTitle("PRTICL - Help")
             .appendNewline().appendNewline()
-            .append(text().content("/prticl help <category>").color(color(MessageColors.system)))
+            .append(text("  Usage: ").color(color(MessageColors.prticlLight)).append(text().content("/prticl help <category>").color(color(MessageColors.system))))
             .appendNewline().appendNewline()
             .append(text().content("  - ")
-                    .append(text().content("node / n » ")).color(color(MessageColors.system))
+                    .append(text().content("node » ")).color(color(MessageColors.system))
                     .append(text().content("Shows help for all the available node subcommands.").color(color(MessageColors.prticlLight))))
             .build();
 

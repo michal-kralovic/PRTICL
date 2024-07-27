@@ -67,7 +67,7 @@ public class TerrainStateChangeEventListener implements Listener {
         }
 
         for (var node : nodes) {
-            NodeChunkLocationsCache.getInstance().addToCache(node);
+            NodeChunkLocationsCache.getInstance().add(node);
         }
 
         for (var node : enabledNodes) {

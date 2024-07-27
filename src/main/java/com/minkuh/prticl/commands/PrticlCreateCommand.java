@@ -5,6 +5,7 @@ import com.minkuh.prticl.common.PrticlLocationObjectBuilder;
 import com.minkuh.prticl.common.PrticlNode;
 import com.minkuh.prticl.common.PrticlNodeBuilder;
 import com.minkuh.prticl.common.message.PrticlMessages;
+import com.minkuh.prticl.data.caches.NodeChunkLocationsCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.common.wrappers.command_args.PrticlCreateCommandArguments;
 import org.bukkit.Location;
@@ -76,6 +77,8 @@ public class PrticlCreateCommand extends PrticlCommand {
             if (!prticlDatabase.getNodeFunctions().addNodeToDatabase((Player) sender, node)) {
                 sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_DATABASE));
                 return true;
+            } else {
+                NodeChunkLocationsCache.getInstance().add(node);
             }
 
             sender.sendMessage(prticlMessage.player(CREATED_NODE));

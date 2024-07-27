@@ -39,7 +39,7 @@ public final class NodeChunkLocationsCache {
         return map.get(chunkKey);
     }
 
-    public synchronized void addToCache(PrticlNode node) {
+    public synchronized void add(PrticlNode node) {
         ChunkKey chunkKey = nodeToKey(node);
 
         if (map.containsKey(chunkKey)) {
@@ -54,7 +54,7 @@ public final class NodeChunkLocationsCache {
         }
     }
 
-    public synchronized boolean removeFromCache(PrticlNode node) {
+    public synchronized boolean remove(PrticlNode node) {
         ChunkKey key = nodeToKey(node);
         List<PrticlNode> nodes = map.get(key);
 

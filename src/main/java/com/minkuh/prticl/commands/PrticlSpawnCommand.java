@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 import static com.minkuh.prticl.common.resources.PrticlConstants.*;
 
@@ -31,10 +32,14 @@ public class PrticlSpawnCommand extends PrticlCommand {
     @Override
     public boolean execute(String[] args, CommandSender sender) {
         if (isCommandSentByPlayer(sender) && args.length == 1) {
-            PrticlNode node = getNodeFromDatabase(args[0], sender);
+            var nodeOpt = getNodeFromDatabase(args[0], sender);
 
-            if (node == null)
+            if (nodeOpt.isEmpty()) {
+                var argStrippedOfIdIfPresent = args[0].startsWith("id:") ? args[0].substring("id:".length()) : args[0];
+                sender.sendMessage(prticlMessage.warning("Unable to find a node in cache using id/name: " + argStrippedOfIdIfPresent));
                 return true;
+            }
+            var node = nodeOpt.get();
 
             if (node.getLocationObject().getLocation() == null)
                 node.getLocationObject().setLocation(((Player) sender).getLocation());
@@ -62,7 +67,7 @@ public class PrticlSpawnCommand extends PrticlCommand {
         return List.of();
     }
 
-    private PrticlNode getNodeFromDatabase(String arg, CommandSender sender) {
+    private Optional<PrticlNode> getNodeFromDatabase(String arg, CommandSender sender) {
         try {
             return arg.startsWith("id:")
                     ? prticlDb.getNodeFunctions().getNodeById(Integer.parseInt(arg.substring("id:".length())))
@@ -73,7 +78,7 @@ public class PrticlSpawnCommand extends PrticlCommand {
             sender.sendMessage(prticlMessage.error(e.getMessage()));
         }
 
-        return null;
+        return Optional.empty();
     }
 
     public static String getCommandName() {
