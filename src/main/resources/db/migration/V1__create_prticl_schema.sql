@@ -3,12 +3,13 @@ CREATE TABLE IF NOT EXISTS locations (
     x NUMERIC,
     y NUMERIC,
     z NUMERIC,
-    world TEXT
+    world_name TEXT,
+    world_id UUID
 );
 
 CREATE TABLE IF NOT EXISTS players (
     id SERIAL PRIMARY KEY,
-    uuid TEXT NOT NULL,
+    uuid UUID NOT NULL,
     username TEXT NOT NULL
 );
 
@@ -18,7 +19,6 @@ CREATE TABLE IF NOT EXISTS nodes (
     repeat_delay INTEGER,
     particle_density INTEGER,
     particle_type TEXT,
-    is_spawned BOOLEAN NOT NULL,
     is_enabled BOOLEAN NOT NULL,
     location_id INTEGER,
     FOREIGN KEY(location_id) REFERENCES locations(id),

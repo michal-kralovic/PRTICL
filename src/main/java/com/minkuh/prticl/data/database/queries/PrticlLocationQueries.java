@@ -1,5 +1,6 @@
 package com.minkuh.prticl.data.database.queries;
 
+import com.minkuh.prticl.data.database.PrticlDbConstants;
 import org.bukkit.Location;
 import org.postgresql.ds.PGSimpleDataSource;
 
@@ -15,7 +16,14 @@ public class PrticlLocationQueries {
         this.pgDataSource = pgDataSource;
     }
 
-    private static final String GET_LOCATION_ID_QUERY = "SELECT id FROM locations WHERE x = ? AND y = ? AND z = ? AND world = ?";
+    private static final String GET_LOCATION_ID_QUERY =
+            "SELECT %s FROM %s WHERE %s = ? AND %s = ? AND %s = ? AND %s = ?".formatted(
+                    PrticlDbConstants.PLAYER_ID,
+                    PrticlDbConstants.LOCATIONS_TABLE,
+                    PrticlDbConstants.LOCATION_X,
+                    PrticlDbConstants.LOCATION_Y,
+                    PrticlDbConstants.LOCATION_Z,
+                    PrticlDbConstants.LOCATION_WORLD_ID);
 
     public int getLocationId(Location location) throws SQLException {
         try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(GET_LOCATION_ID_QUERY)) {
@@ -32,7 +40,13 @@ public class PrticlLocationQueries {
         }
     }
 
-    private static final String IS_LOCATION_IN_DATABASE_QUERY = "SELECT 1 FROM locations WHERE x = ? AND y = ? AND z = ? AND world = ? LIMIT 1";
+    private static final String IS_LOCATION_IN_DATABASE_QUERY = "SELECT 1 FROM %s WHERE %s = ? AND %s = ? AND %s = ? AND %s = ? LIMIT 1".formatted(
+            PrticlDbConstants.LOCATIONS_TABLE,
+            PrticlDbConstants.LOCATION_X,
+            PrticlDbConstants.LOCATION_Y,
+            PrticlDbConstants.LOCATION_Z,
+            PrticlDbConstants.LOCATION_WORLD_ID
+    );
 
     public boolean isLocationInDatabase(Location location) throws SQLException {
         try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(IS_LOCATION_IN_DATABASE_QUERY)) {
@@ -45,33 +59,22 @@ public class PrticlLocationQueries {
         }
     }
 
-    private static final String CREATE_LOCATION_QUERY = "INSERT INTO locations (x, y, z, world) VALUES (?, ?, ?, ?)";
+    private static final String CREATE_LOCATION_QUERY = "INSERT INTO locations (x, y, z, world_id, world_name) VALUES (?, ?, ?, ?, ?)";
 
     public int createLocation(Location location) throws SQLException {
         try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(CREATE_LOCATION_QUERY, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setDouble(1, location.x());
             statement.setDouble(2, location.y());
             statement.setDouble(3, location.z());
-            statement.setString(4, location.getWorld().getName());
+            statement.setObject(4, location.getWorld().getUID());
+            statement.setString(5, location.getWorld().getName());
 
             statement.executeUpdate();
             try (ResultSet rs = statement.getGeneratedKeys()) {
                 if (rs.next())
                     return rs.getInt(1);
-                else
-                    throw new NoSuchElementException("Column ID not returned!");
+                else throw new NoSuchElementException("Column ID not returned!");
             }
-        }
-    }
-
-    public boolean createLocation(double x, double y, double z, String world) throws SQLException {
-        try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(CREATE_LOCATION_QUERY)) {
-            statement.setDouble(1, x);
-            statement.setDouble(2, y);
-            statement.setDouble(3, z);
-            statement.setString(4, world);
-
-            return statement.executeUpdate() == 1;
         }
     }
 }

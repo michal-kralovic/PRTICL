@@ -1,9 +1,9 @@
 package com.minkuh.prticl.data.database;
 
 import com.minkuh.prticl.Prticl;
+import com.minkuh.prticl.common.wrappers.PrticlDataSource;
 import com.minkuh.prticl.data.database.functions.PrticlLocationFunctions;
 import com.minkuh.prticl.data.database.functions.PrticlNodeFunctions;
-import com.minkuh.prticl.data.wrappers.PrticlDataSource;
 import com.minkuh.prticl.systemutil.configuration.PrticlConfigurationUtil;
 import org.postgresql.ds.PGSimpleDataSource;
 

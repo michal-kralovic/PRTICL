@@ -14,13 +14,13 @@ public class PrticlPlayerQueries {
 
     public PrticlPlayerQueries(PGSimpleDataSource pgDataSource) {
         this.pgDataSource = pgDataSource;
-    }
+    };
 
     public int getPlayerIdByPlayerUUID(UUID playerUUID) throws SQLException {
         String query = "SELECT id FROM players WHERE uuid = ? LIMIT 1";
 
         try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(query)) {
-            statement.setString(1, playerUUID.toString());
+            statement.setObject(1, playerUUID);
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next())
@@ -35,7 +35,7 @@ public class PrticlPlayerQueries {
         String query = "SELECT 1 FROM players WHERE uuid = ? LIMIT 1";
 
         try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(query)) {
-            statement.setString(1, player.getUniqueId().toString());
+            statement.setObject(1, player.getUniqueId());
             return statement.executeQuery().next();
         }
     }
@@ -44,7 +44,7 @@ public class PrticlPlayerQueries {
         String query = "INSERT INTO players (uuid, username) VALUES (?, ?)";
 
         try (PreparedStatement statement = pgDataSource.getConnection().prepareStatement(query)) {
-            statement.setString(1, player.getUniqueId().toString());
+            statement.setObject(1, player.getUniqueId());
             statement.setString(2, player.getName());
             return statement.executeUpdate() == 1;
         }

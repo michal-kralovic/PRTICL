@@ -1,11 +1,11 @@
 package com.minkuh.prticl;
 
-import com.minkuh.prticl.data.wrappers.PrticlDataSource;
+import com.minkuh.prticl.common.wrappers.PrticlDataSource;
 import com.minkuh.prticl.event_listeners.RightClickEventListener;
 import com.minkuh.prticl.event_listeners.TerrainStateChangeEventListener;
-import com.minkuh.prticl.nodes.commands.PrticlCommand;
-import com.minkuh.prticl.nodes.prticl.PrticlNode;
-import com.minkuh.prticl.nodes.tab_completers.PrticlTabCompleter;
+import com.minkuh.prticl.commands.PrticlCommand;
+import com.minkuh.prticl.common.PrticlNode;
+import com.minkuh.prticl.commands.PrticlTabCompleter;
 import com.minkuh.prticl.systemutil.PrticlCommandsUtil;
 import com.minkuh.prticl.systemutil.configuration.PrticlConfigurationUtil;
 import org.bukkit.command.Command;
@@ -50,15 +50,14 @@ public final class Prticl extends JavaPlugin {
 
         Flyway flyway = Flyway.configure(getClass().getClassLoader())
                 .validateMigrationNaming(true)
-                .defaultSchema("prticl")
+                .defaultSchema(dataSource.schema())
                 .dataSource(dataSource.url(), dataSource.user(), dataSource.password())
                 .load();
 
         try {
             flyway.migrate();
         } catch (FlywayException ex) {
-            getLogger().log(Level.SEVERE, "Couldn't run migrations! Reason: "
-                    + ex.getMessage()
+            getLogger().log(Level.SEVERE, "Couldn't run migrations! Reason: " + ex.getMessage()
                     + "\nPlease check the data source configuration inside of the plugin's config.yml");
         }
     }

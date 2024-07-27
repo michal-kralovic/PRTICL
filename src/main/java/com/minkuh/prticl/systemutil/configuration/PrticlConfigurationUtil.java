@@ -1,7 +1,7 @@
 package com.minkuh.prticl.systemutil.configuration;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.data.wrappers.PrticlDataSource;
+import com.minkuh.prticl.common.wrappers.PrticlDataSource;
 
 public class PrticlConfigurationUtil {
     private final Prticl plugin;

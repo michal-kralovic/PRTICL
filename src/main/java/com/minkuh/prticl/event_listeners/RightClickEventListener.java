@@ -1,6 +1,6 @@
 package com.minkuh.prticl.event_listeners;
 
-import com.minkuh.prticl.systemutil.message.PrticlMessages;
+import com.minkuh.prticl.common.message.PrticlMessages;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
