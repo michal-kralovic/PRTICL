@@ -5,6 +5,7 @@ import com.minkuh.prticl.common.PrticlNode;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.schedulers.PrticlSpawner;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +66,16 @@ public class PrticlSpawnCommand extends PrticlCommand {
     public List<String> getTabCompletion(String @NotNull [] args) {
         if (args.length == 2) return List.of(NODE_PARAM_ID + '/' + NODE_PARAM_NAME);
         return List.of();
+    }
+
+    @Override
+    public TextComponent.Builder getHelpDescription() {
+        return listEntryOfNodeHelp(
+                PrticlSpawnCommand.getCommandName(),
+                "Spawns a prticl node based on a given id/name.",
+                "/prticl node spawn <(id:X) or (node name)>",
+                "/prticl node spawn id:1"
+        );
     }
 
     private Optional<PrticlNode> getNodeFromDatabase(String arg, CommandSender sender) {

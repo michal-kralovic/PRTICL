@@ -5,9 +5,10 @@ import com.minkuh.prticl.common.PrticlLocationObjectBuilder;
 import com.minkuh.prticl.common.PrticlNode;
 import com.minkuh.prticl.common.PrticlNodeBuilder;
 import com.minkuh.prticl.common.message.PrticlMessages;
+import com.minkuh.prticl.common.wrappers.command_args.PrticlCreateCommandArguments;
 import com.minkuh.prticl.data.caches.NodeChunkLocationsCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
-import com.minkuh.prticl.common.wrappers.command_args.PrticlCreateCommandArguments;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
@@ -125,6 +126,16 @@ public class PrticlCreateCommand extends PrticlCommand {
             }
             default -> List.of();
         };
+    }
+
+    @Override
+    public TextComponent.Builder getHelpDescription() {
+        return listEntryOfNodeHelp(
+                PrticlCreateCommand.getCommandName(),
+                "Creates a new prticl node.",
+                "/prticl node create <name> <particle type> <repeat delay> <density> <(x) (y) (z)>",
+                "/prticl node create my_node minecraft:cloud 5 5 ~ ~ ~"
+        );
     }
 
     private static final List<String> PARTICLE_NAMES = Arrays.stream(Particle.values())

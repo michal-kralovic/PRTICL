@@ -50,7 +50,7 @@ public class PrticlCommandsUtil {
                     }
                 }
 
-                if (args[0].equalsIgnoreCase(PrticlHelpCommand.getCommandName()) // if arg is "help" OR "h"
+                if (args[0].equalsIgnoreCase(PrticlHelpCommand.getCommandName())
                         || args[0].equalsIgnoreCase(String.valueOf(PrticlHelpCommand.getCommandName().charAt(0)))) {
                     commands.get(PrticlHelpCommand.getCommandName()).execute(Arrays.stream(args).skip(1).toArray(String[]::new), sender);
                 }

@@ -5,6 +5,7 @@ import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.common.wrappers.PaginatedResult;
 import com.minkuh.prticl.common.PrticlNode;
 import com.minkuh.prticl.common.message.PrticlMessages;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -43,6 +44,16 @@ public class PrticlListCommand extends PrticlCommand {
         }
 
         return List.of();
+    }
+
+    @Override
+    public TextComponent.Builder getHelpDescription() {
+        return listEntryOfNodeHelp(
+                PrticlListCommand.getCommandName(),
+                "Lists out all the available prticl nodes.",
+                "/prticl node list <page number>",
+                "/prticl node list 1"
+        );
     }
 
     /**

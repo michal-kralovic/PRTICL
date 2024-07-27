@@ -4,6 +4,7 @@ import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.common.PrticlNode;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.StringUtil;
 
@@ -70,6 +71,16 @@ public class PrticlDespawnCommand extends PrticlCommand {
         }
 
         return List.of();
+    }
+
+    @Override
+    public TextComponent.Builder getHelpDescription() {
+        return listEntryOfNodeHelp(
+                PrticlDespawnCommand.getCommandName(),
+                "Despawns a spawned prticl node.",
+                "/prticl node despawn <(id:X) or (node name)>",
+                "/prticl node despawn foo"
+        );
     }
 
     private Optional<PrticlNode> getNodeFromCache(String arg) {

@@ -3,6 +3,7 @@ package com.minkuh.prticl.commands;
 import com.minkuh.prticl.common.wrappers.command_args.PrticlLineCommandArguments;
 import com.minkuh.prticl.common.PrticlLine;
 import com.minkuh.prticl.schedulers.PrticlLineScheduler;
+import net.kyori.adventure.text.TextComponent;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import static com.minkuh.prticl.common.resources.PrticlConstants.*;
+import static net.kyori.adventure.text.Component.text;
 
 /**
  * A Command for handling the creation of particle lines.
@@ -71,6 +73,11 @@ public class PrticlLineCommand extends PrticlCommand {
     @Override
     public List<String> getTabCompletion(String[] args) {
         return List.of();
+    }
+
+    @Override
+    public TextComponent.Builder getHelpDescription() {
+        return text();
     }
 
     /**
