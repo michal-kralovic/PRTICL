@@ -14,6 +14,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Properties;
 
@@ -50,10 +51,30 @@ public class PrticlDatabaseUtil {
     }
 
     private static void configureSessionFactory(Prticl plugin) {
+        var useMySQL = false;
         var pluginConfig = plugin.getConfig();
-        var useMySQL = pluginConfig.getConfigurationSection("database").getBoolean("use-mysql");
-        var dataSource = PrticlDataSource.getFromConfig(pluginConfig);
+        var databaseSection = pluginConfig.getConfigurationSection("database");
 
+        if (databaseSection != null) {
+            useMySQL = databaseSection.getBoolean("use-mysql");
+        }
+
+        var dataSourceOpt = PrticlDataSource.getFromConfig(pluginConfig);
+        if (dataSourceOpt.isEmpty()) {
+            plugin.getLogger().severe("Couldn't obtain the database configuration!");
+            throw new RuntimeException("Couldn't obtain the database configuration!");
+        }
+
+        var config = getConfig(dataSourceOpt.get(), useMySQL);
+
+        config.addAnnotatedClass(Player.class);
+        config.addAnnotatedClass(Node.class);
+
+        var serviceRegistry = new StandardServiceRegistryBuilder().applySettings(config.getProperties()).build();
+        sessionFactory = config.buildSessionFactory(serviceRegistry);
+    }
+
+    private static @NotNull Configuration getConfig(PrticlDataSource dataSource, boolean useMySQL) {
         var config = new Configuration();
         var props = new Properties();
 
@@ -67,10 +88,6 @@ public class PrticlDatabaseUtil {
         props.put(Environment.SHOW_SQL, "true");
 
         config.setProperties(props);
-        config.addAnnotatedClass(Player.class);
-        config.addAnnotatedClass(Node.class);
-
-        var serviceRegistry = new StandardServiceRegistryBuilder().applySettings(config.getProperties()).build();
-        sessionFactory = config.buildSessionFactory(serviceRegistry);
+        return config;
     }
 }

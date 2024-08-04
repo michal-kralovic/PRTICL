@@ -9,11 +9,17 @@ import java.sql.SQLException;
 
 public class PrticlDatabase {
     private final PrticlNodeFunctions nodeFunctions;
-    private final PrticlDataSource PRTICL_DATA_SOURCE;
+    private final PrticlDataSource prticlDataSource;
 
     public PrticlDatabase(Prticl plugin) throws SQLException {
-        this.PRTICL_DATA_SOURCE = new PrticlConfigurationUtil(plugin).getDataSource();
+        var prticlDataSourceOpt = new PrticlConfigurationUtil(plugin).getDataSource();
 
+        if (prticlDataSourceOpt.isEmpty()) {
+            plugin.getLogger().severe("Couldn't obtain the database configuration!");
+            throw new RuntimeException("Couldn't obtain the database configuration!");
+        }
+
+        this.prticlDataSource = prticlDataSourceOpt.get();
         this.nodeFunctions = new PrticlNodeFunctions();
     }
 
@@ -22,6 +28,6 @@ public class PrticlDatabase {
     }
 
     public PrticlDataSource getDataSource() {
-        return PRTICL_DATA_SOURCE;
+        return prticlDataSource;
     }
 }

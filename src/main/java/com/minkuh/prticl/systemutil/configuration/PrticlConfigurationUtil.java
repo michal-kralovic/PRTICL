@@ -4,6 +4,8 @@ import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.common.wrappers.PrticlDataSource;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.Optional;
+
 public class PrticlConfigurationUtil {
     private final FileConfiguration config;
 
@@ -15,7 +17,7 @@ public class PrticlConfigurationUtil {
         return config.getConfigurationSection("database").getBoolean("use-mysql");
     }
 
-    public PrticlDataSource getDataSource() {
+    public Optional<PrticlDataSource> getDataSource() {
         return PrticlDataSource.getFromConfig(config);
     }
 }

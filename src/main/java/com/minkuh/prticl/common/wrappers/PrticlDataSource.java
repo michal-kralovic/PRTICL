@@ -1,12 +1,22 @@
 package com.minkuh.prticl.common.wrappers;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import java.util.Optional;
 
 public record PrticlDataSource(String serverName, int port, String database, String user, String password,
                                String schema) {
 
-    public static PrticlDataSource getFromConfig(FileConfiguration config) {
-        var dataSourceConfigSection = config.getConfigurationSection("database").getConfigurationSection("data-source");
+    public static Optional<PrticlDataSource> getFromConfig(FileConfiguration config) {
+        ConfigurationSection dataSourceConfigSection;
+        var databaseSection = config.getConfigurationSection("database");
+
+        if (databaseSection == null) {
+            return Optional.empty();
+        }
+
+        dataSourceConfigSection = databaseSection.getConfigurationSection("data-source");
 
         String serverName = dataSourceConfigSection.getString("server-name");
         int port = dataSourceConfigSection.getInt("port");
@@ -15,7 +25,7 @@ public record PrticlDataSource(String serverName, int port, String database, Str
         String password = dataSourceConfigSection.getString("password");
         String schema = dataSourceConfigSection.getString("schema");
 
-        return new PrticlDataSource(serverName, port, database, user, password, schema);
+        return Optional.of(new PrticlDataSource(serverName, port, database, user, password, schema));
     }
 
     public String url(boolean useMySQL) {
