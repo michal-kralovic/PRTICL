@@ -1,18 +1,16 @@
 package com.minkuh.prticl.commands;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.common.PrticlLocationObjectBuilder;
-import com.minkuh.prticl.common.PrticlNode;
-import com.minkuh.prticl.common.PrticlNodeBuilder;
 import com.minkuh.prticl.common.message.PrticlMessages;
 import com.minkuh.prticl.common.wrappers.command_args.PrticlCreateCommandArguments;
 import com.minkuh.prticl.data.caches.NodeChunkLocationsCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
+import com.minkuh.prticl.data.entities.Node;
+import com.minkuh.prticl.data.entity_util.NodeBuilder;
+import com.minkuh.prticl.data.entity_util.PlayerBuilder;
 import net.kyori.adventure.text.TextComponent;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.sql.SQLException;
@@ -27,12 +25,12 @@ import static com.minkuh.prticl.common.resources.PrticlConstants.*;
  * Example: <b>/prticl node create leaf_blower CHERRY_LEAVES 5 5</b>
  */
 public class PrticlCreateCommand extends PrticlCommand {
-    private final PrticlNodeBuilder nodeBuilder;
+    private final NodeBuilder nodeBuilder;
     PrticlMessages prticlMessage = new PrticlMessages();
     private final PrticlDatabase prticlDatabase;
 
     public PrticlCreateCommand(Prticl plugin) throws SQLException {
-        this.nodeBuilder = new PrticlNodeBuilder();
+        this.nodeBuilder = new NodeBuilder();
         this.prticlDatabase = new PrticlDatabase(plugin);
     }
 
@@ -67,20 +65,28 @@ public class PrticlCreateCommand extends PrticlCommand {
                 nodeBuilder.setParticleDensity(cmdArgsObject.getParticleDensity());
             }
 
+            var bukkitPlayer = (org.bukkit.entity.Player) sender;
+            var worldName = bukkitPlayer.getLocation().getWorld().getName();
+            var worldUUID = bukkitPlayer.getLocation().getWorld().getUID();
 
-            Location playerLocation = ((Player) sender).getLocation();
-            int dbLocationId = prticlDatabase.getLocationFunctions().createLocation(playerLocation);
-            nodeBuilder.setLocationObject(new PrticlLocationObjectBuilder().withLocation(playerLocation).withId(dbLocationId).build());
-            nodeBuilder.setCreatedBy(sender.getName());
+            nodeBuilder.setLocation(
+                    worldName,
+                    worldUUID,
+                    bukkitPlayer.getLocation()
+            );
+
+            nodeBuilder.setPlayer(PlayerBuilder.fromBukkitPlayer(bukkitPlayer));
+            Node node = nodeBuilder.build();
 
 
-            PrticlNode node = nodeBuilder.build();
-            if (!prticlDatabase.getNodeFunctions().addNodeToDatabase((Player) sender, node)) {
-                sender.sendMessage(prticlMessage.error(FAILED_SAVE_TO_DATABASE));
-                return true;
-            } else {
+            try {
+                prticlDatabase.getNodeFunctions().add(node);
                 NodeChunkLocationsCache.getInstance().add(node);
+            } catch (Exception ex) {
+                sender.sendMessage(prticlMessage.error(ex.getMessage()));
+                return true;
             }
+
 
             sender.sendMessage(prticlMessage.player(CREATED_NODE));
 
@@ -94,6 +100,7 @@ public class PrticlCreateCommand extends PrticlCommand {
     }
 
     private static final List<String> marker = new ArrayList<>();
+
     @Override
     public List<String> getTabCompletion(String[] args) {
         marker.clear();
@@ -185,13 +192,8 @@ public class PrticlCreateCommand extends PrticlCommand {
             return false;
         }
 
-        try {
-            if (nameExistsInDatabase(arg)) {
-                sender.sendMessage(messages.error(DUPLICATE_NODE_NAME));
-                return false;
-            }
-        } catch (SQLException e) {
-            sender.sendMessage(messages.error("An SQL error occurred!"));
+        if (nameExistsInDatabase(arg)) {
+            sender.sendMessage(messages.error(DUPLICATE_NODE_NAME));
             return false;
         }
 
@@ -209,10 +211,8 @@ public class PrticlCreateCommand extends PrticlCommand {
      * @param nodeName The name to check for in the list of existing nodes
      * @return TRUE if exists.
      */
-    private boolean nameExistsInDatabase(String nodeName) throws SQLException {
-        return prticlDatabase.getNodeFunctions().getNodeNames()
-                .stream()
-                .anyMatch(node -> node.toLowerCase(Locale.ROOT).equals(nodeName.toLowerCase(Locale.ROOT)));
+    private boolean nameExistsInDatabase(String nodeName) {
+        return prticlDatabase.getNodeFunctions().isNodeNameUnique(nodeName);
     }
 
     public static String getCommandName() {

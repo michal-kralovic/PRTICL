@@ -3,8 +3,9 @@ package com.minkuh.prticl.commands;
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.common.wrappers.PaginatedResult;
-import com.minkuh.prticl.common.PrticlNode;
 import com.minkuh.prticl.common.message.PrticlMessages;
+import com.minkuh.prticl.data.entities.Node;
+import com.minkuh.prticl.data.entity_util.PlayerBuilder;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -56,14 +57,6 @@ public class PrticlListCommand extends PrticlCommand {
         );
     }
 
-    /**
-     * A utility logic method that collects every single node from the config and passes it to the method that
-     * lists these nodes out. Contains conditional logic for OP player checking.
-     *
-     * @param args   Player input to pass to the listing method
-     * @param sender The sender of the command
-     * @return TRUE if succeeded.
-     */
     private boolean listNodes(String[] args, CommandSender sender) {
         int page;
         try {
@@ -78,29 +71,17 @@ public class PrticlListCommand extends PrticlCommand {
             return true;
         }
 
-        PaginatedResult<PrticlNode> nodePage;
-        try {
-            // TODO: Change once permissions are implemented
-            nodePage = sender.isOp()
-                    ? prticlDatabase.getNodeFunctions().getNodesByPage(page)
-                    : prticlDatabase.getNodeFunctions().getNodesByPageByPlayer(page, ((Player) sender).getUniqueId());
-        } catch (SQLException ex) {
-            sender.sendMessage(prticlMessage.error(ex.getMessage()));
-            return true;
-        }
+        PaginatedResult<Node> nodePage;
+        // TODO: Change once permissions are implemented
+        nodePage = sender.isOp()
+                ? prticlDatabase.getNodeFunctions().getByPage(page)
+                : prticlDatabase.getNodeFunctions().getByPageForPlayer(page, PlayerBuilder.fromBukkitPlayer((Player) sender));
 
         return mainListLogic(nodePage, sender);
     }
 
-    /**
-     * The main utility logic method that lists all the nodes out.
-     *
-     * @param nodes  The page of nodes from the DB
-     * @param sender The sender of the command
-     * @return TRUE if succeeded.
-     */
     @SuppressWarnings("SameReturnValue")
-    private static boolean mainListLogic(PaginatedResult<PrticlNode> nodes, CommandSender sender) {
+    private static boolean mainListLogic(PaginatedResult<Node> nodes, CommandSender sender) {
         int page = nodes.getPage();
         int pageAmount = nodes.getTotalPages();
 

@@ -1,13 +1,12 @@
 package com.minkuh.prticl.commands;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.common.PrticlNode;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
+import com.minkuh.prticl.data.entities.Node;
 import com.minkuh.prticl.schedulers.PrticlSpawner;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -42,17 +41,14 @@ public class PrticlSpawnCommand extends PrticlCommand {
             }
             var node = nodeOpt.get();
 
-            if (node.getLocationObject().getLocation() == null)
-                node.getLocationObject().setLocation(((Player) sender).getLocation());
-
             try {
                 prticlDb.getNodeFunctions().setEnabled(node, true);
-            } catch (SQLException e) {
-                sender.sendMessage(prticlMessage.warning("Failed to toggle node's 'isEnabled'! (continuing...)"));
+                spawner.spawnNode(node);
+                SpawnedNodesCache.getInstance().addToCache(node);
+            } catch (Exception ex) {
+                plugin.getLogger().severe("Encountered an issue when spawning a node!\nIssue: " + ex.getMessage());
+                performRollback(node);
             }
-
-            spawner.spawnNode(node);
-            SpawnedNodesCache.getInstance().addToCache(node);
 
             sender.sendMessage(prticlMessage.player("Spawned '" + node.getName() + '\''));
             return true;
@@ -78,11 +74,11 @@ public class PrticlSpawnCommand extends PrticlCommand {
         );
     }
 
-    private Optional<PrticlNode> getNodeFromDatabase(String arg, CommandSender sender) {
+    private Optional<Node> getNodeFromDatabase(String arg, CommandSender sender) {
         try {
             return arg.startsWith("id:")
-                    ? prticlDb.getNodeFunctions().getNodeById(Integer.parseInt(arg.substring("id:".length())))
-                    : prticlDb.getNodeFunctions().getNodeByName(arg);
+                    ? prticlDb.getNodeFunctions().getById(Integer.parseInt(arg.substring("id:".length())))
+                    : prticlDb.getNodeFunctions().getByName(arg);
         } catch (NumberFormatException e) {
             sender.sendMessage(prticlMessage.error(INCORRECT_NODE_ID_FORMAT));
         } catch (Exception e) {
@@ -90,6 +86,38 @@ public class PrticlSpawnCommand extends PrticlCommand {
         }
 
         return Optional.empty();
+    }
+
+    private void performRollback(Node node) {
+        boolean rolledAnythingBack = false;
+        plugin.getLogger().warning("Attempting to roll back side-effects...");
+
+        try {
+            // Disable if enabled
+            if (prticlDb.getNodeFunctions().isNodeEnabled(node)) {
+                plugin.getLogger().warning("Node is enabled in the database. Reverting...");
+                prticlDb.getNodeFunctions().setEnabled(node, false);
+                rolledAnythingBack = true;
+            }
+
+            // Despawn if spawned
+            if (node.isSpawned()) {
+                plugin.getLogger().warning("Node is spawned. Despawning...");
+                node.setSpawned(false);
+                rolledAnythingBack = true;
+            }
+
+            // Remove from the cache if present
+            if (SpawnedNodesCache.getInstance().isInCache(node)) {
+                plugin.getLogger().warning("Node is in the cache. Removing...");
+                SpawnedNodesCache.getInstance().remove(node);
+                rolledAnythingBack = true;
+            }
+
+            plugin.getLogger().warning(rolledAnythingBack ? "Rollback successful!" : "Nothing to roll back. Done!");
+        } catch (Exception exc) {
+            plugin.getLogger().severe("Encountered an issue during node spawn rollback!\nIssue: " + exc.getMessage());
+        }
     }
 
     public static String getCommandName() {

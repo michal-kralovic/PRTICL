@@ -1,10 +1,10 @@
 package com.minkuh.prticl.event_listeners;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.common.PrticlNode;
 import com.minkuh.prticl.data.caches.NodeChunkLocationsCache;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
+import com.minkuh.prticl.data.entities.Node;
 import com.minkuh.prticl.schedulers.PrticlSpawner;
 import org.bukkit.Chunk;
 import org.bukkit.event.EventHandler;
@@ -15,7 +15,6 @@ import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
 
 public class TerrainStateChangeEventListener implements Listener {
     private final Prticl plugin;
@@ -34,14 +33,14 @@ public class TerrainStateChangeEventListener implements Listener {
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
         Chunk eventChunk = event.getChunk();
-        List<PrticlNode> nodesInTheChunk = NodeChunkLocationsCache.getInstance().getNodesFromCacheByChunk(eventChunk);
+        List<Node> nodesInTheChunk = NodeChunkLocationsCache.getInstance().getNodesFromCacheByChunk(eventChunk);
 
         if (nodesInTheChunk == null) {
-            plugin.getLogger().log(Level.FINE, "No nodes found in chunk: x:" + eventChunk.getX() + ", z:" + eventChunk.getZ());
+            plugin.getLogger().fine("No nodes found in chunk: x:" + eventChunk.getX() + ", z:" + eventChunk.getZ());
             return;
         }
 
-        for (PrticlNode node : nodesInTheChunk) {
+        for (Node node : nodesInTheChunk) {
             if (!node.isEnabled()) continue;
 
             spawner.spawnNode(node);
@@ -56,12 +55,14 @@ public class TerrainStateChangeEventListener implements Listener {
     }
 
     private void setupCachesOnWorldLoad(WorldLoadEvent event) {
-        List<PrticlNode> nodes;
-        List<PrticlNode> enabledNodes;
+        List<Node> nodes;
+        List<Node> enabledNodes;
+
         try {
             PrticlDatabase db = new PrticlDatabase(plugin);
-            nodes = db.getNodeFunctions().getNodesByWorld(event.getWorld());
+            nodes = db.getNodeFunctions().getByWorld(event.getWorld().getUID());
             enabledNodes = db.getNodeFunctions().getEnabledNodes();
+
         } catch (SQLException ex) {
             throw new RuntimeException("Failed to initialize the database while preparing the cache!");
         }

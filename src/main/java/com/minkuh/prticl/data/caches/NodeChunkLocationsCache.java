@@ -1,6 +1,7 @@
 package com.minkuh.prticl.data.caches;
 
-import com.minkuh.prticl.common.PrticlNode;
+import com.minkuh.prticl.common.builders.LocationBuilder;
+import com.minkuh.prticl.data.entities.Node;
 import org.bukkit.Chunk;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class NodeChunkLocationsCache {
     private static NodeChunkLocationsCache INSTANCE;
-    private final Map<ChunkKey, List<PrticlNode>> map;
+    private final Map<ChunkKey, List<Node>> map;
 
     private NodeChunkLocationsCache() {
         map = new ConcurrentHashMap<>();
@@ -27,19 +28,19 @@ public final class NodeChunkLocationsCache {
         return INSTANCE;
     }
 
-    public synchronized List<PrticlNode> getNodesFromCacheByChunk(Chunk chunk) {
+    public synchronized List<Node> getNodesFromCacheByChunk(Chunk chunk) {
         return getNodesFromCacheByChunkKey(new ChunkKey(chunk.getX(), chunk.getZ()));
     }
 
-    public synchronized List<PrticlNode> getNodesFromCacheByChunkCoordinates(int x, int z) {
+    public synchronized List<Node> getNodesFromCacheByChunkCoordinates(int x, int z) {
         return getNodesFromCacheByChunkKey(new ChunkKey(x, z));
     }
 
-    public synchronized List<PrticlNode> getNodesFromCacheByChunkKey(ChunkKey chunkKey) {
+    public synchronized List<Node> getNodesFromCacheByChunkKey(ChunkKey chunkKey) {
         return map.get(chunkKey);
     }
 
-    public synchronized void add(PrticlNode node) {
+    public synchronized void add(Node node) {
         ChunkKey chunkKey = nodeToKey(node);
 
         if (map.containsKey(chunkKey)) {
@@ -54,9 +55,9 @@ public final class NodeChunkLocationsCache {
         }
     }
 
-    public synchronized boolean remove(PrticlNode node) {
+    public synchronized boolean remove(Node node) {
         ChunkKey key = nodeToKey(node);
-        List<PrticlNode> nodes = map.get(key);
+        List<Node> nodes = map.get(key);
 
         try {
             if (nodes != null) {
@@ -72,10 +73,12 @@ public final class NodeChunkLocationsCache {
         }
     }
 
-    private ChunkKey nodeToKey(PrticlNode node) {
+    private ChunkKey nodeToKey(Node node) {
+        var location = LocationBuilder.fromNode(node);
+
         return new ChunkKey(
-                node.getLocationObject().getLocation().getChunk().getX(),
-                node.getLocationObject().getLocation().getChunk().getZ()
+                location.getChunk().getX(),
+                location.getChunk().getZ()
         );
     }
 }

@@ -1,23 +1,17 @@
 package com.minkuh.prticl;
 
-import com.minkuh.prticl.common.wrappers.PrticlDataSource;
+import com.minkuh.prticl.commands.PrticlCommand;
+import com.minkuh.prticl.commands.PrticlTabCompleter;
+import com.minkuh.prticl.data.database.PrticlDatabaseUtil;
 import com.minkuh.prticl.event_listeners.RightClickEventListener;
 import com.minkuh.prticl.event_listeners.TerrainStateChangeEventListener;
-import com.minkuh.prticl.commands.PrticlCommand;
-import com.minkuh.prticl.common.PrticlNode;
-import com.minkuh.prticl.commands.PrticlTabCompleter;
 import com.minkuh.prticl.systemutil.PrticlCommandsUtil;
-import com.minkuh.prticl.systemutil.configuration.PrticlConfigurationUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.FlywayException;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
-import java.util.logging.Level;
 
 /**
  * PRTICL 🎉
@@ -30,10 +24,9 @@ public final class Prticl extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        setupDatabase();
+        saveDefaultConfig();
 
-        // serialization
-        ConfigurationSerialization.registerClass(PrticlNode.class);
+        PrticlDatabaseUtil.init(this);
 
         getServer().getPluginManager().registerEvents(new RightClickEventListener(), this);
         getServer().getPluginManager().registerEvents(new TerrainStateChangeEventListener(this), this);
@@ -41,24 +34,12 @@ public final class Prticl extends JavaPlugin {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return cmdUtil.commandExecutor(command, sender, args);
+    public void onDisable() {
+        PrticlDatabaseUtil.shutdown();
     }
 
-    private void setupDatabase() {
-        PrticlDataSource dataSource = new PrticlConfigurationUtil(this).getDataSource();
-
-        Flyway flyway = Flyway.configure(getClass().getClassLoader())
-                .validateMigrationNaming(true)
-                .defaultSchema(dataSource.schema())
-                .dataSource(dataSource.url(), dataSource.user(), dataSource.password())
-                .load();
-
-        try {
-            flyway.migrate();
-        } catch (FlywayException ex) {
-            getLogger().log(Level.SEVERE, "Couldn't run migrations! Reason: " + ex.getMessage()
-                    + "\nPlease check the data source configuration inside of the plugin's config.yml");
-        }
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        return cmdUtil.commandExecutor(command, sender, args);
     }
 }

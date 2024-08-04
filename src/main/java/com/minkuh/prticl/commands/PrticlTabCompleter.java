@@ -53,6 +53,13 @@ public class PrticlTabCompleter implements TabCompleter {
         return completions;
     }
 
+    private List<String> getSortedCommands(String arg) {
+        List<String> completions = new ArrayList<>();
+        StringUtil.copyPartialMatches(arg, COMMAND_NAMES, completions);
+
+        return completions;
+    }
+
     private static final List<String> COMMAND_NAMES = new ArrayList<>() {{
         add(PrticlSpawnCommand.getCommandName());
         add(PrticlDespawnCommand.getCommandName());
@@ -60,13 +67,6 @@ public class PrticlTabCompleter implements TabCompleter {
         add(PrticlCreateCommand.getCommandName());
         add(PrticlListCommand.getCommandName());
     }};
-
-    private List<String> getSortedCommands(String arg) {
-        List<String> completions = new ArrayList<>();
-        StringUtil.copyPartialMatches(arg, COMMAND_NAMES, completions);
-
-        return completions;
-    }
 
     private boolean isNodeSubcommand(String arg) {
         return arg.equalsIgnoreCase(NODE_DEFAULT_NAME) || arg.equalsIgnoreCase(NODE_DEFAULT_NAME.substring(0, 1));

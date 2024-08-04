@@ -1,7 +1,7 @@
 package com.minkuh.prticl.common.message;
 
 import com.minkuh.prticl.common.wrappers.PaginatedResult;
-import com.minkuh.prticl.common.PrticlNode;
+import com.minkuh.prticl.data.entities.Node;
 import net.kyori.adventure.text.TextComponent;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +51,7 @@ public class PrticlMessages {
      * @param nodePage     The list to show
      * @return TextComponent output, the message to be sent to the player.
      */
-    public @NotNull TextComponent listNodes(PaginatedResult<PrticlNode> nodePage) {
+    public @NotNull TextComponent listNodes(PaginatedResult<Node> nodePage) {
         TextComponent output = player("List of nodes — Page " + nodePage.getPage() + " / " + nodePage.getTotalPages());
 
         for (var entry : nodePage.getList())
@@ -71,12 +71,12 @@ public class PrticlMessages {
      * @return The TextComponent to use in a list.
      */
     @Contract("_ -> new")
-    private @NotNull TextComponent listEntryOfNode(@NotNull PrticlNode node) {
+    private @NotNull TextComponent listEntryOfNode(@NotNull Node node) {
         return text().content("- ")
                 .append(text().content("ID: ").color(color(MessageColors.system)))
                 .append(text().content(node.getId() + ", ").color(color(MessageColors.prticlLight)))
                 .append(text().content("Owner: ").color(color(MessageColors.system)))
-                .append(text().content(node.getCreatedBy() + ", ").color(color(MessageColors.prticlLight)))
+                .append(text().content(node.getPlayer().getUsername() + ", ").color(color(MessageColors.prticlLight)))
                 .append(text().content("Node name: ").color(color(MessageColors.system)))
                 .append(text().content(node.getName() + ", ").color(color(MessageColors.prticlLight)))
                 .append(text().content("Node type: ").color(color(MessageColors.system)))

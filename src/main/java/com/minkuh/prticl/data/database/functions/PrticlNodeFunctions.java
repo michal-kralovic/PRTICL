@@ -1,103 +1,136 @@
 package com.minkuh.prticl.data.database.functions;
 
-import com.minkuh.prticl.data.database.queries.PrticlNodeQueries;
-import com.minkuh.prticl.data.database.queries.PrticlPlayerQueries;
 import com.minkuh.prticl.common.wrappers.PaginatedResult;
-import com.minkuh.prticl.common.PrticlNode;
-import org.bukkit.Chunk;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.postgresql.ds.PGSimpleDataSource;
+import com.minkuh.prticl.data.entities.Node;
+import com.minkuh.prticl.data.entities.Player;
+import jakarta.persistence.NoResultException;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class PrticlNodeFunctions {
-    private final PrticlNodeQueries nodeQueries;
-    private final PrticlPlayerQueries playerQueries;
-
-    public PrticlNodeFunctions(PGSimpleDataSource pgDataSource) {
-        this.nodeQueries = new PrticlNodeQueries(pgDataSource);
-        this.playerQueries = new PrticlPlayerQueries(pgDataSource);
+public class PrticlNodeFunctions extends PrticlFunctionsBase {
+    public PrticlNodeFunctions() {
     }
 
-    public List<PrticlNode> getNodes() throws SQLException {
-        return nodeQueries.getNodes();
+    public List<Node> getByWorld(UUID worldUUID) {
+        return executeInTransactionWithResult(session -> {
+            var query = session.createQuery("SELECT n FROM Node n WHERE n.worldUUID = :worldUUID", Node.class);
+
+            query.setParameter("worldUUID", worldUUID);
+
+            return query.getResultList();
+        });
     }
 
-    public PaginatedResult<PrticlNode> getNodesByPage(int page) throws SQLException {
-        return nodeQueries.getNodesByPage(page);
+    public List<Node> getEnabledNodes() {
+        return executeInTransactionWithResult(session -> {
+            var query = session.createQuery("SELECT n from Node n WHERE n.isEnabled = TRUE", Node.class);
+
+            return query.getResultList();
+        });
     }
 
-    public PaginatedResult<PrticlNode> getNodesByPageByPlayer(int page, UUID playerUUID) throws SQLException {
-        return nodeQueries.getNodesByPageByPlayer(page, playerUUID);
+    public PaginatedResult<Node> getByPage(int page) {
+        var startCount = page <= 1 ? 0 : (page - 1) * 10;
+
+        var list = executeInTransactionWithResult(session -> {
+            String jpql = "SELECT n FROM Node n";
+            var query = session.createQuery(jpql, Node.class);
+
+            query.setFirstResult(startCount);
+            query.setMaxResults(10);
+
+            return query.getResultList();
+        });
+
+        var count = executeInTransactionWithResult(session -> {
+            String jpql = "SELECT COUNT(n) FROM Node n";
+            var query = session.createQuery(jpql, Long.class);
+
+            return query.getSingleResult();
+        });
+
+        return new PaginatedResult<>(list, page, Math.toIntExact(count));
     }
 
-    public Optional<PrticlNode> getNodeById(int nodeId) throws SQLException {
-        return nodeQueries.getNodeById(nodeId);
+    public PaginatedResult<Node> getByPageForPlayer(int page, Player player) {
+        var startCount = page <= 1 ? 0 : (page - 1) * 10;
+
+        var list = executeInTransactionWithResult(session -> {
+            String jpql = "SELECT n FROM Node n WHERE n.player.uuid = :uuid";
+            var query = session.createQuery(jpql, Node.class);
+
+            query.setParameter("uuid", player.getUUID());
+            query.setFirstResult(startCount);
+            query.setMaxResults(10);
+
+            return query.getResultList();
+        });
+
+        var count = executeInTransactionWithResult(session -> {
+            String jpql = "SELECT COUNT(n) FROM Node n";
+            var query = session.createQuery(jpql, Long.class);
+
+            return query.getSingleResult();
+        });
+
+        return new PaginatedResult<>(list, page, Math.toIntExact(count));
     }
 
-    public Optional<PrticlNode> getNodeByName(String nodeName) throws SQLException {
-        return nodeQueries.getNodeByName(nodeName);
+    public Optional<Node> getById(int id) {
+        return executeInTransactionWithResult(session -> Optional.of(session.find(Node.class, id)));
     }
 
-    public List<String> getNodeNames() throws SQLException {
-        return nodeQueries.getNodeNamesList();
+    public Optional<Node> getByName(String name) {
+        return executeInTransactionWithResult(session -> {
+            String jpql = "SELECT n FROM Node n WHERE n.name = :name";
+            var query = session.createQuery(jpql, Node.class);
+            query.setParameter("name", name);
+
+            try {
+                return Optional.of(query.getSingleResult());
+            } catch (NoResultException ex) {
+                return Optional.empty();
+            }
+        });
     }
 
-    public List<PrticlNode> getNodesByWorld(World world) throws SQLException {
-        return nodeQueries.getNodesByWorld(world);
+    public void add(Node node) {
+        new PrticlPlayerFunctions().addOrUpdatePlayerViaNode(node);
+        executeInTransaction(session -> session.merge(node));
     }
 
-    public List<PrticlNode> getNodesByCoordinates(int x, int z, World world) throws SQLException {
-        return nodeQueries.getNodesByCoordinates(x, z, world);
+    public void setEnabled(Node node, boolean state) {
+        executeInTransaction(session -> {
+            node.setEnabled(state);
+            session.merge(node);
+        });
     }
 
-    public List<PrticlNode> getNodesListByChunk(Chunk chunk) throws SQLException {
-        if (!nodeQueries.chunkHasNodes(chunk))
-            return null;
+    public boolean isNodeEnabled(Node node) {
+        return executeInTransactionWithResult(session -> {
+            var query = session.createQuery("SELECT n FROM Node n WHERE n.id = :nodeID");
+            query.setParameter("nodeID", node.getId());
+            Node output;
 
-        return nodeQueries.getNodesListByChunk(chunk);
+            try {
+                output = (Node) query.getSingleResult();
+            } catch (NoResultException nre) {
+                return false;
+            }
+
+            return output != null && node.isEnabled();
+        });
     }
 
-    public List<PrticlNode> getEnabledNodes() throws SQLException {
-        return nodeQueries.getEnabledNodes();
-    }
+    public boolean isNodeNameUnique(String name) {
+        return executeInTransactionWithResult(session -> {
+            String jpql = "SELECT name FROM Node n";
+            var query = session.createQuery(jpql, String.class);
+            var queryResult = query.getResultList();
 
-    public boolean setEnabled(PrticlNode node, boolean state) throws SQLException {
-        node.setEnabled(state);
-        return nodeQueries.setEnabled(node, state);
-    }
-
-    public boolean isNodeNameTaken(String nodeName) throws SQLException {
-        return nodeQueries.isNodeNameTaken(nodeName);
-    }
-
-    /**
-     * Creates an entry for a node in the database.<br>
-     * Additionally, creates a Player entry if non-existent, and a Location entry.
-     *
-     * @param player A player to create the node for
-     * @param node   The node to create
-     * @return TRUE, if the operation was successful.
-     */
-    public boolean addNodeToDatabase(Player player, PrticlNode node) throws SQLException {
-        if (!playerQueries.isPlayerInDatabase(player))
-            playerQueries.createPlayer(player);
-
-        int locationId = node.getLocationObject().getId();
-        int playerId = playerQueries.getPlayerIdByPlayerUUID(player.getUniqueId());
-
-        return nodeQueries.createNode(
-                node.getName(),
-                node.getRepeatDelay(),
-                node.getParticleDensity(),
-                node.getParticleType().toString(),
-                node.isEnabled(),
-                locationId,
-                playerId
-        );
+            return queryResult.stream().anyMatch(dbName -> dbName.equalsIgnoreCase(name));
+        });
     }
 }
