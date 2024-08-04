@@ -1,9 +1,9 @@
 package com.minkuh.prticl.commands;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.common.PrticlNode;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
+import com.minkuh.prticl.data.entities.Node;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.StringUtil;
@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import static com.minkuh.prticl.common.resources.PrticlConstants.*;
+import static com.minkuh.prticl.common.resources.PrticlConstants.DESPAWN_COMMAND;
+import static com.minkuh.prticl.common.resources.PrticlConstants.INCORRECT_COMMAND_SYNTAX_OR_OTHER;
 
 /**
  * A Command for handling the despawning of PrticlNodes.
@@ -44,12 +45,8 @@ public class PrticlDespawnCommand extends PrticlCommand {
             }
             var node = nodeOpt.get();
 
-            try {
-                prticlDb.getNodeFunctions().setEnabled(node, false);
-                SpawnedNodesCache.getInstance().remove(node);
-            } catch (SQLException e) {
-                sender.sendMessage(prticlMessage.warning("Couldn't set the spawned node's isEnabled value to false! (continuing...)"));
-            }
+            prticlDb.getNodeFunctions().setEnabled(node, false);
+            SpawnedNodesCache.getInstance().remove(node);
 
             sender.sendMessage(prticlMessage.player("Despawned '" + node.getName() + '\''));
             return true;
@@ -62,7 +59,7 @@ public class PrticlDespawnCommand extends PrticlCommand {
     @Override
     public List<String> getTabCompletion(String[] args) {
         if (args.length == 2) {
-            List<String> spawnedNodeNames = SpawnedNodesCache.getInstance().getAll().stream().map(PrticlNode::getName).toList();
+            List<String> spawnedNodeNames = SpawnedNodesCache.getInstance().getAll().stream().map(com.minkuh.prticl.data.entities.Node::getName).toList();
             var sortedNodeNames = new ArrayList<String>();
 
             StringUtil.copyPartialMatches(args[1], spawnedNodeNames, sortedNodeNames);
@@ -83,7 +80,7 @@ public class PrticlDespawnCommand extends PrticlCommand {
         );
     }
 
-    private Optional<PrticlNode> getNodeFromCache(String arg) {
+    private Optional<Node> getNodeFromCache(String arg) {
         try {
             return arg.toLowerCase(Locale.ROOT).startsWith("id:")
                     ? SpawnedNodesCache.getInstance().get(Integer.parseInt(arg.substring("id:".length())))

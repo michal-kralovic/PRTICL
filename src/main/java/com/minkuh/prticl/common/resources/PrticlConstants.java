@@ -26,11 +26,8 @@ public class PrticlConstants {
 
     public static final String NODE_DEFAULT_NAME = NODE_CHILD;
     public static final String NODE_PARAM_ID = "id";
-    public static final String NODE_PARAM_OWNER = "owner";
     public static final String NODE_PARAM_NAME = "name";
-    public static final String NODE_PARAM_PARTICLE_TYPE = "particle-type";
     public static final String NODE_PARAM_PARTICLE_DENSITY = "particle-density";
-    public static final String NODE_PARAM_LOCATION = "location";
     public static final String NODE_PARAM_REPEAT_DELAY = "repeat-delay";
 
     //
@@ -43,7 +40,6 @@ public class PrticlConstants {
     // Error messages
     //
 
-    public static final String FAILED_SAVE_TO_DATABASE = "Couldn't save the node to the database!";
     public static final String MISMATCHING_WORLDS = "Points cannot be in different worlds!";
     public static final String PLAYER_COMMAND_ONLY = "This command can only be executed by a player!";
     public static final String INCORRECT_COORDINATES_INPUT = "Incorrect coordinates!";

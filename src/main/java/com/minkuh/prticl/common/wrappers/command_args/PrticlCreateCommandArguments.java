@@ -34,8 +34,8 @@ public class PrticlCreateCommandArguments {
         this.name = name;
     }
 
-    public Particle getParticleType() {
-        return particleType;
+    public String getParticleType() {
+        return particleType.toString();
     }
 
     public void setParticleType(Particle particleType) {

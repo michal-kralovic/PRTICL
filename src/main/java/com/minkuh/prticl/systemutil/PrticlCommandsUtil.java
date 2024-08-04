@@ -31,11 +31,9 @@ public class PrticlCommandsUtil {
      * @return TRUE if handled.
      */
     public boolean commandExecutor(Command command, CommandSender sender, String[] args) {
-        PrticlMessages prticlMessage = new PrticlMessages();
         switch (command.getName().toLowerCase(Locale.ROOT)) {
 
             case PRTICL_COMMAND -> {
-
                 if (args.length > 1 // if args is longer than 1 (has more args past "/prticl <subcommand>")
                         // AND the subcommand arg is "node" OR "n"
                         && (args[0].equalsIgnoreCase(NODE_DEFAULT_NAME) || args[0].equalsIgnoreCase(String.valueOf(NODE_DEFAULT_NAME.charAt(0))))) {
@@ -54,10 +52,9 @@ public class PrticlCommandsUtil {
                         || args[0].equalsIgnoreCase(String.valueOf(PrticlHelpCommand.getCommandName().charAt(0)))) {
                     commands.get(PrticlHelpCommand.getCommandName()).execute(Arrays.stream(args).skip(1).toArray(String[]::new), sender);
                 }
-
             }
 
-            default -> sender.sendMessage(prticlMessage.error(UNKNOWN_COMMAND));
+            default -> sender.sendMessage(new PrticlMessages().error(UNKNOWN_COMMAND));
         }
         return true;
     }

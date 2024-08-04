@@ -2,25 +2,20 @@ package com.minkuh.prticl.systemutil.configuration;
 
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.common.wrappers.PrticlDataSource;
+import org.bukkit.configuration.file.FileConfiguration;
 
 public class PrticlConfigurationUtil {
-    private final Prticl plugin;
+    private final FileConfiguration config;
 
     public PrticlConfigurationUtil(Prticl plugin) {
-        this.plugin = plugin;
-        plugin.saveDefaultConfig();
+        this.config = plugin.getConfig();
+    }
+
+    public boolean usingMySql() {
+        return config.getConfigurationSection("database").getBoolean("use-mysql");
     }
 
     public PrticlDataSource getDataSource() {
-        var dataSourceConfigSection = plugin.getConfig().getConfigurationSection("data-source");
-
-        String serverName = dataSourceConfigSection.getString("server-name");
-        int port = dataSourceConfigSection.getInt("port");
-        String database = dataSourceConfigSection.getString("database");
-        String user = dataSourceConfigSection.getString("user");
-        String password = dataSourceConfigSection.getString("password");
-        String schema = dataSourceConfigSection.getString("schema");
-
-        return new PrticlDataSource(serverName, port, database, user, password, schema);
+        return PrticlDataSource.getFromConfig(config);
     }
 }

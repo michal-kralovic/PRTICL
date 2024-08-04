@@ -1,7 +1,9 @@
 package com.minkuh.prticl.schedulers;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.common.PrticlNode;
+import com.minkuh.prticl.data.entities.Node;
+import com.minkuh.prticl.common.builders.LocationBuilder;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -12,17 +14,19 @@ public class PrticlSpawner {
         this.plugin = plugin;
     }
 
-    public void spawnNode(PrticlNode node) {
-        new PrticlNodeScheduler(node, node.getLocationObject().getLocation().getWorld()).runTaskTimer(plugin, 0, node.getRepeatDelay());
+    public void spawnNode(Node node) {
+        new PrticlNodeScheduler(node).runTaskTimer(plugin, 0, node.getRepeatDelay());
     }
 
     private static class PrticlNodeScheduler extends BukkitRunnable {
-        private final PrticlNode node;
+        private final Location location;
+        private final Node node;
         private final World world;
 
-        public PrticlNodeScheduler(PrticlNode node, World world) {
+        public PrticlNodeScheduler(Node node) {
             this.node = node;
-            this.world = world;
+            this.location = LocationBuilder.fromNode(node);
+            this.world = location.getWorld();
         }
 
         @Override
@@ -30,7 +34,7 @@ public class PrticlSpawner {
             if (this.node.isEnabled()) {
                 world.spawnParticle(
                         node.getParticleType(),
-                        node.getLocationObject().getLocation(),
+                        location,
                         node.getParticleDensity()
                 );
 

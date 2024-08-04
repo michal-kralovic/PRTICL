@@ -1,0 +1,159 @@
+package com.minkuh.prticl.data.entities;
+
+import jakarta.persistence.*;
+import org.bukkit.Particle;
+
+import java.util.UUID;
+
+@Entity
+@Table(name = "nodes", schema = "prticl")
+public class Node {
+    public Node() {
+    }
+
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column(name = "name", unique = true, nullable = false, length = 50)
+    private String name;
+
+    @Column(name = "repeat_delay")
+    private int repeatDelay;
+
+    @Column(name = "particle_density")
+    private int particleDensity;
+
+    @Column(name = "particle_type")
+    private String particleType;
+
+    @Column(name = "is_enabled")
+    private boolean isEnabled;
+
+    @Column(name = "world_name")
+    private String worldName;
+
+    @Column(name = "world_uuid")
+    private UUID worldUUID;
+
+    @Column(name = "x")
+    private double x;
+
+    @Column(name = "y")
+    private double y;
+
+    @Column(name = "z")
+    private double z;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.REFRESH})
+    @JoinColumn(name = "player_id")
+    private Player player;
+
+    @Transient
+    private boolean isSpawned;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getRepeatDelay() {
+        return repeatDelay;
+    }
+
+    public void setRepeatDelay(int repeatDelay) {
+        this.repeatDelay = repeatDelay;
+    }
+
+    public int getParticleDensity() {
+        return particleDensity;
+    }
+
+    public void setParticleDensity(int particleDensity) {
+        this.particleDensity = particleDensity;
+    }
+
+    public Particle getParticleType() {
+        return Particle.valueOf(particleType);
+    }
+
+    public void setParticleType(String particleType) {
+        this.particleType = particleType;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    public boolean isSpawned() {
+        return isSpawned;
+    }
+
+    public String getWorldName() {
+        return worldName;
+    }
+
+    public void setWorldName(String worldName) {
+        this.worldName = worldName;
+    }
+
+    public UUID getWorldUUID() {
+        return worldUUID;
+    }
+
+    public void setWorldUUID(UUID worldUUID) {
+        this.worldUUID = worldUUID;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public double getZ() {
+        return z;
+    }
+
+    public void setZ(double z) {
+        this.z = z;
+    }
+
+    public void setSpawned(boolean spawned) {
+        isSpawned = spawned;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+}
