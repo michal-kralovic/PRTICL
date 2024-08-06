@@ -39,9 +39,7 @@ public class PrticlConstants {
     // Error messages
     //
 
-    public static final String MISMATCHING_WORLDS = "Points cannot be in different worlds!";
     public static final String PLAYER_COMMAND_ONLY = "This command can only be executed by a player!";
-    public static final String INCORRECT_COORDINATES_INPUT = "Incorrect coordinates!";
     public static final String INCORRECT_PAGE_INPUT = "Incorrect page number!";
     public static final String INCORRECT_COMMAND_SYNTAX_OR_OTHER = "Incorrect command syntax or other error!";
     public static final String DUPLICATE_NODE_NAME = "A Prticl node with this name already exists!";
