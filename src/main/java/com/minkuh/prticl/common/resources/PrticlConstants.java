@@ -15,7 +15,6 @@ public class PrticlConstants {
     public static final String PRTICL_COMMAND = "prticl";
     public static final String CREATE_COMMAND = "create";
     public static final String HELP_COMMAND = "help";
-    public static final String LINE_COMMAND = "line";
     public static final String LIST_COMMAND = "list";
     public static final String SPAWN_COMMAND = "spawn";
     public static final String DESPAWN_COMMAND = "despawn";
