@@ -15,17 +15,18 @@ import java.util.List;
 
 import static com.minkuh.prticl.common.resources.PrticlConstants.*;
 
+// TODO: Make independent from nodes (so it can support Triggers, and possibly any further Prticl types in the future)
 /**
  * Prticl list command.<br>
  * Displays every single node stored in the config file
  * (limited to the ones made by the calling player if met with insufficient permissions).<br><br>
  * This command can be run via the console as well.
  */
-public class PrticlListCommand extends PrticlCommand {
+public class ListCommand extends PrticlCommand {
     private static final PrticlMessages prticlMessage = new PrticlMessages();
     private final PrticlDatabase prticlDatabase;
 
-    public PrticlListCommand(Prticl plugin) throws SQLException {
+    public ListCommand(Prticl plugin) throws SQLException {
         this.prticlDatabase = new PrticlDatabase(plugin);
     }
 
@@ -50,7 +51,7 @@ public class PrticlListCommand extends PrticlCommand {
     @Override
     public TextComponent.Builder getHelpDescription() {
         return listEntryOfNodeHelp(
-                PrticlListCommand.getCommandName(),
+                ListCommand.getCommandName(),
                 "Lists out all the available prticl nodes.",
                 "/prticl node list <page number>",
                 "/prticl node list 1"

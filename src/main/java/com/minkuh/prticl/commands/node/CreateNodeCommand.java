@@ -1,6 +1,7 @@
-package com.minkuh.prticl.commands;
+package com.minkuh.prticl.commands.node;
 
 import com.minkuh.prticl.Prticl;
+import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.common.message.PrticlMessages;
 import com.minkuh.prticl.common.wrappers.command_args.PrticlCreateCommandArguments;
 import com.minkuh.prticl.data.caches.NodeChunkLocationsCache;
@@ -24,12 +25,12 @@ import static com.minkuh.prticl.common.resources.PrticlConstants.*;
  * - where nothing except for the name is necessary to specify.</i><br><br>
  * Example: <b>/prticl node create leaf_blower CHERRY_LEAVES 5 5</b>
  */
-public class PrticlCreateCommand extends PrticlCommand {
+public class CreateNodeCommand extends PrticlCommand {
     private final NodeBuilder nodeBuilder;
     PrticlMessages prticlMessage = new PrticlMessages();
     private final PrticlDatabase prticlDatabase;
 
-    public PrticlCreateCommand(Prticl plugin) throws SQLException {
+    public CreateNodeCommand(Prticl plugin) throws SQLException {
         this.nodeBuilder = new NodeBuilder();
         this.prticlDatabase = new PrticlDatabase(plugin);
     }
@@ -138,7 +139,7 @@ public class PrticlCreateCommand extends PrticlCommand {
     @Override
     public TextComponent.Builder getHelpDescription() {
         return listEntryOfNodeHelp(
-                PrticlCreateCommand.getCommandName(),
+                CreateNodeCommand.getCommandName(),
                 "Creates a new prticl node.",
                 "/prticl node create <name> <particle type> <repeat delay> <density> <(x) (y) (z)>",
                 "/prticl node create my_node minecraft:cloud 5 5 ~ ~ ~"

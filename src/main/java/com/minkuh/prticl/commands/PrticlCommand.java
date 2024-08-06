@@ -25,7 +25,7 @@ public abstract class PrticlCommand implements IPrticlCommand {
     /**
      * Allows access to PRTICL system messages.
      */
-    PrticlMessages prticlMessage = new PrticlMessages();
+    public PrticlMessages prticlMessage = new PrticlMessages();
 
     /**
      * A utility method to handle non-Player command triggers.

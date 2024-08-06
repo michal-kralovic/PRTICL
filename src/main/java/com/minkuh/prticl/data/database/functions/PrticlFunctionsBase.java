@@ -10,7 +10,12 @@ public abstract class PrticlFunctionsBase {
     public PrticlFunctionsBase() {
     }
 
-    protected void executeInTransaction(Consumer<Session> action) {
+    /**
+     * Executes a {@link Session} action in a transaction.<br/>
+     * Automatically handles rollbacks in case an exception occurs.
+     * @param action An action to execute.
+     */
+    protected void transactify(Consumer<Session> action) {
         try (var session = PrticlDatabaseUtil.getSession()) {
             var transaction = session.getTransaction();
 
@@ -28,7 +33,12 @@ public abstract class PrticlFunctionsBase {
         }
     }
 
-    protected <R> R executeInTransactionWithResult(Function<Session, R> action) {
+    /**
+     * Executes a {@link Session} action in a transaction, returning {@link R}.<br/>
+     * Automatically handles rollbacks in case an exception occurs.
+     * @param action An action to execute.
+     */
+    protected <R> R transactifyAndReturn(Function<Session, R> action) {
         try (var session = PrticlDatabaseUtil.getSession()) {
             var transaction = session.getTransaction();
 

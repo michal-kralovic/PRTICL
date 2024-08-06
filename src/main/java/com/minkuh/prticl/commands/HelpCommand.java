@@ -16,7 +16,7 @@ import static net.kyori.adventure.text.format.TextColor.color;
 /**
  * Displays help information
  */
-public class PrticlHelpCommand extends PrticlCommand {
+public class HelpCommand extends PrticlCommand {
     @Override
     public boolean execute(String[] args, CommandSender sender) {
         if (args.length != 1) {
@@ -36,7 +36,7 @@ public class PrticlHelpCommand extends PrticlCommand {
     @Override
     public TextComponent.Builder getHelpDescription() {
         return listEntryOfNodeHelp(
-                PrticlHelpCommand.getCommandName(),
+                HelpCommand.getCommandName(),
                 "Displays helpful information about Prticl.",
                 "/prticl help",
                 "/prticl help"
@@ -56,7 +56,7 @@ public class PrticlHelpCommand extends PrticlCommand {
         var output = helpMenuTitle("PRTICL - Help - Node Subcommands")
                 .appendNewline().appendNewline();
 
-        for (var command : PrticlCommandsUtil.commands.entrySet()) {
+        for (var command : PrticlCommandsUtil.COMMANDS.entrySet()) {
             output.append(command.getValue().getHelpDescription());
             output.appendNewline();
         }

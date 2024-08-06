@@ -1,5 +1,8 @@
 package com.minkuh.prticl.commands;
 
+import com.minkuh.prticl.commands.node.CreateNodeCommand;
+import com.minkuh.prticl.commands.node.DespawnNodeCommand;
+import com.minkuh.prticl.commands.node.SpawnNodeCommand;
 import com.minkuh.prticl.systemutil.PrticlCommandsUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -26,25 +29,18 @@ public class PrticlTabCompleter implements TabCompleter {
             String[] tabCompletionArray = Arrays.copyOfRange(args, 1, args.length);
             return switch (args[1].toLowerCase(Locale.ROOT)) {
                 case (SPAWN_COMMAND) ->
-                        PrticlCommandsUtil.commands.get(PrticlSpawnCommand.getCommandName()).getTabCompletion(tabCompletionArray);
+                        PrticlCommandsUtil.COMMANDS.get(SpawnNodeCommand.getCommandName()).getTabCompletion(tabCompletionArray);
                 case (DESPAWN_COMMAND) ->
-                        PrticlCommandsUtil.commands.get(PrticlDespawnCommand.getCommandName()).getTabCompletion(tabCompletionArray);
-                case (LINE_COMMAND) ->
-                        PrticlCommandsUtil.commands.get(PrticlLineCommand.getCommandName()).getTabCompletion(tabCompletionArray);
+                        PrticlCommandsUtil.COMMANDS.get(DespawnNodeCommand.getCommandName()).getTabCompletion(tabCompletionArray);
                 case (CREATE_COMMAND) ->
-                        PrticlCommandsUtil.commands.get(PrticlCreateCommand.getCommandName()).getTabCompletion(tabCompletionArray);
+                        PrticlCommandsUtil.COMMANDS.get(CreateNodeCommand.getCommandName()).getTabCompletion(tabCompletionArray);
                 case (LIST_COMMAND) ->
-                        PrticlCommandsUtil.commands.get(PrticlListCommand.getCommandName()).getTabCompletion(tabCompletionArray);
+                        PrticlCommandsUtil.COMMANDS.get(ListCommand.getCommandName()).getTabCompletion(tabCompletionArray);
                 default -> Collections.emptyList();
             };
         }
         return Collections.emptyList();
     }
-
-    private static final List<String> SUBCOMMANDS = new ArrayList<>() {{
-        add(NODE_DEFAULT_NAME);
-        add(HELP_COMMAND);
-    }};
 
     private static List<String> getSortedSubcommands(String arg) {
         List<String> completions = new ArrayList<>();
@@ -60,12 +56,13 @@ public class PrticlTabCompleter implements TabCompleter {
         return completions;
     }
 
+    private static final List<String> SUBCOMMANDS = new ArrayList<>() {{
+        add(NODE_DEFAULT_NAME);
+        add(HELP_COMMAND);
+    }};
+
     private static final List<String> COMMAND_NAMES = new ArrayList<>() {{
-        add(PrticlSpawnCommand.getCommandName());
-        add(PrticlDespawnCommand.getCommandName());
-        add(PrticlLineCommand.getCommandName());
-        add(PrticlCreateCommand.getCommandName());
-        add(PrticlListCommand.getCommandName());
+        PrticlCommandsUtil.COMMANDS.forEach((cmdName, command) -> COMMAND_NAMES.add(cmdName));
     }};
 
     private boolean isNodeSubcommand(String arg) {

@@ -1,6 +1,9 @@
 package com.minkuh.prticl.systemutil;
 
 import com.minkuh.prticl.Prticl;
+import com.minkuh.prticl.commands.node.CreateNodeCommand;
+import com.minkuh.prticl.commands.node.DespawnNodeCommand;
+import com.minkuh.prticl.commands.node.SpawnNodeCommand;
 import com.minkuh.prticl.common.message.PrticlMessages;
 import com.minkuh.prticl.commands.*;
 import org.bukkit.command.Command;
@@ -17,12 +20,11 @@ import static com.minkuh.prticl.common.resources.PrticlConstants.*;
 public class PrticlCommandsUtil {
 
     public PrticlCommandsUtil(Prticl plugin) throws SQLException {
-        commands.put(PrticlSpawnCommand.getCommandName(), new PrticlSpawnCommand(plugin));
-        commands.put(PrticlDespawnCommand.getCommandName(), new PrticlDespawnCommand(plugin));
-        commands.put(PrticlLineCommand.getCommandName(), new PrticlLineCommand(plugin));
-        commands.put(PrticlCreateCommand.getCommandName(), new PrticlCreateCommand(plugin));
-        commands.put(PrticlListCommand.getCommandName(), new PrticlListCommand(plugin));
-        commands.put(PrticlHelpCommand.getCommandName(), new PrticlHelpCommand());
+        COMMANDS.put(SpawnNodeCommand.getCommandName(), new SpawnNodeCommand(plugin));
+        COMMANDS.put(DespawnNodeCommand.getCommandName(), new DespawnNodeCommand(plugin));
+        COMMANDS.put(CreateNodeCommand.getCommandName(), new CreateNodeCommand(plugin));
+        COMMANDS.put(ListCommand.getCommandName(), new ListCommand(plugin));
+        COMMANDS.put(HelpCommand.getCommandName(), new HelpCommand());
     }
 
     /**
@@ -40,17 +42,16 @@ public class PrticlCommandsUtil {
                     String[] commandArgs = Arrays.stream(args).skip(2).toArray(String[]::new);
 
                     switch (args[1].toLowerCase(Locale.ROOT)) {
-                        case SPAWN_COMMAND -> commands.get(PrticlSpawnCommand.getCommandName()).execute(commandArgs, sender);
-                        case DESPAWN_COMMAND -> commands.get(PrticlDespawnCommand.getCommandName()).execute(commandArgs, sender);
-                        case LINE_COMMAND -> commands.get(PrticlLineCommand.getCommandName()).execute(commandArgs, sender);
-                        case CREATE_COMMAND -> commands.get(PrticlCreateCommand.getCommandName()).execute(commandArgs, sender);
-                        case LIST_COMMAND -> commands.get(PrticlListCommand.getCommandName()).execute(commandArgs, sender);
+                        case SPAWN_COMMAND -> COMMANDS.get(SpawnNodeCommand.getCommandName()).execute(commandArgs, sender);
+                        case DESPAWN_COMMAND -> COMMANDS.get(DespawnNodeCommand.getCommandName()).execute(commandArgs, sender);
+                        case CREATE_COMMAND -> COMMANDS.get(CreateNodeCommand.getCommandName()).execute(commandArgs, sender);
+                        case LIST_COMMAND -> COMMANDS.get(ListCommand.getCommandName()).execute(commandArgs, sender);
                     }
                 }
 
-                if (args[0].equalsIgnoreCase(PrticlHelpCommand.getCommandName())
-                        || args[0].equalsIgnoreCase(String.valueOf(PrticlHelpCommand.getCommandName().charAt(0)))) {
-                    commands.get(PrticlHelpCommand.getCommandName()).execute(Arrays.stream(args).skip(1).toArray(String[]::new), sender);
+                if (args[0].equalsIgnoreCase(HelpCommand.getCommandName())
+                        || args[0].equalsIgnoreCase(String.valueOf(HelpCommand.getCommandName().charAt(0)))) {
+                    COMMANDS.get(HelpCommand.getCommandName()).execute(Arrays.stream(args).skip(1).toArray(String[]::new), sender);
                 }
             }
 
@@ -59,5 +60,5 @@ public class PrticlCommandsUtil {
         return true;
     }
 
-    public static final Map<String, IPrticlCommand> commands = new HashMap<>();
+    public static final Map<String, IPrticlCommand> COMMANDS = new HashMap<>();
 }

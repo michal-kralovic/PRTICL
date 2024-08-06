@@ -1,6 +1,7 @@
-package com.minkuh.prticl.commands;
+package com.minkuh.prticl.commands.node;
 
 import com.minkuh.prticl.Prticl;
+import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.data.entities.Node;
@@ -18,12 +19,12 @@ import static com.minkuh.prticl.common.resources.PrticlConstants.*;
 /**
  * A Command for handling the spawning of PrticlNodes.
  */
-public class PrticlSpawnCommand extends PrticlCommand {
+public class SpawnNodeCommand extends PrticlCommand {
     private final Prticl plugin;
     private final PrticlDatabase prticlDb;
     private final PrticlSpawner spawner;
 
-    public PrticlSpawnCommand(Prticl plugin) throws SQLException {
+    public SpawnNodeCommand(Prticl plugin) throws SQLException {
         this.plugin = plugin;
         this.prticlDb = new PrticlDatabase(this.plugin);
         this.spawner = new PrticlSpawner(plugin);
@@ -67,7 +68,7 @@ public class PrticlSpawnCommand extends PrticlCommand {
     @Override
     public TextComponent.Builder getHelpDescription() {
         return listEntryOfNodeHelp(
-                PrticlSpawnCommand.getCommandName(),
+                SpawnNodeCommand.getCommandName(),
                 "Spawns a prticl node based on a given id/name.",
                 "/prticl node spawn <(id:X) or (node name)>",
                 "/prticl node spawn id:1"

@@ -12,7 +12,7 @@ import java.util.UUID;
 public class PrticlNodeFunctions extends PrticlFunctionsBase {
 
     public List<Node> getByWorld(UUID worldUUID) {
-        return executeInTransactionWithResult(session -> {
+        return transactifyAndReturn(session -> {
             var query = session.createQuery("SELECT n FROM Node n WHERE n.worldUUID = :worldUUID", Node.class);
 
             query.setParameter("worldUUID", worldUUID);
@@ -22,7 +22,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     }
 
     public List<Node> getEnabledNodes() {
-        return executeInTransactionWithResult(session -> {
+        return transactifyAndReturn(session -> {
             var query = session.createQuery("SELECT n from Node n WHERE n.isEnabled = TRUE", Node.class);
 
             return query.getResultList();
@@ -32,7 +32,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     public PaginatedResult<Node> getByPage(int page) {
         var startCount = page <= 1 ? 0 : (page - 1) * 10;
 
-        var list = executeInTransactionWithResult(session -> {
+        var list = transactifyAndReturn(session -> {
             String jpql = "SELECT n FROM Node n";
             var query = session.createQuery(jpql, Node.class);
 
@@ -42,7 +42,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
             return query.getResultList();
         });
 
-        var count = executeInTransactionWithResult(session -> {
+        var count = transactifyAndReturn(session -> {
             String jpql = "SELECT COUNT(n) FROM Node n";
             var query = session.createQuery(jpql, Long.class);
 
@@ -55,7 +55,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     public PaginatedResult<Node> getByPageForPlayer(int page, Player player) {
         var startCount = page <= 1 ? 0 : (page - 1) * 10;
 
-        var list = executeInTransactionWithResult(session -> {
+        var list = transactifyAndReturn(session -> {
             String jpql = "SELECT n FROM Node n WHERE n.player.uuid = :uuid";
             var query = session.createQuery(jpql, Node.class);
 
@@ -66,7 +66,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
             return query.getResultList();
         });
 
-        var count = executeInTransactionWithResult(session -> {
+        var count = transactifyAndReturn(session -> {
             String jpql = "SELECT COUNT(n) FROM Node n";
             var query = session.createQuery(jpql, Long.class);
 
@@ -77,11 +77,11 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     }
 
     public Optional<Node> getById(int id) {
-        return executeInTransactionWithResult(session -> Optional.of(session.find(Node.class, id)));
+        return transactifyAndReturn(session -> Optional.of(session.find(Node.class, id)));
     }
 
     public Optional<Node> getByName(String name) {
-        return executeInTransactionWithResult(session -> {
+        return transactifyAndReturn(session -> {
             String jpql = "SELECT n FROM Node n WHERE n.name = :name";
             var query = session.createQuery(jpql, Node.class);
             query.setParameter("name", name);
@@ -95,7 +95,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     }
 
     public void add(Node node) {
-        executeInTransaction(session -> {
+        transactify(session -> {
             var player = new PrticlPlayerFunctions().addOrGetExistingPlayer(session, node.getPlayer());
             node.setPlayer(player);
             session.merge(node);
@@ -103,20 +103,20 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     }
 
     public void setEnabled(Node node, boolean state) {
-        executeInTransaction(session -> {
+        transactify(session -> {
             node.setEnabled(state);
             session.merge(node);
         });
     }
 
     public boolean isNodeEnabled(Node node) {
-        return executeInTransactionWithResult(session -> {
-            var query = session.createQuery("SELECT n FROM Node n WHERE n.id = :nodeID");
+        return transactifyAndReturn(session -> {
+            var query = session.createQuery("SELECT n FROM Node n WHERE n.id = :nodeID", Node.class);
             query.setParameter("nodeID", node.getId());
             Node output;
 
             try {
-                output = (Node) query.getSingleResult();
+                output = query.getSingleResult();
             } catch (NoResultException nre) {
                 return false;
             }
@@ -126,7 +126,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     }
 
     public boolean isNodeNameUnique(String name) {
-        return executeInTransactionWithResult(session -> {
+        return transactifyAndReturn(session -> {
             String jpql = "SELECT name FROM Node n";
             var query = session.createQuery(jpql, String.class);
             var queryResult = query.getResultList();

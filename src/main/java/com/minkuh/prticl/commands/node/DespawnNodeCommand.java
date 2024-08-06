@@ -1,6 +1,7 @@
-package com.minkuh.prticl.commands;
+package com.minkuh.prticl.commands.node;
 
 import com.minkuh.prticl.Prticl;
+import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.data.entities.Node;
@@ -20,11 +21,11 @@ import static com.minkuh.prticl.common.resources.PrticlConstants.INCORRECT_COMMA
 /**
  * A Command for handling the despawning of PrticlNodes.
  */
-public class PrticlDespawnCommand extends PrticlCommand {
+public class DespawnNodeCommand extends PrticlCommand {
     private final Prticl plugin;
     private final PrticlDatabase prticlDb;
 
-    public PrticlDespawnCommand(Prticl plugin) throws SQLException {
+    public DespawnNodeCommand(Prticl plugin) throws SQLException {
         this.plugin = plugin;
         this.prticlDb = new PrticlDatabase(this.plugin);
     }
@@ -73,7 +74,7 @@ public class PrticlDespawnCommand extends PrticlCommand {
     @Override
     public TextComponent.Builder getHelpDescription() {
         return listEntryOfNodeHelp(
-                PrticlDespawnCommand.getCommandName(),
+                DespawnNodeCommand.getCommandName(),
                 "Despawns a spawned prticl node.",
                 "/prticl node despawn <(id:X) or (node name)>",
                 "/prticl node despawn foo"
