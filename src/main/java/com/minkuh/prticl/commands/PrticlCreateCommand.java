@@ -83,7 +83,7 @@ public class PrticlCreateCommand extends PrticlCommand {
                 prticlDatabase.getNodeFunctions().add(node);
                 NodeChunkLocationsCache.getInstance().add(node);
             } catch (Exception ex) {
-                sender.sendMessage(prticlMessage.error(ex.getMessage()));
+                sender.sendMessage(prticlMessage.error("Unexpected error!\nError: " + ex.getMessage()));
                 return true;
             }
 

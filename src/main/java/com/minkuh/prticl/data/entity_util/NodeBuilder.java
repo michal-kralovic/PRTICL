@@ -10,9 +10,11 @@ public class NodeBuilder {
     private int id;
     private String name;
     private int repeatDelay;
+    private int repeatCount;
     private int particleDensity;
     private String particleType;
     private boolean isEnabled;
+    private boolean isSpawned;
     private String worldName;
     private UUID worldUUID;
     private double x;
@@ -35,6 +37,11 @@ public class NodeBuilder {
         return this;
     }
 
+    public NodeBuilder setRepeatCount(int repeatCount) {
+        this.repeatCount = repeatCount;
+        return this;
+    }
+
     public NodeBuilder setParticleDensity(int particleDensity) {
         this.particleDensity = particleDensity;
         return this;
@@ -47,6 +54,11 @@ public class NodeBuilder {
 
     public NodeBuilder setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
+        return this;
+    }
+
+    public NodeBuilder setSpawned(boolean isSpawned) {
+        this.isSpawned = isSpawned;
         return this;
     }
 
@@ -70,9 +82,11 @@ public class NodeBuilder {
         node.setId(id);
         node.setName(name);
         node.setRepeatDelay(repeatDelay);
+        node.setRepeatCount(repeatCount);
         node.setParticleDensity(particleDensity);
         node.setParticleType(particleType);
         node.setEnabled(isEnabled);
+        node.setSpawned(isSpawned);
         node.setPlayer(player);
         node.setWorldUUID(worldUUID);
         node.setWorldName(worldName);

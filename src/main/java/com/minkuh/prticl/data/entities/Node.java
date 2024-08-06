@@ -22,6 +22,9 @@ public class Node {
     @Column(name = "repeat_delay")
     private int repeatDelay;
 
+    @Column(name = "repeat_count")
+    private int repeatCount;
+
     @Column(name = "particle_density")
     private int particleDensity;
 
@@ -50,6 +53,10 @@ public class Node {
     @JoinColumn(name = "player_id")
     private Player player;
 
+    @ManyToOne
+    @JoinColumn(name = "trigger_id")
+    private Trigger trigger;
+
     @Transient
     private boolean isSpawned;
 
@@ -75,6 +82,14 @@ public class Node {
 
     public void setRepeatDelay(int repeatDelay) {
         this.repeatDelay = repeatDelay;
+    }
+
+    public int getRepeatCount() {
+        return repeatCount;
+    }
+
+    public void setRepeatCount(int repeatCount) {
+        this.repeatCount = repeatCount;
     }
 
     public int getParticleDensity() {

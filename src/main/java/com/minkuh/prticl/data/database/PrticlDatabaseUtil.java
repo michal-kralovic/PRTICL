@@ -4,6 +4,7 @@ import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.common.wrappers.PrticlDataSource;
 import com.minkuh.prticl.data.entities.Node;
 import com.minkuh.prticl.data.entities.Player;
+import com.minkuh.prticl.data.entities.Trigger;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
@@ -69,6 +70,7 @@ public class PrticlDatabaseUtil {
 
         config.addAnnotatedClass(Player.class);
         config.addAnnotatedClass(Node.class);
+        config.addAnnotatedClass(Trigger.class);
 
         var serviceRegistry = new StandardServiceRegistryBuilder().applySettings(config.getProperties()).build();
         sessionFactory = config.buildSessionFactory(serviceRegistry);
@@ -82,10 +84,11 @@ public class PrticlDatabaseUtil {
         props.put(Environment.JAKARTA_JDBC_USER, dataSource.user());
         props.put(Environment.JAKARTA_JDBC_PASSWORD, dataSource.password());
         props.put(Environment.JAKARTA_JDBC_DRIVER, useMySQL ? "com.mysql.cj.jdbc.Driver" : "org.postgresql.Driver");
-        props.put(Environment.HBM2DDL_AUTO, "update");
+        props.put(Environment.HBM2DDL_AUTO, "create-drop");
         props.put(Environment.CONNECTION_PROVIDER, HikariCPConnectionProvider.class.getName());
         props.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
         props.put(Environment.SHOW_SQL, "true");
+        props.put(Environment.DEFAULT_SCHEMA, "prticl");
 
         config.setProperties(props);
         return config;

@@ -10,8 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class PrticlNodeFunctions extends PrticlFunctionsBase {
-    public PrticlNodeFunctions() {
-    }
 
     public List<Node> getByWorld(UUID worldUUID) {
         return executeInTransactionWithResult(session -> {
@@ -97,8 +95,11 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     }
 
     public void add(Node node) {
-        new PrticlPlayerFunctions().addOrUpdatePlayerViaNode(node);
-        executeInTransaction(session -> session.merge(node));
+        executeInTransaction(session -> {
+            var player = new PrticlPlayerFunctions().addOrGetExistingPlayer(session, node.getPlayer());
+            node.setPlayer(player);
+            session.merge(node);
+        });
     }
 
     public void setEnabled(Node node, boolean state) {
