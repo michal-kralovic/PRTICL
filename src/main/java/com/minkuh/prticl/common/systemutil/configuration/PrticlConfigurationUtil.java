@@ -1,4 +1,4 @@
-package com.minkuh.prticl.systemutil.configuration;
+package com.minkuh.prticl.common.systemutil.configuration;
 
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.common.wrappers.PrticlDataSource;

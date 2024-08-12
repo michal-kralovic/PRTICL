@@ -1,7 +1,7 @@
 package com.minkuh.prticl.commands;
 
-import com.minkuh.prticl.common.message.MessageColors;
-import com.minkuh.prticl.systemutil.PrticlCommandsUtil;
+import com.minkuh.prticl.common.MessageColors;
+import com.minkuh.prticl.common.systemutil.PrticlCommandsUtil;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.format.TextDecoration.State;
@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-import static com.minkuh.prticl.common.resources.PrticlConstants.HELP_COMMAND;
+import static com.minkuh.prticl.common.PrticlConstants.HELP_COMMAND;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.TextColor.color;
 
@@ -35,7 +35,7 @@ public class HelpCommand extends PrticlCommand {
 
     @Override
     public TextComponent.Builder getHelpDescription() {
-        return listEntryOfNodeHelp(
+        return createHelpSectionForCommand(
                 HelpCommand.getCommandName(),
                 "Displays helpful information about Prticl.",
                 "/prticl help",

@@ -4,19 +4,18 @@ import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
-import com.minkuh.prticl.data.entities.Node;
+import com.minkuh.prticl.data.database.entities.Node;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.StringUtil;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import static com.minkuh.prticl.common.resources.PrticlConstants.DESPAWN_COMMAND;
-import static com.minkuh.prticl.common.resources.PrticlConstants.INCORRECT_COMMAND_SYNTAX_OR_OTHER;
+import static com.minkuh.prticl.common.PrticlConstants.DESPAWN_COMMAND;
+import static com.minkuh.prticl.common.PrticlConstants.INCORRECT_COMMAND_SYNTAX_OR_OTHER;
 
 /**
  * A Command for handling the despawning of PrticlNodes.
@@ -25,7 +24,7 @@ public class DespawnNodeCommand extends PrticlCommand {
     private final Prticl plugin;
     private final PrticlDatabase prticlDb;
 
-    public DespawnNodeCommand(Prticl plugin) throws SQLException {
+    public DespawnNodeCommand(Prticl plugin) {
         this.plugin = plugin;
         this.prticlDb = new PrticlDatabase(this.plugin);
     }
@@ -60,7 +59,7 @@ public class DespawnNodeCommand extends PrticlCommand {
     @Override
     public List<String> getTabCompletion(String[] args) {
         if (args.length == 2) {
-            List<String> spawnedNodeNames = SpawnedNodesCache.getInstance().getAll().stream().map(com.minkuh.prticl.data.entities.Node::getName).toList();
+            List<String> spawnedNodeNames = SpawnedNodesCache.getInstance().getAll().stream().map(com.minkuh.prticl.data.database.entities.Node::getName).toList();
             var sortedNodeNames = new ArrayList<String>();
 
             StringUtil.copyPartialMatches(args[1], spawnedNodeNames, sortedNodeNames);
@@ -73,7 +72,7 @@ public class DespawnNodeCommand extends PrticlCommand {
 
     @Override
     public TextComponent.Builder getHelpDescription() {
-        return listEntryOfNodeHelp(
+        return createHelpSectionForCommand(
                 DespawnNodeCommand.getCommandName(),
                 "Despawns a spawned prticl node.",
                 "/prticl node despawn <(id:X) or (node name)>",

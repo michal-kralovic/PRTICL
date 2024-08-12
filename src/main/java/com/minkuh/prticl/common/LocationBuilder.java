@@ -1,6 +1,6 @@
-package com.minkuh.prticl.common.builders;
+package com.minkuh.prticl.common;
 
-import com.minkuh.prticl.data.entities.Node;
+import com.minkuh.prticl.data.database.entities.Node;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 

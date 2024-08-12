@@ -2,19 +2,18 @@ package com.minkuh.prticl.commands.node;
 
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.commands.PrticlCommand;
+import com.minkuh.prticl.common.PrticlSpawner;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
-import com.minkuh.prticl.data.entities.Node;
-import com.minkuh.prticl.schedulers.PrticlSpawner;
+import com.minkuh.prticl.data.database.entities.Node;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import static com.minkuh.prticl.common.resources.PrticlConstants.*;
+import static com.minkuh.prticl.common.PrticlConstants.*;
 
 /**
  * A Command for handling the spawning of PrticlNodes.
@@ -24,7 +23,7 @@ public class SpawnNodeCommand extends PrticlCommand {
     private final PrticlDatabase prticlDb;
     private final PrticlSpawner spawner;
 
-    public SpawnNodeCommand(Prticl plugin) throws SQLException {
+    public SpawnNodeCommand(Prticl plugin) {
         this.plugin = plugin;
         this.prticlDb = new PrticlDatabase(this.plugin);
         this.spawner = new PrticlSpawner(plugin);
@@ -67,7 +66,7 @@ public class SpawnNodeCommand extends PrticlCommand {
 
     @Override
     public TextComponent.Builder getHelpDescription() {
-        return listEntryOfNodeHelp(
+        return createHelpSectionForCommand(
                 SpawnNodeCommand.getCommandName(),
                 "Spawns a prticl node based on a given id/name.",
                 "/prticl node spawn <(id:X) or (node name)>",

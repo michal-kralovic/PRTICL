@@ -1,17 +1,18 @@
 package com.minkuh.prticl.data.database;
 
 import com.minkuh.prticl.Prticl;
+import com.minkuh.prticl.common.systemutil.configuration.PrticlConfigurationUtil;
 import com.minkuh.prticl.common.wrappers.PrticlDataSource;
 import com.minkuh.prticl.data.database.functions.PrticlNodeFunctions;
-import com.minkuh.prticl.systemutil.configuration.PrticlConfigurationUtil;
-
-import java.sql.SQLException;
+import com.minkuh.prticl.data.database.functions.PrticlTriggerFunctions;
 
 public class PrticlDatabase {
-    private final PrticlNodeFunctions nodeFunctions;
     private final PrticlDataSource prticlDataSource;
 
-    public PrticlDatabase(Prticl plugin) throws SQLException {
+    private final PrticlNodeFunctions nodeFunctions;
+    private final PrticlTriggerFunctions triggerFunctions;
+
+    public PrticlDatabase(Prticl plugin) {
         var prticlDataSourceOpt = new PrticlConfigurationUtil(plugin).getDataSource();
 
         if (prticlDataSourceOpt.isEmpty()) {
@@ -21,13 +22,18 @@ public class PrticlDatabase {
 
         this.prticlDataSource = prticlDataSourceOpt.get();
         this.nodeFunctions = new PrticlNodeFunctions();
+        this.triggerFunctions = new PrticlTriggerFunctions();
+    }
+
+    public PrticlDataSource getDataSource() {
+        return prticlDataSource;
     }
 
     public PrticlNodeFunctions getNodeFunctions() {
         return nodeFunctions;
     }
 
-    public PrticlDataSource getDataSource() {
-        return prticlDataSource;
+    public PrticlTriggerFunctions getTriggerFunctions() {
+        return triggerFunctions;
     }
 }

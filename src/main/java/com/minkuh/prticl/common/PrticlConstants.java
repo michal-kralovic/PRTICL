@@ -1,4 +1,4 @@
-package com.minkuh.prticl.common.resources;
+package com.minkuh.prticl.common;
 
 public class PrticlConstants {
 
@@ -7,6 +7,7 @@ public class PrticlConstants {
     //
 
     public static final String NODE_CHILD = "node";
+    public static final String TRIGGER = "trigger";
 
     //
     // Command names
@@ -14,10 +15,12 @@ public class PrticlConstants {
 
     public static final String PRTICL_COMMAND = "prticl";
     public static final String CREATE_COMMAND = "create";
+    public static final String CREATE_TRIGGER_COMMAND = "create-trigger";
     public static final String HELP_COMMAND = "help";
     public static final String LIST_COMMAND = "list";
     public static final String SPAWN_COMMAND = "spawn";
     public static final String DESPAWN_COMMAND = "despawn";
+    public static final String NODE_ADD_COMMAND = "add";
 
     //
     // Node Model
@@ -42,10 +45,10 @@ public class PrticlConstants {
     public static final String PLAYER_COMMAND_ONLY = "This command can only be executed by a player!";
     public static final String INCORRECT_PAGE_INPUT = "Incorrect page number!";
     public static final String INCORRECT_COMMAND_SYNTAX_OR_OTHER = "Incorrect command syntax or other error!";
-    public static final String DUPLICATE_NODE_NAME = "A Prticl node with this name already exists!";
-    public static final String EMPTY_NODE_NAME = "Prticl node name can't be empty!";
-    public static final String NODE_NAME_TOO_LONG = "Prticl node name can't be longer than 50 characters!";
-    public static final String NODE_NAME_UNAVAILABLE = "This name isn't available!";
+    public static final String DUPLICATE_ENTITY_NAME = "A Prticl entity with this name already exists!";
+    public static final String EMPTY_ENTITY_NAME = "Prticl entity name can't be empty!";
+    public static final String ENTITY_NAME_TOO_LONG = "Prticl entity name can't be longer than 50 characters!";
+    public static final String ENTITY_NAME_UNAVAILABLE = "This name isn't available!";
     public static final String INCORRECT_NODE_ID_FORMAT = "Incorrect node ID format! (expected a valid integer number)";
     public static final String INCORRECT_NUMBER_INPUT_FORMAT = "Incorrect number input format!";
     public static final String UNKNOWN_COMMAND = "Unknown command!";

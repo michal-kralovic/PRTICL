@@ -1,7 +1,7 @@
-package com.minkuh.prticl.common.message;
+package com.minkuh.prticl.common;
 
 import com.minkuh.prticl.common.wrappers.PaginatedResult;
-import com.minkuh.prticl.data.entities.Node;
+import com.minkuh.prticl.data.database.entities.Node;
 import net.kyori.adventure.text.TextComponent;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

@@ -1,8 +1,8 @@
 package com.minkuh.prticl.data.database.functions;
 
 import com.minkuh.prticl.common.wrappers.PaginatedResult;
-import com.minkuh.prticl.data.entities.Node;
-import com.minkuh.prticl.data.entities.Player;
+import com.minkuh.prticl.data.database.entities.Node;
+import com.minkuh.prticl.data.database.entities.Player;
 import jakarta.persistence.NoResultException;
 
 import java.util.List;
@@ -94,21 +94,6 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
         });
     }
 
-    public void add(Node node) {
-        transactify(session -> {
-            var player = new PrticlPlayerFunctions().addOrGetExistingPlayer(session, node.getPlayer());
-            node.setPlayer(player);
-            session.merge(node);
-        });
-    }
-
-    public void setEnabled(Node node, boolean state) {
-        transactify(session -> {
-            node.setEnabled(state);
-            session.merge(node);
-        });
-    }
-
     public boolean isNodeEnabled(Node node) {
         return transactifyAndReturn(session -> {
             var query = session.createQuery("SELECT n FROM Node n WHERE n.id = :nodeID", Node.class);
@@ -131,7 +116,22 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
             var query = session.createQuery(jpql, String.class);
             var queryResult = query.getResultList();
 
-            return queryResult.stream().anyMatch(dbName -> dbName.equalsIgnoreCase(name));
+            return queryResult.stream().noneMatch(dbName -> dbName.equalsIgnoreCase(name));
+        });
+    }
+
+    public void add(Node node) {
+        transactify(session -> {
+            var player = new PrticlPlayerFunctions().addOrGetExistingPlayer(session, node.getPlayer());
+            node.setPlayer(player);
+            session.merge(node);
+        });
+    }
+
+    public void setEnabled(Node node, boolean state) {
+        transactify(session -> {
+            node.setEnabled(state);
+            session.merge(node);
         });
     }
 }

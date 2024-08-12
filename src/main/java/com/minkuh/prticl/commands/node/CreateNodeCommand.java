@@ -2,22 +2,25 @@ package com.minkuh.prticl.commands.node;
 
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.commands.PrticlCommand;
-import com.minkuh.prticl.common.message.PrticlMessages;
+import com.minkuh.prticl.common.PrticlMessages;
 import com.minkuh.prticl.common.wrappers.command_args.PrticlCreateCommandArguments;
 import com.minkuh.prticl.data.caches.NodeChunkLocationsCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
-import com.minkuh.prticl.data.entities.Node;
-import com.minkuh.prticl.data.entity_util.NodeBuilder;
-import com.minkuh.prticl.data.entity_util.PlayerBuilder;
+import com.minkuh.prticl.data.database.entities.Node;
+import com.minkuh.prticl.data.database.entity_util.EntityValidation;
+import com.minkuh.prticl.data.database.entity_util.NodeBuilder;
+import com.minkuh.prticl.data.database.entity_util.PlayerBuilder;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.StringUtil;
 
-import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-import static com.minkuh.prticl.common.resources.PrticlConstants.*;
+import static com.minkuh.prticl.common.PrticlConstants.*;
 
 /**
  * Provides a configurable modular way of creating a PRTICL node before spawning it.<br><br>
@@ -27,10 +30,10 @@ import static com.minkuh.prticl.common.resources.PrticlConstants.*;
  */
 public class CreateNodeCommand extends PrticlCommand {
     private final NodeBuilder nodeBuilder;
-    PrticlMessages prticlMessage = new PrticlMessages();
+    private final PrticlMessages prticlMessage = new PrticlMessages();
     private final PrticlDatabase prticlDatabase;
 
-    public CreateNodeCommand(Prticl plugin) throws SQLException {
+    public CreateNodeCommand(Prticl plugin) {
         this.nodeBuilder = new NodeBuilder();
         this.prticlDatabase = new PrticlDatabase(plugin);
     }
@@ -42,8 +45,7 @@ public class CreateNodeCommand extends PrticlCommand {
             return true;
         }
 
-        if (!isNodeNameCompatible(args[0], sender))
-            return true;
+        if (!EntityValidation.isNodeNameValid(prticlDatabase, args[0], sender)) return true;
 
         try {
             PrticlCreateCommandArguments cmdArgsObject = cmdArgsObjectify(args);
@@ -59,6 +61,10 @@ public class CreateNodeCommand extends PrticlCommand {
                 nodeBuilder.setRepeatDelay(cmdArgsObject.getRepeatDelay());
             }
 
+            if (cmdArgsObject.getRepeatCount() != null) {
+                nodeBuilder.setRepeatCount(cmdArgsObject.getRepeatCount());
+            }
+
             if (cmdArgsObject.getParticleDensity() != null) {
                 if (cmdArgsObject.getParticleDensity() > 25)
                     sender.sendMessage(prticlMessage.warning(HIGH_PARTICLE_DENSITY));
@@ -67,11 +73,9 @@ public class CreateNodeCommand extends PrticlCommand {
             }
 
             var bukkitPlayer = (org.bukkit.entity.Player) sender;
-            var worldName = bukkitPlayer.getLocation().getWorld().getName();
             var worldUUID = bukkitPlayer.getLocation().getWorld().getUID();
 
             nodeBuilder.setLocation(
-                    worldName,
                     worldUUID,
                     bukkitPlayer.getLocation()
             );
@@ -117,18 +121,22 @@ public class CreateNodeCommand extends PrticlCommand {
                 yield marker;
             }
             case 5 -> {
-                marker.add(NODE_PARAM_PARTICLE_DENSITY);
+                marker.add("repeat_count");
                 yield marker;
             }
             case 6 -> {
-                marker.add("x y z");
+                marker.add(NODE_PARAM_PARTICLE_DENSITY);
                 yield marker;
             }
             case 7 -> {
-                marker.add("y z");
+                marker.add("x y z");
                 yield marker;
             }
             case 8 -> {
+                marker.add("y z");
+                yield marker;
+            }
+            case 9 -> {
                 marker.add("z");
                 yield marker;
             }
@@ -138,7 +146,7 @@ public class CreateNodeCommand extends PrticlCommand {
 
     @Override
     public TextComponent.Builder getHelpDescription() {
-        return listEntryOfNodeHelp(
+        return createHelpSectionForCommand(
                 CreateNodeCommand.getCommandName(),
                 "Creates a new prticl node.",
                 "/prticl node create <name> <particle type> <repeat delay> <density> <(x) (y) (z)>",
@@ -167,53 +175,6 @@ public class CreateNodeCommand extends PrticlCommand {
      */
     private static PrticlCreateCommandArguments cmdArgsObjectify(String[] args) {
         return new PrticlCreateCommandArguments(args);
-    }
-
-    /**
-     * Utility method to block the player from entering a name that's: <br>
-     * - "id:" <br>
-     * - over 50 characters in length <br>
-     * - already taken by another node <br>
-     * - blank
-     *
-     * @param arg    The name to be checked
-     * @param sender The sender that sent the command
-     * @return TRUE if compatbiel.
-     */
-    private boolean isNodeNameCompatible(String arg, CommandSender sender) {
-        PrticlMessages messages = new PrticlMessages();
-
-        if (arg.toLowerCase(Locale.ROOT).startsWith("id:".toLowerCase(Locale.ROOT))) {
-            sender.sendMessage(messages.error(NODE_NAME_UNAVAILABLE));
-            return false;
-        }
-
-        if (arg.length() > 50) {
-            sender.sendMessage(messages.error(NODE_NAME_TOO_LONG));
-            return false;
-        }
-
-        if (nameExistsInDatabase(arg)) {
-            sender.sendMessage(messages.error(DUPLICATE_NODE_NAME));
-            return false;
-        }
-
-        if (arg.isBlank()) {
-            sender.sendMessage(messages.error(EMPTY_NODE_NAME));
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Utility method to check for duplicate names in nodes. Ignores case-sensitivity.
-     *
-     * @param nodeName The name to check for in the list of existing nodes
-     * @return TRUE if exists.
-     */
-    private boolean nameExistsInDatabase(String nodeName) {
-        return prticlDatabase.getNodeFunctions().isNodeNameUnique(nodeName);
     }
 
     public static String getCommandName() {

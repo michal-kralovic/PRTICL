@@ -2,9 +2,9 @@ package com.minkuh.prticl.data.database;
 
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.common.wrappers.PrticlDataSource;
-import com.minkuh.prticl.data.entities.Node;
-import com.minkuh.prticl.data.entities.Player;
-import com.minkuh.prticl.data.entities.Trigger;
+import com.minkuh.prticl.data.database.entities.Node;
+import com.minkuh.prticl.data.database.entities.Player;
+import com.minkuh.prticl.data.database.entities.Trigger;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;

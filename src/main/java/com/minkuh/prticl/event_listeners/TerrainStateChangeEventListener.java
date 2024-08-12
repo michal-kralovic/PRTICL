@@ -1,11 +1,11 @@
 package com.minkuh.prticl.event_listeners;
 
 import com.minkuh.prticl.Prticl;
+import com.minkuh.prticl.common.PrticlSpawner;
 import com.minkuh.prticl.data.caches.NodeChunkLocationsCache;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
-import com.minkuh.prticl.data.entities.Node;
-import com.minkuh.prticl.schedulers.PrticlSpawner;
+import com.minkuh.prticl.data.database.entities.Node;
 import org.bukkit.Chunk;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,7 +13,6 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class TerrainStateChangeEventListener implements Listener {
@@ -50,7 +49,7 @@ public class TerrainStateChangeEventListener implements Listener {
     }
 
     @EventHandler
-    public void onWorldUnload(WorldUnloadEvent event) throws SQLException {
+    public void onWorldUnload(WorldUnloadEvent event) {
         // TODO: Add the de-spawning of nodes of the unloading world
     }
 
@@ -58,14 +57,9 @@ public class TerrainStateChangeEventListener implements Listener {
         List<Node> nodes;
         List<Node> enabledNodes;
 
-        try {
-            PrticlDatabase db = new PrticlDatabase(plugin);
-            nodes = db.getNodeFunctions().getByWorld(event.getWorld().getUID());
-            enabledNodes = db.getNodeFunctions().getEnabledNodes();
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("Failed to initialize the database while preparing the cache!");
-        }
+        PrticlDatabase db = new PrticlDatabase(plugin);
+        nodes = db.getNodeFunctions().getByWorld(event.getWorld().getUID());
+        enabledNodes = db.getNodeFunctions().getEnabledNodes();
 
         for (var node : nodes) {
             NodeChunkLocationsCache.getInstance().add(node);

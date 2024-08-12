@@ -1,8 +1,7 @@
-package com.minkuh.prticl.schedulers;
+package com.minkuh.prticl.common;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.data.entities.Node;
-import com.minkuh.prticl.common.builders.LocationBuilder;
+import com.minkuh.prticl.data.database.entities.Node;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -22,6 +21,7 @@ public class PrticlSpawner {
         private final Location location;
         private final Node node;
         private final World world;
+        private int counter = 0;
 
         public PrticlNodeScheduler(Node node) {
             this.node = node;
@@ -31,7 +31,15 @@ public class PrticlSpawner {
 
         @Override
         public void run() {
-            if (this.node.isEnabled()) {
+            if (node.getRepeatCount() > 0) {
+                if (counter < node.getRepeatCount() - 1) {
+                    counter++;
+                } else {
+                    cancel();
+                }
+            }
+
+            if (node.isEnabled()) {
                 world.spawnParticle(
                         node.getParticleType(),
                         location,

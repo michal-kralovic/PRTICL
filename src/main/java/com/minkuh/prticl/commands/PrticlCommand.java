@@ -1,7 +1,7 @@
 package com.minkuh.prticl.commands;
 
-import com.minkuh.prticl.common.message.MessageColors;
-import com.minkuh.prticl.common.message.PrticlMessages;
+import com.minkuh.prticl.common.MessageColors;
+import com.minkuh.prticl.common.PrticlMessages;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -11,8 +11,8 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-import static com.minkuh.prticl.common.resources.PrticlConstants.PLAYER_COMMAND_ONLY;
-import static com.minkuh.prticl.common.resources.PrticlConstants.PRTICL_COMMAND;
+import static com.minkuh.prticl.common.PrticlConstants.PLAYER_COMMAND_ONLY;
+import static com.minkuh.prticl.common.PrticlConstants.PRTICL_COMMAND;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.TextColor.color;
 
@@ -42,14 +42,6 @@ public abstract class PrticlCommand implements IPrticlCommand {
     }
 
     /**
-     * Defines tab completion cases for each of the provided arguments. <br/>
-     * It also assumes the arguments passed to it are stripped of the main command (prticl) and the main subcommand (e.g. node)
-     *
-     * @return Tab completion result
-     */
-    abstract public List<String> getTabCompletion(String[] args);
-
-    /**
      * Defines the implementation of a Prticl command.
      *
      * @param args   The arguments of the Command
@@ -57,6 +49,14 @@ public abstract class PrticlCommand implements IPrticlCommand {
      * @return TRUE if handled.
      */
     abstract public boolean execute(String[] args, CommandSender sender);
+
+    /**
+     * Defines tab completion cases for each of the provided arguments. <br/>
+     * It also assumes the arguments passed to it are stripped of the main command (prticl) and the main subcommand (e.g. node)
+     *
+     * @return Tab completion result
+     */
+    abstract public List<String> getTabCompletion(String[] args);
 
     /**
      * Gets the help block of the command. <br/>
@@ -69,18 +69,18 @@ public abstract class PrticlCommand implements IPrticlCommand {
      */
     abstract public TextComponent.Builder getHelpDescription();
 
-    public TextComponent.Builder listEntryOfNodeHelp(String nodeSubcommandName, String nodeSubcommandDescription, String exampleSubcommandUse, String exampleCommand) {
+    public TextComponent.Builder createHelpSectionForCommand(String name, String description, String template, String workingExample) {
         return text()
                 .append(text()
-                        .content(nodeSubcommandName + " » ")
+                        .content(name + " » ")
                         .hoverEvent(HoverEvent.showText(text().content("Click me!")))
-                        .clickEvent(ClickEvent.suggestCommand(exampleCommand))
+                        .clickEvent(ClickEvent.suggestCommand(workingExample))
                         .decoration(TextDecoration.BOLD, TextDecoration.State.TRUE)
                         .color(color(MessageColors.system))
-                ).append(text().decoration(TextDecoration.BOLD, TextDecoration.State.FALSE).content(nodeSubcommandDescription).color(color(MessageColors.prticlLight)))
+                ).append(text().decoration(TextDecoration.BOLD, TextDecoration.State.FALSE).content(description).color(color(MessageColors.prticlLight)))
                 .appendNewline()
                 .append(text().content("  " + "Template: ").color(color(MessageColors.system)))
-                .append(text().content(exampleSubcommandUse).color(color(MessageColors.prticlLight)));
+                .append(text().content(template).color(color(MessageColors.prticlLight)));
     }
 
     public static String getCommandName() {

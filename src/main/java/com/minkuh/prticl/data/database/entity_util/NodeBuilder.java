@@ -1,7 +1,7 @@
-package com.minkuh.prticl.data.entity_util;
+package com.minkuh.prticl.data.database.entity_util;
 
-import com.minkuh.prticl.data.entities.Node;
-import com.minkuh.prticl.data.entities.Player;
+import com.minkuh.prticl.data.database.entities.Node;
+import com.minkuh.prticl.data.database.entities.Player;
 import org.bukkit.Location;
 
 import java.util.UUID;
@@ -15,7 +15,6 @@ public class NodeBuilder {
     private String particleType;
     private boolean isEnabled;
     private boolean isSpawned;
-    private String worldName;
     private UUID worldUUID;
     private double x;
     private double y;
@@ -67,8 +66,7 @@ public class NodeBuilder {
         return this;
     }
 
-    public NodeBuilder setLocation(String worldName, UUID worldUUID, Location location) {
-        this.worldName = worldName;
+    public NodeBuilder setLocation(UUID worldUUID, Location location) {
         this.worldUUID = worldUUID;
         this.x = location.x();
         this.y = location.y();
@@ -89,7 +87,6 @@ public class NodeBuilder {
         node.setSpawned(isSpawned);
         node.setPlayer(player);
         node.setWorldUUID(worldUUID);
-        node.setWorldName(worldName);
         node.setX(x);
         node.setY(y);
         node.setZ(z);

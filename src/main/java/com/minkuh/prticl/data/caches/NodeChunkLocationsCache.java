@@ -1,7 +1,7 @@
 package com.minkuh.prticl.data.caches;
 
-import com.minkuh.prticl.common.builders.LocationBuilder;
-import com.minkuh.prticl.data.entities.Node;
+import com.minkuh.prticl.common.LocationBuilder;
+import com.minkuh.prticl.data.database.entities.Node;
 import org.bukkit.Chunk;
 
 import java.util.ArrayList;

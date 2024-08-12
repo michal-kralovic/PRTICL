@@ -1,19 +1,18 @@
 package com.minkuh.prticl.commands;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.data.database.PrticlDatabase;
+import com.minkuh.prticl.common.PrticlMessages;
 import com.minkuh.prticl.common.wrappers.PaginatedResult;
-import com.minkuh.prticl.common.message.PrticlMessages;
-import com.minkuh.prticl.data.entities.Node;
-import com.minkuh.prticl.data.entity_util.PlayerBuilder;
+import com.minkuh.prticl.data.database.PrticlDatabase;
+import com.minkuh.prticl.data.database.entities.Node;
+import com.minkuh.prticl.data.database.entity_util.PlayerBuilder;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.util.List;
 
-import static com.minkuh.prticl.common.resources.PrticlConstants.*;
+import static com.minkuh.prticl.common.PrticlConstants.*;
 
 // TODO: Make independent from nodes (so it can support Triggers, and possibly any further Prticl types in the future)
 /**
@@ -26,7 +25,7 @@ public class ListCommand extends PrticlCommand {
     private static final PrticlMessages prticlMessage = new PrticlMessages();
     private final PrticlDatabase prticlDatabase;
 
-    public ListCommand(Prticl plugin) throws SQLException {
+    public ListCommand(Prticl plugin) {
         this.prticlDatabase = new PrticlDatabase(plugin);
     }
 
@@ -50,7 +49,7 @@ public class ListCommand extends PrticlCommand {
 
     @Override
     public TextComponent.Builder getHelpDescription() {
-        return listEntryOfNodeHelp(
+        return createHelpSectionForCommand(
                 ListCommand.getCommandName(),
                 "Lists out all the available prticl nodes.",
                 "/prticl node list <page number>",

@@ -1,10 +1,11 @@
-package com.minkuh.prticl.data.entity_util;
+package com.minkuh.prticl.data.database.entity_util;
 
-import com.minkuh.prticl.data.entities.Node;
-import com.minkuh.prticl.data.entities.Player;
-import com.minkuh.prticl.data.entities.Trigger;
+import com.minkuh.prticl.data.database.entities.Node;
+import com.minkuh.prticl.data.database.entities.Player;
+import com.minkuh.prticl.data.database.entities.Trigger;
 
-import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class TriggerBuilder {
     private int id;
@@ -13,7 +14,8 @@ public class TriggerBuilder {
     private double y;
     private double z;
     private String blockName;
-    private List<Node> nodes;
+    private UUID worldUUID;
+    private Set<Node> nodes;
     private Player player;
 
     public TriggerBuilder setId(int id) {
@@ -46,13 +48,18 @@ public class TriggerBuilder {
         return this;
     }
 
-    public TriggerBuilder setNodes(List<Node> nodes) {
+    public TriggerBuilder setNodes(Set<Node> nodes) {
         this.nodes = nodes;
         return this;
     }
 
     public TriggerBuilder setPlayer(Player player) {
         this.player = player;
+        return this;
+    }
+
+    public TriggerBuilder setWorldUUID(UUID worldUUID) {
+        this.worldUUID = worldUUID;
         return this;
     }
 
@@ -65,6 +72,7 @@ public class TriggerBuilder {
         trigger.setY(y);
         trigger.setZ(z);
         trigger.setBlockName(blockName);
+        trigger.setWorldUUID(worldUUID);
         trigger.setNodes(nodes);
         trigger.setPlayer(player);
 

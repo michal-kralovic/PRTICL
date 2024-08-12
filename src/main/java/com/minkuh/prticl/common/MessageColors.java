@@ -1,4 +1,4 @@
-package com.minkuh.prticl.common.message;
+package com.minkuh.prticl.common;
 
 /**
  * Contains PRTICL-specific Message colors.

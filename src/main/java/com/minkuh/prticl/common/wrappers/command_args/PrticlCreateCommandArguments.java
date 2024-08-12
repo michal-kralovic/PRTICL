@@ -10,6 +10,7 @@ public class PrticlCreateCommandArguments {
     private String name;
     private Particle particleType;
     private Integer repeatDelay;
+    private Integer repeatCount;
     private Integer particleDensity;
     private Location location;
 
@@ -20,7 +21,8 @@ public class PrticlCreateCommandArguments {
         setParticleType(particle);
         try {
             setRepeatDelay(Integer.parseInt(args[2]));
-            setParticleDensity(Integer.parseInt(args[3]));
+            setRepeatCount(Integer.parseInt(args[3]));
+            setParticleDensity(Integer.parseInt(args[4]));
         } catch (NumberFormatException ex) {
             throw new IllegalArgumentException();
         }
@@ -36,6 +38,14 @@ public class PrticlCreateCommandArguments {
 
     public String getParticleType() {
         return particleType.toString();
+    }
+
+    public Integer getRepeatCount() {
+        return repeatCount;
+    }
+
+    public void setRepeatCount(Integer repeatCount) {
+        this.repeatCount = repeatCount;
     }
 
     public void setParticleType(Particle particleType) {
@@ -78,7 +88,7 @@ public class PrticlCreateCommandArguments {
     private String getSupportedParticle(String arg) throws IllegalArgumentException {
         arg = arg.contains(":") ? arg.split(":")[1].toUpperCase(Locale.ROOT) : arg.toUpperCase(Locale.ROOT);
 
-        if(!EnumUtils.isValidEnum(Particle.class, arg))
+        if (!EnumUtils.isValidEnum(Particle.class, arg))
             throw new IllegalArgumentException("The " + Particle.class.getName() + " enum doesn't contain the input particle \"" + arg + "\"");
 
         return arg.toUpperCase(Locale.ROOT);

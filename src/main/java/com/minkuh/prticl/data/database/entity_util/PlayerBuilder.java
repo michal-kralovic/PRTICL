@@ -1,6 +1,6 @@
-package com.minkuh.prticl.data.entity_util;
+package com.minkuh.prticl.data.database.entity_util;
 
-import com.minkuh.prticl.data.entities.Player;
+import com.minkuh.prticl.data.database.entities.Player;
 
 import java.util.UUID;
 

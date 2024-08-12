@@ -1,8 +1,10 @@
-package com.minkuh.prticl.data.entities;
+package com.minkuh.prticl.data.database.entities;
 
 import jakarta.persistence.*;
 import org.bukkit.Particle;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -34,9 +36,6 @@ public class Node {
     @Column(name = "is_enabled")
     private boolean isEnabled;
 
-    @Column(name = "world_name")
-    private String worldName;
-
     @Column(name = "world_uuid")
     private UUID worldUUID;
 
@@ -53,9 +52,14 @@ public class Node {
     @JoinColumn(name = "player_id")
     private Player player;
 
-    @ManyToOne
-    @JoinColumn(name = "trigger_id")
-    private Trigger trigger;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "node_trigger",
+            schema = "prticl",
+            joinColumns = @JoinColumn(name = "node_id"),
+            inverseJoinColumns = @JoinColumn(name = "trigger_id")
+    )
+    private Set<Trigger> triggers = new HashSet<>();
 
     @Transient
     private boolean isSpawned;
@@ -120,14 +124,6 @@ public class Node {
         return isSpawned;
     }
 
-    public String getWorldName() {
-        return worldName;
-    }
-
-    public void setWorldName(String worldName) {
-        this.worldName = worldName;
-    }
-
     public UUID getWorldUUID() {
         return worldUUID;
     }
@@ -158,6 +154,14 @@ public class Node {
 
     public void setZ(double z) {
         this.z = z;
+    }
+
+    public Set<Trigger> getTriggers() {
+        return triggers;
+    }
+
+    public void setTriggers(Set<Trigger> triggers) {
+        this.triggers = triggers;
     }
 
     public void setSpawned(boolean spawned) {

@@ -1,4 +1,4 @@
-package com.minkuh.prticl.data.entities;
+package com.minkuh.prticl.data.database.entities;
 
 import jakarta.persistence.*;
 

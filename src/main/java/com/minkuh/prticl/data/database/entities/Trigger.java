@@ -1,8 +1,10 @@
-package com.minkuh.prticl.data.entities;
+package com.minkuh.prticl.data.database.entities;
 
 import jakarta.persistence.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "triggers", schema = "prticl")
@@ -30,8 +32,11 @@ public class Trigger {
     @Column(name = "block_name")
     private String blockName;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "trigger")
-    private List<Node> nodes;
+    @Column(name = "world_uuid")
+    private UUID worldUUID;
+
+    @ManyToMany(mappedBy = "triggers", fetch = FetchType.EAGER)
+    private Set<Node> nodes = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.REFRESH})
     @JoinColumn(name = "player_id")
@@ -85,11 +90,19 @@ public class Trigger {
         this.blockName = blockName;
     }
 
-    public List<Node> getNodes() {
+    public UUID getWorldUUID() {
+        return worldUUID;
+    }
+
+    public void setWorldUUID(UUID worldUUID) {
+        this.worldUUID = worldUUID;
+    }
+
+    public Set<Node> getNodes() {
         return nodes;
     }
 
-    public void setNodes(List<Node> nodes) {
+    public void setNodes(Set<Node> nodes) {
         this.nodes = nodes;
     }
 

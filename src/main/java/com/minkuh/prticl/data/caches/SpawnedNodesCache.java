@@ -1,6 +1,6 @@
 package com.minkuh.prticl.data.caches;
 
-import com.minkuh.prticl.data.entities.Node;
+import com.minkuh.prticl.data.database.entities.Node;
 
 import java.util.ArrayList;
 import java.util.List;
