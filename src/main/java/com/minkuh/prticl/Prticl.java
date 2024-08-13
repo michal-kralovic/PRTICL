@@ -4,6 +4,7 @@ import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.commands.PrticlTabCompleter;
 import com.minkuh.prticl.common.systemutil.PrticlCommandsUtil;
 import com.minkuh.prticl.data.database.PrticlDatabaseUtil;
+import com.minkuh.prticl.event_listeners.PlayerInteractEventListener;
 import com.minkuh.prticl.event_listeners.RightClickEventListener;
 import com.minkuh.prticl.event_listeners.TerrainStateChangeEventListener;
 import org.bukkit.command.Command;
@@ -25,6 +26,7 @@ public final class Prticl extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new RightClickEventListener(), this);
         getServer().getPluginManager().registerEvents(new TerrainStateChangeEventListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerInteractEventListener(this), this);
         getCommand(PrticlCommand.getCommandName()).setTabCompleter(new PrticlTabCompleter());
     }
 

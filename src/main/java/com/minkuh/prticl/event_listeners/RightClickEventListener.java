@@ -9,10 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class RightClickEventListener implements Listener {
 
-    PrticlMessages messageComponents = new PrticlMessages();
-
-    public RightClickEventListener() {
-    }
+    private final PrticlMessages messageComponents = new PrticlMessages();
 
     @EventHandler
     public void onRightClick(@NotNull PlayerInteractEvent event) {

@@ -3,6 +3,7 @@ package com.minkuh.prticl.data.database.functions;
 import com.minkuh.prticl.data.database.entities.Node;
 import com.minkuh.prticl.data.database.entities.Trigger;
 import jakarta.persistence.NoResultException;
+import org.bukkit.Location;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -25,6 +26,40 @@ public class PrticlTriggerFunctions extends PrticlFunctionsBase {
             } catch (NoResultException ex) {
                 return Optional.empty();
             }
+        });
+    }
+
+    public Set<Node> getNodesForTrigger(int triggerId) {
+        return transactifyAndReturn(session -> {
+            Trigger trigger = session.find(Trigger.class, triggerId);
+            return trigger != null ? new HashSet<>(trigger.getNodes()) : new HashSet<>();
+        });
+    }
+
+    public Set<Trigger> getTriggersForNode(int nodeId) {
+        return transactifyAndReturn(session -> {
+            Node node = session.find(Node.class, nodeId);
+            return node != null ? new HashSet<>(node.getTriggers()) : new HashSet<>();
+        });
+    }
+
+    public Optional<Integer> getTriggerForBlock(Location location) {
+        var x = location.x();
+        var y = location.y();
+        var z = location.z();
+
+        var sql = "SELECT t.id FROM Trigger t WHERE t.x = :x AND t.y = :y AND t.z = :z";
+
+        return transactifyAndReturn(session -> {
+            var query = session.createQuery(sql, Integer.class);
+
+            query.setParameter("x", x);
+            query.setParameter("y", y);
+            query.setParameter("z", z);
+
+            var outputFromDb = query.getResultList();
+
+            return outputFromDb.isEmpty() ? Optional.empty() : Optional.of(outputFromDb.getFirst());
         });
     }
 
@@ -59,20 +94,6 @@ public class PrticlTriggerFunctions extends PrticlFunctionsBase {
                 session.merge(node);
                 session.merge(trigger);
             }
-        });
-    }
-
-    public Set<Node> getNodesForTrigger(int triggerId) {
-        return transactifyAndReturn(session -> {
-            Trigger trigger = session.find(Trigger.class, triggerId);
-            return trigger != null ? new HashSet<>(trigger.getNodes()) : new HashSet<>();
-        });
-    }
-
-    public Set<Trigger> getTriggersForNode(int nodeId) {
-        return transactifyAndReturn(session -> {
-            Node node = session.find(Node.class, nodeId);
-            return node != null ? new HashSet<>(node.getTriggers()) : new HashSet<>();
         });
     }
 
