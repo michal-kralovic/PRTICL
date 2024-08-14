@@ -36,7 +36,7 @@ public class SpawnNodeCommand extends PrticlCommand {
 
             if (nodeOpt.isEmpty()) {
                 var argStrippedOfIdIfPresent = args[0].startsWith("id:") ? args[0].substring("id:".length()) : args[0];
-                sender.sendMessage(prticlMessage.warning("Unable to find a node in cache using id/name: " + argStrippedOfIdIfPresent));
+                sender.sendMessage(prticlMessage.warning("Node with id/name: '" + argStrippedOfIdIfPresent + "' doesn't exist"));
                 return true;
             }
             var node = nodeOpt.get();

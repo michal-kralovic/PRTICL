@@ -1,8 +1,7 @@
 package com.minkuh.prticl.commands;
 
 import com.minkuh.prticl.common.MessageColors;
-import com.minkuh.prticl.common.systemutil.PrticlCommandsUtil;
-import net.kyori.adventure.text.TextComponent;
+    import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.format.TextDecoration.State;
 import org.bukkit.command.CommandSender;

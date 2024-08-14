@@ -2,7 +2,7 @@ package com.minkuh.prticl;
 
 import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.commands.PrticlTabCompleter;
-import com.minkuh.prticl.common.systemutil.PrticlCommandsUtil;
+import com.minkuh.prticl.commands.PrticlCommandsUtil;
 import com.minkuh.prticl.data.database.PrticlDatabaseUtil;
 import com.minkuh.prticl.event_listeners.PlayerInteractEventListener;
 import com.minkuh.prticl.event_listeners.RightClickEventListener;

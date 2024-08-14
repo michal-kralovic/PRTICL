@@ -77,7 +77,10 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     }
 
     public Optional<Node> getById(int id) {
-        return transactifyAndReturn(session -> Optional.of(session.find(Node.class, id)));
+        return transactifyAndReturn(session -> {
+            var node = session.find(Node.class, id);
+            return node == null ? Optional.empty() : Optional.of(node);
+        });
     }
 
     public Optional<Node> getByName(String name) {
