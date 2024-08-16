@@ -2,9 +2,6 @@ package com.minkuh.prticl.data.database;
 
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.common.wrappers.PrticlDataSource;
-import com.minkuh.prticl.data.database.entities.Node;
-import com.minkuh.prticl.data.database.entities.Player;
-import com.minkuh.prticl.data.database.entities.Trigger;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
@@ -18,6 +15,8 @@ import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Properties;
+
+import static com.minkuh.prticl.data.database.PrticlDatabase.PRTICL_DATABASE_ENTITIES;
 
 public class PrticlDatabaseUtil {
 
@@ -68,9 +67,9 @@ public class PrticlDatabaseUtil {
 
         var config = getConfig(dataSourceOpt.get(), useMySQL);
 
-        config.addAnnotatedClass(Player.class);
-        config.addAnnotatedClass(Node.class);
-        config.addAnnotatedClass(Trigger.class);
+        for (var clazz : PRTICL_DATABASE_ENTITIES) {
+            config.addAnnotatedClass(clazz.getClass());
+        }
 
         var serviceRegistry = new StandardServiceRegistryBuilder().applySettings(config.getProperties()).build();
         sessionFactory = config.buildSessionFactory(serviceRegistry);

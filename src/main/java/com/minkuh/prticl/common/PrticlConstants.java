@@ -8,6 +8,7 @@ public class PrticlConstants {
 
     public static final String NODE_CHILD = "node";
     public static final String TRIGGER = "trigger";
+    public static final String PLAYER = "player";
 
     //
     // Command names
@@ -43,7 +44,6 @@ public class PrticlConstants {
     //
 
     public static final String PLAYER_COMMAND_ONLY = "This command can only be executed by a player!";
-    public static final String INCORRECT_PAGE_INPUT = "Incorrect page number!";
     public static final String INCORRECT_COMMAND_SYNTAX_OR_OTHER = "Incorrect command syntax or other error!";
     public static final String DUPLICATE_ENTITY_NAME = "A Prticl entity with this name already exists!";
     public static final String EMPTY_ENTITY_NAME = "Prticl entity name can't be empty!";

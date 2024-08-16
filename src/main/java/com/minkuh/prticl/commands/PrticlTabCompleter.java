@@ -29,6 +29,9 @@ public class PrticlTabCompleter implements TabCompleter {
 
                 if (isTriggerSubcommand(args[0]))
                     return getSortedStrings(args[1], TRIGGER_COMMAND_NAMES);
+
+                if (isPlayerSubcommand(args[0]))
+                    return getSortedStrings(args[1], PLAYER_COMMAND_NAMES);
             }
 
             String[] tabCompletionArray = Arrays.copyOfRange(args, 1, args.length);
@@ -69,6 +72,7 @@ public class PrticlTabCompleter implements TabCompleter {
     private static final List<String> SUBCOMMANDS = new ArrayList<>() {{
         add(NODE_DEFAULT_NAME);
         add(TRIGGER);
+        add(PLAYER);
         add(HELP_COMMAND);
     }};
 
@@ -83,6 +87,11 @@ public class PrticlTabCompleter implements TabCompleter {
     private static final List<String> TRIGGER_COMMAND_NAMES = new ArrayList<>() {{
         add(CreateTriggerCommand.getCommandName());
         add(AddNodeTriggerCommand.getCommandName());
+        add(ListCommand.getCommandName());
+    }};
+
+    private static final List<String> PLAYER_COMMAND_NAMES = new ArrayList<>() {{
+        add(ListCommand.getCommandName());
     }};
 
     private boolean isNodeSubcommand(String arg) {
@@ -91,5 +100,9 @@ public class PrticlTabCompleter implements TabCompleter {
 
     private boolean isTriggerSubcommand(String arg) {
         return arg.equalsIgnoreCase(TRIGGER) || arg.equalsIgnoreCase(TRIGGER.substring(0, 1));
+    }
+
+    private boolean isPlayerSubcommand(String arg) {
+        return arg.equalsIgnoreCase(PLAYER) || arg.equalsIgnoreCase(PLAYER.substring(0, 1));
     }
 }

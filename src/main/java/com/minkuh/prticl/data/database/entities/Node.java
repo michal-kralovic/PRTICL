@@ -1,7 +1,9 @@
 package com.minkuh.prticl.data.database.entities;
 
 import jakarta.persistence.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Particle;
+import org.bukkit.World;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -9,7 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "nodes", schema = "prticl")
-public class Node {
+public class Node implements IPrticlEntity {
     public Node() {
     }
 
@@ -122,6 +124,16 @@ public class Node {
 
     public boolean isSpawned() {
         return isSpawned;
+    }
+
+    public String getWorldName() {
+        World world = Bukkit.getWorld(this.getWorldUUID());
+
+        if (world == null) {
+            return null;
+        } else {
+            return world.getName();
+        }
     }
 
     public UUID getWorldUUID() {

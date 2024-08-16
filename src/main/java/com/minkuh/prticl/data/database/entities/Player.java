@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "players", schema = "prticl")
-public class Player {
+public class Player implements IPrticlEntity {
     public Player() {
     }
 

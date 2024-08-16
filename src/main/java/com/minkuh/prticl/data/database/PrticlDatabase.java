@@ -1,32 +1,26 @@
 package com.minkuh.prticl.data.database;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.common.systemutil.configuration.PrticlConfigurationUtil;
-import com.minkuh.prticl.common.wrappers.PrticlDataSource;
+import com.minkuh.prticl.data.database.entities.Node;
+import com.minkuh.prticl.data.database.entities.Player;
+import com.minkuh.prticl.data.database.entities.IPrticlEntity;
+import com.minkuh.prticl.data.database.entities.Trigger;
 import com.minkuh.prticl.data.database.functions.PrticlNodeFunctions;
+import com.minkuh.prticl.data.database.functions.PrticlPlayerFunctions;
 import com.minkuh.prticl.data.database.functions.PrticlTriggerFunctions;
 
-public class PrticlDatabase {
-    private final PrticlDataSource prticlDataSource;
+import java.util.ArrayList;
+import java.util.List;
 
+public class PrticlDatabase {
     private final PrticlNodeFunctions nodeFunctions;
     private final PrticlTriggerFunctions triggerFunctions;
+    private final PrticlPlayerFunctions playerFunctions;
 
     public PrticlDatabase(Prticl plugin) {
-        var prticlDataSourceOpt = new PrticlConfigurationUtil(plugin).getDataSource();
-
-        if (prticlDataSourceOpt.isEmpty()) {
-            plugin.getLogger().severe("Couldn't obtain the database configuration!");
-            throw new RuntimeException("Couldn't obtain the database configuration!");
-        }
-
-        this.prticlDataSource = prticlDataSourceOpt.get();
         this.nodeFunctions = new PrticlNodeFunctions();
         this.triggerFunctions = new PrticlTriggerFunctions();
-    }
-
-    public PrticlDataSource getDataSource() {
-        return prticlDataSource;
+        this.playerFunctions = new PrticlPlayerFunctions();
     }
 
     public PrticlNodeFunctions getNodeFunctions() {
@@ -36,4 +30,17 @@ public class PrticlDatabase {
     public PrticlTriggerFunctions getTriggerFunctions() {
         return triggerFunctions;
     }
+
+    public PrticlPlayerFunctions getPlayerFunctions() {
+        return playerFunctions;
+    }
+
+    /**
+     * A constant list to share annotated JPA entities across Prticl.
+     */
+    public static final List<IPrticlEntity> PRTICL_DATABASE_ENTITIES = new ArrayList<>() {{
+        add(new Player());
+        add(new Node());
+        add(new Trigger());
+    }};
 }

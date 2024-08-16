@@ -23,6 +23,8 @@ import static com.minkuh.prticl.common.PrticlConstants.*;
 @SuppressWarnings("SameReturnValue")
 public class PrticlCommandsUtil {
 
+    private static final PrticlMessages prticlMessages = new PrticlMessages();
+
     public PrticlCommandsUtil(Prticl plugin) {
         COMMANDS.put(SpawnNodeCommand.getCommandName(), new SpawnNodeCommand(plugin));
         COMMANDS.put(DespawnNodeCommand.getCommandName(), new DespawnNodeCommand(plugin));
@@ -40,36 +42,49 @@ public class PrticlCommandsUtil {
      */
     public boolean commandExecutor(Command command, CommandSender sender, String[] args) {
         if (!command.getName().equalsIgnoreCase(PRTICL_COMMAND)) return true;
-        if (args.length <= 1) return true;
 
-        String[] commandArgs = Arrays.stream(args).skip(2).toArray(String[]::new);
+        if (matchesFullyOrFirstLetter(args[0], HelpCommand.getCommandName())) { // /prticl help
+            COMMANDS.get(HelpCommand.getCommandName()).execute(Arrays.stream(args).skip(1).toArray(String[]::new), sender);
+        }
+
+        if (args.length == 1) return true;
+
+        String[] shortenedArgs = Arrays.stream(args).skip(2).toArray(String[]::new);
 
 
         if (matchesFullyOrFirstLetter(args[0], NODE_DEFAULT_NAME)) { // /prticl node (...)
 
             return switch (args[1].toLowerCase(Locale.ROOT)) {
-                case SPAWN_COMMAND -> COMMANDS.get(SpawnNodeCommand.getCommandName()).execute(commandArgs, sender);
-                case DESPAWN_COMMAND -> COMMANDS.get(DespawnNodeCommand.getCommandName()).execute(commandArgs, sender);
-                case CREATE_COMMAND -> COMMANDS.get(CreateNodeCommand.getCommandName()).execute(commandArgs, sender);
-                case LIST_COMMAND -> COMMANDS.get(ListCommand.getCommandName()).execute(commandArgs, sender);
+                case SPAWN_COMMAND -> COMMANDS.get(SpawnNodeCommand.getCommandName()).execute(shortenedArgs, sender);
+                case DESPAWN_COMMAND ->
+                        COMMANDS.get(DespawnNodeCommand.getCommandName()).execute(shortenedArgs, sender);
+                case CREATE_COMMAND -> COMMANDS.get(CreateNodeCommand.getCommandName()).execute(shortenedArgs, sender);
+                case LIST_COMMAND -> COMMANDS.get(ListCommand.getCommandName()).execute(args, sender);
                 default -> {
-                    sender.sendMessage(new PrticlMessages().error("Unknown node subcommand: " + args[1]));
+                    sender.sendMessage(prticlMessages.error("Unknown node subcommand: " + args[1]));
                     yield true;
                 }
             };
         }
 
         if (matchesFullyOrFirstLetter(args[0], TRIGGER)) { // /prticl trigger (...)
-
-            if (args[1].toLowerCase(Locale.ROOT).equals(CREATE_COMMAND)) {
-                return COMMANDS.get(CreateTriggerCommand.getCommandName()).execute(commandArgs, sender);
-            } else { // prticl trigger (name/id)
-                return executeUnnamedTriggerCommand(Arrays.stream(args).skip(1).toArray(String[]::new), sender);
-            }
+            return switch (args[1].toLowerCase(Locale.ROOT)) {
+                case CREATE_COMMAND ->
+                        COMMANDS.get(CreateTriggerCommand.getCommandName()).execute(shortenedArgs, sender);
+                case LIST_COMMAND -> COMMANDS.get(ListCommand.getCommandName()).execute(args, sender);
+                default ->  // prticl trigger (name/id)
+                        executeUnnamedTriggerCommand(Arrays.stream(args).skip(1).toArray(String[]::new), sender);
+            };
         }
 
-        if (matchesFullyOrFirstLetter(args[0], HelpCommand.getCommandName())) { // /prticl help
-            COMMANDS.get(HelpCommand.getCommandName()).execute(Arrays.stream(args).skip(1).toArray(String[]::new), sender);
+        if (matchesFullyOrFirstLetter(args[0], PLAYER)) {
+            return switch (args[1].toLowerCase(Locale.ROOT)) {
+                case LIST_COMMAND -> COMMANDS.get(ListCommand.getCommandName()).execute(args, sender);
+                default -> {
+                    sender.sendMessage(prticlMessages.error("Unknown player subcommand: " + args[1]));
+                    yield true;
+                }
+            };
         }
 
         return true;

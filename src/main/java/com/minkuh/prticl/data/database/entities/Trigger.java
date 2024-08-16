@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "triggers", schema = "prticl")
-public class Trigger {
+public class Trigger implements IPrticlEntity {
     public Trigger() {
     }
 

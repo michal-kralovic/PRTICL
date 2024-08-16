@@ -1,6 +1,7 @@
 package com.minkuh.prticl.data.database.functions;
 
 import com.minkuh.prticl.common.wrappers.PaginatedResult;
+import com.minkuh.prticl.data.database.entities.IPrticlEntity;
 import com.minkuh.prticl.data.database.entities.Node;
 import com.minkuh.prticl.data.database.entities.Player;
 import jakarta.persistence.NoResultException;
@@ -29,12 +30,12 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
         });
     }
 
-    public PaginatedResult<Node> getByPage(int page) {
+    public PaginatedResult<IPrticlEntity> getByPage(int page) {
         var startCount = page <= 1 ? 0 : (page - 1) * 10;
 
         var list = transactifyAndReturn(session -> {
-            String jpql = "SELECT n FROM Node n";
-            var query = session.createQuery(jpql, Node.class);
+            String jpql = "SELECT n FROM Node n ORDER BY n.id ASC";
+            var query = session.createQuery(jpql, IPrticlEntity.class);
 
             query.setFirstResult(startCount);
             query.setMaxResults(10);
@@ -49,15 +50,23 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
             return query.getSingleResult();
         });
 
-        return new PaginatedResult<>(list, page, Math.toIntExact(count));
+        var totalCount = count;
+
+        if (count <= 0) {
+            count = 0L;
+        } else {
+            count = (count / 10) + 1;
+        }
+
+        return new PaginatedResult<>(list, page, Math.toIntExact(count), Math.toIntExact(totalCount));
     }
 
-    public PaginatedResult<Node> getByPageForPlayer(int page, Player player) {
+    public PaginatedResult<IPrticlEntity> getByPageForPlayer(int page, Player player) {
         var startCount = page <= 1 ? 0 : (page - 1) * 10;
 
         var list = transactifyAndReturn(session -> {
-            String jpql = "SELECT n FROM Node n WHERE n.player.uuid = :uuid";
-            var query = session.createQuery(jpql, Node.class);
+            String jpql = "SELECT n FROM Node n WHERE n.player.uuid = :uuid ORDER BY n.id ASC";
+            var query = session.createQuery(jpql, IPrticlEntity.class);
 
             query.setParameter("uuid", player.getUUID());
             query.setFirstResult(startCount);
@@ -73,7 +82,15 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
             return query.getSingleResult();
         });
 
-        return new PaginatedResult<>(list, page, Math.toIntExact(count));
+        var totalCount = count;
+
+        if (count <= 0) {
+            count = 0L;
+        } else {
+            count = (count / 10) + 1;
+        }
+
+        return new PaginatedResult<>(list, page, Math.toIntExact(count), Math.toIntExact(totalCount));
     }
 
     public Optional<Node> getById(int id) {
