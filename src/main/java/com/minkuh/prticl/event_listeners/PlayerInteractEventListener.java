@@ -1,7 +1,6 @@
 package com.minkuh.prticl.event_listeners;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.common.PrticlMessages;
 import com.minkuh.prticl.common.PrticlSpawner;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import org.bukkit.block.data.Powerable;
@@ -14,13 +13,10 @@ import static org.bukkit.event.block.Action.PHYSICAL;
 
 public class PlayerInteractEventListener implements Listener {
 
-    private final PrticlMessages prticlMessage = new PrticlMessages();
-    private final Prticl plugin;
     private final PrticlDatabase prticlDb;
     private final PrticlSpawner prticlSpawner;
 
     public PlayerInteractEventListener(Prticl plugin) {
-        this.plugin = plugin;
         this.prticlDb = new PrticlDatabase(plugin);
         this.prticlSpawner = new PrticlSpawner(plugin);
     }
@@ -33,10 +29,7 @@ public class PlayerInteractEventListener implements Listener {
                 && event.getClickedBlock().getBlockData() instanceof Powerable) {
             var triggerId = prticlDb.getTriggerFunctions().getTriggerForBlock(event.getClickedBlock().getLocation());
 
-            if (triggerId.isEmpty()) {
-                event.setCancelled(true);
-                return;
-            }
+            if (triggerId.isEmpty()) return;
 
             var nodes = prticlDb.getTriggerFunctions().getNodesForTrigger(triggerId.get());
 

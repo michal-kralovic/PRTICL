@@ -1,6 +1,6 @@
 package com.minkuh.prticl.data.database.functions;
 
-import com.minkuh.prticl.common.wrappers.PaginatedResult;
+import com.minkuh.prticl.common.PaginatedResult;
 import com.minkuh.prticl.data.database.entities.IPrticlEntity;
 import com.minkuh.prticl.data.database.entities.Player;
 import org.hibernate.Session;

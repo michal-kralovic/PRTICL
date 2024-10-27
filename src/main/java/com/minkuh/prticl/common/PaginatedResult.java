@@ -1,4 +1,4 @@
-package com.minkuh.prticl.common.wrappers;
+package com.minkuh.prticl.common;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.minkuh.prticl.data.database;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.common.wrappers.PrticlDataSource;
+import com.minkuh.prticl.common.PrticlDataSource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;

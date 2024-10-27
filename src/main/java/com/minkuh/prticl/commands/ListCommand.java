@@ -2,7 +2,7 @@ package com.minkuh.prticl.commands;
 
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.common.PrticlMessages;
-import com.minkuh.prticl.common.wrappers.PaginatedResult;
+import com.minkuh.prticl.common.PaginatedResult;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.data.database.entities.IPrticlEntity;
 import com.minkuh.prticl.data.database.entities.Node;
@@ -47,8 +47,10 @@ public class ListCommand extends PrticlCommand {
                 }
             }
 
-            if (entityToUse == null)
+            if (entityToUse == null) {
                 sender.sendMessage(prticlMessage.error("No such entity: " + args[0]));
+                return true;
+            }
 
             return listEntities(entityToUse, args, sender);
         } catch (Exception ex) {
@@ -71,8 +73,8 @@ public class ListCommand extends PrticlCommand {
         return createHelpSectionForCommand(
                 ListCommand.getCommandName(),
                 "Lists out all the available entities.",
-                "/prticl <entity> list <page number>",
-                "/prticl <entity> list 1"
+                "/prticl <entity> list (page number)",
+                "/prticl player list 1"
         );
     }
 

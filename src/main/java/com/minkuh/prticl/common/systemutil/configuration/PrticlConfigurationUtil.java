@@ -1,7 +1,7 @@
 package com.minkuh.prticl.common.systemutil.configuration;
 
 import com.minkuh.prticl.Prticl;
-import com.minkuh.prticl.common.wrappers.PrticlDataSource;
+import com.minkuh.prticl.common.PrticlDataSource;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Optional;

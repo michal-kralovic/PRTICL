@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 /**
  * A singleton HashMap cache. <br/>
@@ -70,6 +71,14 @@ public final class NodeChunkLocationsCache {
             return true;
         } catch (Exception ex) {
             return false;
+        }
+    }
+
+    public synchronized void removeWhere(Predicate<Node> condition) {
+        for (var nodeRow : map.values()) {
+            for (var filteredNode : nodeRow.stream().filter(condition).toList()) {
+                remove(filteredNode);
+            }
         }
     }
 

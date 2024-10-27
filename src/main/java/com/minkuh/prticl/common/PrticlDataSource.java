@@ -1,4 +1,4 @@
-package com.minkuh.prticl.common.wrappers;
+package com.minkuh.prticl.common;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;

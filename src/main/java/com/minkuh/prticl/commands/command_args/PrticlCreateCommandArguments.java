@@ -1,4 +1,4 @@
-package com.minkuh.prticl.common.wrappers.command_args;
+package com.minkuh.prticl.commands.command_args;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Location;

@@ -5,6 +5,7 @@ import com.minkuh.prticl.data.database.entities.Node;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class SpawnedNodesCache {
     private static SpawnedNodesCache INSTANCE;
@@ -21,10 +22,7 @@ public class SpawnedNodesCache {
     }
 
     public synchronized List<Node> getAll() {
-        List<Node> output = new ArrayList();
-        output.addAll(spawnedNodes);
-
-        return output;
+        return spawnedNodes;
     }
 
     public synchronized Optional<Node> get(int nodeId) {
@@ -55,5 +53,13 @@ public class SpawnedNodesCache {
         node.setSpawned(false);
 
         return this.spawnedNodes.remove(node);
+    }
+
+    public synchronized void removeWhere(Predicate<Node> condition) {
+        for (var node : spawnedNodes.stream().filter(condition).toList()) {
+            node.setSpawned(false);
+
+            this.spawnedNodes.remove(node);
+        }
     }
 }

@@ -3,7 +3,7 @@ package com.minkuh.prticl.commands.node;
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.common.PrticlMessages;
-import com.minkuh.prticl.common.wrappers.command_args.PrticlCreateCommandArguments;
+import com.minkuh.prticl.commands.command_args.PrticlCreateCommandArguments;
 import com.minkuh.prticl.data.caches.NodeChunkLocationsCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.data.database.entities.Node;
