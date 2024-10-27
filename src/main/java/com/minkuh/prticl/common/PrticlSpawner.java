@@ -31,6 +31,7 @@ public class PrticlSpawner {
 
         @Override
         public void run() {
+            // If repeat count is greater than 0, we impose a repeat count limit on the node
             if (node.getRepeatCount() > 0) {
                 if (counter < node.getRepeatCount() - 1) {
                     counter++;

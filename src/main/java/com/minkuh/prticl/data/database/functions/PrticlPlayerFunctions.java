@@ -35,7 +35,7 @@ public class PrticlPlayerFunctions extends PrticlFunctionsBase {
         };
 
         if (session == null) {
-            return transactifyAndReturn(func);
+            return transactify(func);
         } else {
             return func.apply(session);
         }
@@ -44,7 +44,7 @@ public class PrticlPlayerFunctions extends PrticlFunctionsBase {
     public PaginatedResult<IPrticlEntity> getByPage(int page) {
         var startCount = page <= 1 ? 0 : (page - 1) * 10;
 
-        var list = transactifyAndReturn(session -> {
+        var list = transactify(session -> {
             String jpql = "SELECT p FROM Player p ORDER BY p.id ASC";
             var query = session.createQuery(jpql, IPrticlEntity.class);
 
@@ -54,7 +54,7 @@ public class PrticlPlayerFunctions extends PrticlFunctionsBase {
             return query.getResultList();
         });
 
-        var count = transactifyAndReturn(session -> {
+        var count = transactify(session -> {
             String jpql = "SELECT COUNT(p) FROM Player p";
             var query = session.createQuery(jpql, Long.class);
 

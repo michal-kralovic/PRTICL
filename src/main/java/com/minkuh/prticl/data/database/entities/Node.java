@@ -187,4 +187,12 @@ public class Node implements IPrticlEntity {
     public void setPlayer(Player player) {
         this.player = player;
     }
+
+    @Override
+    public void setDefaults() {
+        setName("Foo");
+        setRepeatCount(0);
+        setParticleType("HEART");
+        setParticleDensity(10);
+    }
 }

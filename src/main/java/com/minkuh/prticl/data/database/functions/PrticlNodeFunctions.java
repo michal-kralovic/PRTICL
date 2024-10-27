@@ -13,7 +13,7 @@ import java.util.UUID;
 public class PrticlNodeFunctions extends PrticlFunctionsBase {
 
     public List<Node> getByWorld(UUID worldUUID) {
-        return transactifyAndReturn(session -> {
+        return transactify(session -> {
             var query = session.createQuery("SELECT n FROM Node n WHERE n.worldUUID = :worldUUID", Node.class);
 
             query.setParameter("worldUUID", worldUUID);
@@ -23,7 +23,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     }
 
     public List<Node> getEnabledNodes() {
-        return transactifyAndReturn(session -> {
+        return transactify(session -> {
             var query = session.createQuery("SELECT n from Node n WHERE n.isEnabled = TRUE", Node.class);
 
             return query.getResultList();
@@ -33,7 +33,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     public PaginatedResult<IPrticlEntity> getByPage(int page) {
         var startCount = page <= 1 ? 0 : (page - 1) * 10;
 
-        var list = transactifyAndReturn(session -> {
+        var list = transactify(session -> {
             String jpql = "SELECT n FROM Node n ORDER BY n.id ASC";
             var query = session.createQuery(jpql, IPrticlEntity.class);
 
@@ -43,7 +43,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
             return query.getResultList();
         });
 
-        var count = transactifyAndReturn(session -> {
+        var count = transactify(session -> {
             String jpql = "SELECT COUNT(n) FROM Node n";
             var query = session.createQuery(jpql, Long.class);
 
@@ -64,7 +64,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     public PaginatedResult<IPrticlEntity> getByPageForPlayer(int page, Player player) {
         var startCount = page <= 1 ? 0 : (page - 1) * 10;
 
-        var list = transactifyAndReturn(session -> {
+        var list = transactify(session -> {
             String jpql = "SELECT n FROM Node n WHERE n.player.uuid = :uuid ORDER BY n.id ASC";
             var query = session.createQuery(jpql, IPrticlEntity.class);
 
@@ -75,7 +75,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
             return query.getResultList();
         });
 
-        var count = transactifyAndReturn(session -> {
+        var count = transactify(session -> {
             String jpql = "SELECT COUNT(n) FROM Node n";
             var query = session.createQuery(jpql, Long.class);
 
@@ -94,14 +94,14 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     }
 
     public Optional<Node> getById(int id) {
-        return transactifyAndReturn(session -> {
+        return transactify(session -> {
             var node = session.find(Node.class, id);
             return node == null ? Optional.empty() : Optional.of(node);
         });
     }
 
     public Optional<Node> getByName(String name) {
-        return transactifyAndReturn(session -> {
+        return transactify(session -> {
             String jpql = "SELECT n FROM Node n WHERE n.name = :name";
             var query = session.createQuery(jpql, Node.class);
             query.setParameter("name", name);
@@ -115,7 +115,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     }
 
     public boolean isNodeEnabled(Node node) {
-        return transactifyAndReturn(session -> {
+        return transactify(session -> {
             var query = session.createQuery("SELECT n FROM Node n WHERE n.id = :nodeID", Node.class);
             query.setParameter("nodeID", node.getId());
             Node output;
@@ -131,7 +131,7 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
     }
 
     public boolean isNodeNameUnique(String name) {
-        return transactifyAndReturn(session -> {
+        return transactify(session -> {
             String jpql = "SELECT name FROM Node n";
             var query = session.createQuery(jpql, String.class);
             var queryResult = query.getResultList();

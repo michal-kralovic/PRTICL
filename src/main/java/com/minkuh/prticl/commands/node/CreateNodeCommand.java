@@ -3,7 +3,6 @@ package com.minkuh.prticl.commands.node;
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.common.PrticlMessages;
-import com.minkuh.prticl.commands.command_args.PrticlCreateCommandArguments;
 import com.minkuh.prticl.data.caches.NodeChunkLocationsCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.data.database.entities.Node;
@@ -11,74 +10,80 @@ import com.minkuh.prticl.data.database.entity_util.EntityValidation;
 import com.minkuh.prticl.data.database.entity_util.NodeBuilder;
 import com.minkuh.prticl.data.database.entity_util.PlayerBuilder;
 import net.kyori.adventure.text.TextComponent;
+import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.minkuh.prticl.common.PrticlConstants.*;
 
-/**
- * Provides a configurable modular way of creating a PRTICL node before spawning it.<br><br>
- * In-game usage: <b>/prticl node create (name) (particle) (repeat delay in ticks) (particle density) (x) (y) (z)</b><br><i>
- * - where nothing except for the name is necessary to specify.</i><br><br>
- * Example: <b>/prticl node create leaf_blower CHERRY_LEAVES 5 5</b>
- */
 public class CreateNodeCommand extends PrticlCommand {
-    private final NodeBuilder nodeBuilder;
     private final PrticlMessages prticlMessage = new PrticlMessages();
     private final PrticlDatabase prticlDatabase;
 
     public CreateNodeCommand(Prticl plugin) {
-        this.nodeBuilder = new NodeBuilder();
         this.prticlDatabase = new PrticlDatabase(plugin);
     }
 
     @Override
     public boolean execute(String[] args, CommandSender sender) {
+        //#region Validation
+        if (args.length < 1)
+            sender.sendMessage(prticlMessage.error("Invalid argument amount!"));
+
         if (!isCommandSentByPlayer(sender)) {
             sender.sendMessage(prticlMessage.error(PLAYER_COMMAND_ONLY));
             return true;
         }
 
-        if (!EntityValidation.isNodeNameValid(prticlDatabase, args[0], sender)) return true;
+        if (!EntityValidation.isNodeNameValid(prticlDatabase, args[0], sender))
+            return true;
+        //#endregion
 
         try {
-            PrticlCreateCommandArguments cmdArgsObject = cmdArgsObjectify(args);
-            if (cmdArgsObject.getName() != null) {
-                nodeBuilder.setName(cmdArgsObject.getName());
-            }
-
-            if (cmdArgsObject.getParticleType() != null) {
-                nodeBuilder.setParticleType(cmdArgsObject.getParticleType());
-            }
-
-            if (cmdArgsObject.getRepeatDelay() != null) {
-                nodeBuilder.setRepeatDelay(cmdArgsObject.getRepeatDelay());
-            }
-
-            if (cmdArgsObject.getRepeatCount() != null) {
-                nodeBuilder.setRepeatCount(cmdArgsObject.getRepeatCount());
-            }
-
-            if (cmdArgsObject.getParticleDensity() != null) {
-                if (cmdArgsObject.getParticleDensity() > 25)
-                    sender.sendMessage(prticlMessage.warning(HIGH_PARTICLE_DENSITY));
-
-                nodeBuilder.setParticleDensity(cmdArgsObject.getParticleDensity());
-            }
-
             var bukkitPlayer = (org.bukkit.entity.Player) sender;
             var worldUUID = bukkitPlayer.getLocation().getWorld().getUID();
 
-            nodeBuilder.setLocation(
-                    worldUUID,
-                    bukkitPlayer.getLocation()
-            );
+            if (args.length == 1) {
+                spawnDefaultNode(args, sender, bukkitPlayer, worldUUID);
+                return true;
+            }
+
+            var nodeBuilder = new NodeBuilder();
+
+            nodeBuilder.setName(args[0]);
+            nodeBuilder.setParticleType((Particle.valueOf(getSupportedParticle(args[1]))).toString());
+            if (args.length >= 3) {
+                nodeBuilder.setRepeatDelay(Integer.parseInt(args[2]));
+            }
+
+            if (args.length >= 4) {
+                nodeBuilder.setRepeatCount(Integer.parseInt(args[3]));
+            }
+
+            if (args.length >= 5) {
+                var particleDensity = Integer.parseInt(args[4]);
+
+                nodeBuilder.setParticleDensity(particleDensity);
+
+                if (particleDensity > 25) {
+                    sender.sendMessage(prticlMessage.warning(HIGH_PARTICLE_DENSITY));
+                }
+            }
+
+            if (args.length >= 8) {
+                nodeBuilder.setLocation(
+                        worldUUID,
+                        Integer.parseInt(args[5]), // x
+                        Integer.parseInt(args[6]), // y
+                        Integer.parseInt(args[7])  // z
+                );
+            } else {
+                nodeBuilder.setLocation(worldUUID, bukkitPlayer.getLocation());
+            }
 
             nodeBuilder.setPlayer(PlayerBuilder.fromBukkitPlayer(bukkitPlayer));
             Node node = nodeBuilder.build();
@@ -92,7 +97,6 @@ public class CreateNodeCommand extends PrticlCommand {
                 return true;
             }
 
-
             sender.sendMessage(prticlMessage.player(CREATED_NODE));
 
         } catch (NumberFormatException e) {
@@ -102,6 +106,28 @@ public class CreateNodeCommand extends PrticlCommand {
         }
 
         return true;
+    }
+
+    private void spawnDefaultNode(String[] args, CommandSender sender, Player bukkitPlayer, UUID worldUUID) {
+        var node = new Node();
+        node.setDefaults();
+        node.setName(args[0]);
+
+        node.setPlayer(PlayerBuilder.fromBukkitPlayer(bukkitPlayer));
+        node.setWorldUUID(worldUUID);
+        node.setX(bukkitPlayer.getX());
+        node.setY(bukkitPlayer.getY());
+        node.setZ(bukkitPlayer.getZ());
+
+        try {
+            prticlDatabase.getNodeFunctions().add(node);
+            NodeChunkLocationsCache.getInstance().add(node);
+        } catch (Exception ex) {
+            sender.sendMessage(prticlMessage.error("Unexpected error!\nError: " + ex.getMessage()));
+            return;
+        }
+
+        sender.sendMessage(prticlMessage.player(CREATED_NODE));
     }
 
     private static final List<String> marker = new ArrayList<>();
@@ -167,17 +193,25 @@ public class CreateNodeCommand extends PrticlCommand {
         return completions;
     }
 
-    /**
-     * Utility method to create an object with variables for easier command arguments manipulation.
-     *
-     * @param args The arguments of the executed command
-     * @return A new PrticlCreateCommandArguments object with the arguments usable via variables.
-     */
-    private static PrticlCreateCommandArguments cmdArgsObjectify(String[] args) {
-        return new PrticlCreateCommandArguments(args);
-    }
-
     public static String getCommandName() {
         return CREATE_COMMAND;
+    }
+
+    /**
+     * A utility method to strip the input particle argument of its namespace if necessary.<br><br>
+     * E.g.:<br>
+     * - input: "minecraft:cloud", "cLoUd"<br>
+     * - output (of this method): "CLOUD", "CLOUD"
+     *
+     * @param arg The input particle from the Player
+     * @return The Particle as a support String.
+     */
+    private String getSupportedParticle(String arg) throws IllegalArgumentException {
+        arg = arg.contains(":") ? arg.split(":")[1].toUpperCase(Locale.ROOT) : arg.toUpperCase(Locale.ROOT);
+
+        if (!EnumUtils.isValidEnum(Particle.class, arg))
+            throw new IllegalArgumentException("The " + Particle.class.getName() + " enum doesn't contain the input particle \"" + arg + "\"");
+
+        return arg.toUpperCase(Locale.ROOT);
     }
 }

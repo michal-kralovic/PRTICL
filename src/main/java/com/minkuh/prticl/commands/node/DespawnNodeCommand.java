@@ -59,7 +59,7 @@ public class DespawnNodeCommand extends PrticlCommand {
     @Override
     public List<String> getTabCompletion(String[] args) {
         if (args.length == 2) {
-            List<String> spawnedNodeNames = SpawnedNodesCache.getInstance().getAll().stream().map(com.minkuh.prticl.data.database.entities.Node::getName).toList();
+            List<String> spawnedNodeNames = SpawnedNodesCache.getInstance().getAll().stream().map(Node::getName).toList();
             var sortedNodeNames = new ArrayList<String>();
 
             StringUtil.copyPartialMatches(args[1], spawnedNodeNames, sortedNodeNames);

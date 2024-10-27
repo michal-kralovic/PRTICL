@@ -15,11 +15,13 @@ import java.util.Set;
 public class PrticlTriggerFunctions extends PrticlFunctionsBase {
 
     public Optional<Trigger> getById(int id) {
-        return transactifyAndReturn(session -> Optional.of(session.find(Trigger.class, id)));
+        return transactify(session -> {
+            return Optional.of(session.find(Trigger.class, id));
+        });
     }
 
     public Optional<Trigger> getByName(String name) {
-        return transactifyAndReturn(session -> {
+        return transactify(session -> {
             String jpql = "SELECT n FROM Trigger n WHERE n.name = :name";
             var query = session.createQuery(jpql, Trigger.class);
             query.setParameter("name", name);
@@ -33,7 +35,7 @@ public class PrticlTriggerFunctions extends PrticlFunctionsBase {
     }
 
     public Set<Node> getNodesForTrigger(int triggerId) {
-        return transactifyAndReturn(session -> {
+        return transactify(session -> {
             Trigger trigger = session.find(Trigger.class, triggerId);
             return trigger != null ? new HashSet<>(trigger.getNodes()) : new HashSet<>();
         });
@@ -42,7 +44,7 @@ public class PrticlTriggerFunctions extends PrticlFunctionsBase {
     public PaginatedResult<IPrticlEntity> getByPage(int page) {
         var startCount = page <= 1 ? 0 : (page - 1) * 10;
 
-        var list = transactifyAndReturn(session -> {
+        var list = transactify(session -> {
             String jpql = "SELECT t FROM Trigger t ORDER BY t.id ASC";
             var query = session.createQuery(jpql, IPrticlEntity.class);
 
@@ -52,7 +54,7 @@ public class PrticlTriggerFunctions extends PrticlFunctionsBase {
             return query.getResultList();
         });
 
-        var count = transactifyAndReturn(session -> {
+        var count = transactify(session -> {
             String jpql = "SELECT COUNT(t) FROM Trigger t";
             var query = session.createQuery(jpql, Long.class);
 
@@ -73,7 +75,7 @@ public class PrticlTriggerFunctions extends PrticlFunctionsBase {
     public PaginatedResult<IPrticlEntity> getByPageForPlayer(int page, Player player) {
         var startCount = page <= 1 ? 0 : (page - 1) * 10;
 
-        var list = transactifyAndReturn(session -> {
+        var list = transactify(session -> {
             String jpql = "SELECT t FROM Trigger t WHERE t.player.uuid = :uuid ORDER BY t.id ASC";
             var query = session.createQuery(jpql, IPrticlEntity.class);
 
@@ -84,7 +86,7 @@ public class PrticlTriggerFunctions extends PrticlFunctionsBase {
             return query.getResultList();
         });
 
-        var count = transactifyAndReturn(session -> {
+        var count = transactify(session -> {
             String jpql = "SELECT COUNT(t) FROM Trigger t";
             var query = session.createQuery(jpql, Long.class);
 
@@ -103,7 +105,7 @@ public class PrticlTriggerFunctions extends PrticlFunctionsBase {
     }
 
     public Set<Trigger> getTriggersForNode(int nodeId) {
-        return transactifyAndReturn(session -> {
+        return transactify(session -> {
             Node node = session.find(Node.class, nodeId);
             return node != null ? new HashSet<>(node.getTriggers()) : new HashSet<>();
         });
@@ -116,7 +118,7 @@ public class PrticlTriggerFunctions extends PrticlFunctionsBase {
 
         var sql = "SELECT t.id FROM Trigger t WHERE t.x = :x AND t.y = :y AND t.z = :z";
 
-        return transactifyAndReturn(session -> {
+        return transactify(session -> {
             var query = session.createQuery(sql, Integer.class);
 
             query.setParameter("x", x);
@@ -164,7 +166,7 @@ public class PrticlTriggerFunctions extends PrticlFunctionsBase {
     }
 
     public boolean isTriggerNameUnique(String name) {
-        return transactifyAndReturn(session -> {
+        return transactify(session -> {
             String hql = "SELECT name FROM Trigger t";
             var query = session.createQuery(hql, String.class);
             var queryResult = query.getResultList();

@@ -1,6 +1,7 @@
 package com.minkuh.prticl.data.database.entities;
 
 import jakarta.persistence.*;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.UUID;
 
@@ -43,5 +44,10 @@ public class Player implements IPrticlEntity {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @Override
+    public void setDefaults() {
+        throw new NotImplementedException("A default Player entity doesn't exist.");
     }
 }

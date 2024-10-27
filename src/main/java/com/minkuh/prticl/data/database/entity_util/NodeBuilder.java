@@ -66,6 +66,15 @@ public class NodeBuilder {
         return this;
     }
 
+    public NodeBuilder setLocation(UUID worldUUID, double x, double y, double z) {
+        this.worldUUID = worldUUID;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+
+        return this;
+    }
+
     public NodeBuilder setLocation(UUID worldUUID, Location location) {
         this.worldUUID = worldUUID;
         this.x = location.x();

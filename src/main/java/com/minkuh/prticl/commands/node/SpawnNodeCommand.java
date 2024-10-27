@@ -39,7 +39,13 @@ public class SpawnNodeCommand extends PrticlCommand {
                 sender.sendMessage(prticlMessage.warning("Node with id/name: '" + argStrippedOfIdIfPresent + "' doesn't exist"));
                 return true;
             }
+
             var node = nodeOpt.get();
+
+            if (SpawnedNodesCache.getInstance().isInCache(node)) {
+                sender.sendMessage(prticlMessage.warning("Can't spawn an already spawned node!"));
+                return true;
+            }
 
             try {
                 prticlDb.getNodeFunctions().setEnabled(node, true);

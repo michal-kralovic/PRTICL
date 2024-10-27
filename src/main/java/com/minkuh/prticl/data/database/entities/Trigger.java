@@ -113,4 +113,13 @@ public class Trigger implements IPrticlEntity {
     public void setPlayer(Player player) {
         this.player = player;
     }
+
+    @Override
+    public void setDefaults() {
+        setName("Foo");
+        setBlockName("LEVER");
+        setX(0);
+        setY(0);
+        setZ(0);
+    }
 }
