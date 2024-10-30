@@ -25,6 +25,7 @@ public class PrticlSpawner {
 
         public PrticlNodeScheduler(Node node) {
             this.node = node;
+            node.setSpawned(true);
             this.location = LocationBuilder.fromNode(node);
             this.world = location.getWorld();
         }
@@ -36,6 +37,8 @@ public class PrticlSpawner {
                 if (counter < node.getRepeatCount() - 1) {
                     counter++;
                 } else {
+                    node.setSpawned(false);
+                    // TODO: Investigate whether setting enabled to false is desired functionality
                     cancel();
                 }
             }
@@ -50,6 +53,7 @@ public class PrticlSpawner {
                 return;
             }
 
+            node.setSpawned(false);
             cancel();
         }
     }

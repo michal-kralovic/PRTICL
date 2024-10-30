@@ -1,6 +1,5 @@
 package com.minkuh.prticl.commands.node;
 
-import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.common.PrticlMessages;
 import com.minkuh.prticl.data.caches.NodeChunkLocationsCache;
@@ -24,8 +23,8 @@ public class CreateNodeCommand extends PrticlCommand {
     private final PrticlMessages prticlMessage = new PrticlMessages();
     private final PrticlDatabase prticlDatabase;
 
-    public CreateNodeCommand(Prticl plugin) {
-        this.prticlDatabase = new PrticlDatabase(plugin);
+    public CreateNodeCommand() {
+        this.prticlDatabase = new PrticlDatabase();
     }
 
     @Override
@@ -39,7 +38,7 @@ public class CreateNodeCommand extends PrticlCommand {
             return true;
         }
 
-        if (!EntityValidation.isNodeNameValid(prticlDatabase, args[0], sender))
+        if (!EntityValidation.isNodeNameValid(args[0], sender))
             return true;
         //#endregion
 
@@ -48,56 +47,20 @@ public class CreateNodeCommand extends PrticlCommand {
             var worldUUID = bukkitPlayer.getLocation().getWorld().getUID();
 
             if (args.length == 1) {
-                spawnDefaultNode(args, sender, bukkitPlayer, worldUUID);
+                createDefaultNode(args, sender, bukkitPlayer, worldUUID);
                 return true;
             }
 
-            var nodeBuilder = new NodeBuilder();
-
-            nodeBuilder.setName(args[0]);
-            nodeBuilder.setParticleType((Particle.valueOf(getSupportedParticle(args[1]))).toString());
-            if (args.length >= 3) {
-                nodeBuilder.setRepeatDelay(Integer.parseInt(args[2]));
-            }
-
-            if (args.length >= 4) {
-                nodeBuilder.setRepeatCount(Integer.parseInt(args[3]));
-            }
-
-            if (args.length >= 5) {
-                var particleDensity = Integer.parseInt(args[4]);
-
-                nodeBuilder.setParticleDensity(particleDensity);
-
-                if (particleDensity > 25) {
-                    sender.sendMessage(prticlMessage.warning(HIGH_PARTICLE_DENSITY));
-                }
-            }
-
-            if (args.length >= 8) {
-                nodeBuilder.setLocation(
-                        worldUUID,
-                        Integer.parseInt(args[5]), // x
-                        Integer.parseInt(args[6]), // y
-                        Integer.parseInt(args[7])  // z
-                );
-            } else {
-                nodeBuilder.setLocation(worldUUID, bukkitPlayer.getLocation());
-            }
-
-            nodeBuilder.setPlayer(PlayerBuilder.fromBukkitPlayer(bukkitPlayer));
-            Node node = nodeBuilder.build();
-
+            Node node = buildNode(args, sender, worldUUID, bukkitPlayer);
 
             try {
-                prticlDatabase.getNodeFunctions().add(node);
-                NodeChunkLocationsCache.getInstance().add(node);
+                NodeChunkLocationsCache.getInstance().add(prticlDatabase.getNodeFunctions().add(node));
             } catch (Exception ex) {
                 sender.sendMessage(prticlMessage.error("Unexpected error!\nError: " + ex.getMessage()));
                 return true;
             }
 
-            sender.sendMessage(prticlMessage.player(CREATED_NODE));
+            sender.sendMessage(prticlMessage.player("Created '" + node.getName() + '\''));
 
         } catch (NumberFormatException e) {
             sender.sendMessage(prticlMessage.error(INCORRECT_NUMBER_INPUT_FORMAT));
@@ -108,7 +71,46 @@ public class CreateNodeCommand extends PrticlCommand {
         return true;
     }
 
-    private void spawnDefaultNode(String[] args, CommandSender sender, Player bukkitPlayer, UUID worldUUID) {
+    private Node buildNode(String[] args, CommandSender sender, UUID worldUUID, Player bukkitPlayer) {
+        var nodeBuilder = new NodeBuilder();
+
+        nodeBuilder.setName(args[0]);
+        nodeBuilder.setParticleType((Particle.valueOf(getSupportedParticle(args[1]))).toString());
+        if (args.length >= 3) {
+            nodeBuilder.setRepeatDelay(Integer.parseInt(args[2]));
+        }
+
+        if (args.length >= 4) {
+            nodeBuilder.setRepeatCount(Integer.parseInt(args[3]));
+        }
+
+        if (args.length >= 5) {
+            var particleDensity = Integer.parseInt(args[4]);
+
+            nodeBuilder.setParticleDensity(particleDensity);
+
+            if (particleDensity > 25) {
+                sender.sendMessage(prticlMessage.warning(HIGH_PARTICLE_DENSITY));
+            }
+        }
+
+        if (args.length >= 8) {
+            nodeBuilder.setLocation(
+                    worldUUID,
+                    Integer.parseInt(args[5]), // x
+                    Integer.parseInt(args[6]), // y
+                    Integer.parseInt(args[7])  // z
+            );
+        } else {
+            nodeBuilder.setLocation(worldUUID, bukkitPlayer.getLocation());
+        }
+
+        nodeBuilder.setPlayer(PlayerBuilder.fromBukkitPlayer(bukkitPlayer));
+
+        return nodeBuilder.build();
+    }
+
+    private void createDefaultNode(String[] args, CommandSender sender, Player bukkitPlayer, UUID worldUUID) {
         var node = new Node();
         node.setDefaults();
         node.setName(args[0]);
@@ -120,14 +122,13 @@ public class CreateNodeCommand extends PrticlCommand {
         node.setZ(bukkitPlayer.getZ());
 
         try {
-            prticlDatabase.getNodeFunctions().add(node);
-            NodeChunkLocationsCache.getInstance().add(node);
+            NodeChunkLocationsCache.getInstance().add(prticlDatabase.getNodeFunctions().add(node));
         } catch (Exception ex) {
             sender.sendMessage(prticlMessage.error("Unexpected error!\nError: " + ex.getMessage()));
             return;
         }
 
-        sender.sendMessage(prticlMessage.player(CREATED_NODE));
+        sender.sendMessage(prticlMessage.player("Created '" + node.getName() + '\''));
     }
 
     private static final List<String> marker = new ArrayList<>();

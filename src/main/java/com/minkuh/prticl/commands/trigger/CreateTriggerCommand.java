@@ -1,11 +1,11 @@
 package com.minkuh.prticl.commands.trigger;
 
-import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.data.database.entity_util.EntityValidation;
 import com.minkuh.prticl.data.database.entity_util.PlayerBuilder;
 import com.minkuh.prticl.data.database.entity_util.TriggerBuilder;
+import com.minkuh.prticl.data.database.functions.PrticlTriggerFunctions;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.command.CommandSender;
@@ -18,11 +18,10 @@ import static com.minkuh.prticl.common.PrticlConstants.CREATE_TRIGGER_COMMAND;
 import static com.minkuh.prticl.common.PrticlConstants.NODE_PARAM_NAME;
 
 public class CreateTriggerCommand extends PrticlCommand {
+    private final PrticlTriggerFunctions triggerFunctions;
 
-    private final PrticlDatabase prticlDb;
-
-    public CreateTriggerCommand(Prticl plugin) {
-        this.prticlDb = new PrticlDatabase(plugin);
+    public CreateTriggerCommand() {
+        this.triggerFunctions = new PrticlDatabase().getTriggerFunctions();
     }
 
     @Override
@@ -32,7 +31,7 @@ public class CreateTriggerCommand extends PrticlCommand {
             return true;
         }
 
-        if (!EntityValidation.isTriggerNameValid(prticlDb, args[0], sender)) return true;
+        if (!EntityValidation.isTriggerNameValid(args[0], sender)) return true;
 
         var targetedBlock = ((Player) sender).getTargetBlockExact(5);
         if (targetedBlock == null) {
@@ -56,7 +55,7 @@ public class CreateTriggerCommand extends PrticlCommand {
                 .setWorldUUID(targetedBlock.getWorld().getUID())
                 .build();
 
-        prticlDb.getTriggerFunctions().add(trigger);
+        triggerFunctions.add(trigger);
 
         sender.sendMessage(prticlMessage.player("Created the trigger."));
         return true;

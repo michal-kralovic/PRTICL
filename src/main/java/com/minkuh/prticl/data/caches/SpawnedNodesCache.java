@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class SpawnedNodesCache {
+public final class SpawnedNodesCache {
     private static SpawnedNodesCache INSTANCE;
     private final List<Node> spawnedNodes;
 
@@ -33,8 +33,8 @@ public class SpawnedNodesCache {
         return spawnedNodes.stream().filter(node -> node.getName().equalsIgnoreCase(nodeName)).findFirst();
     }
 
-    public synchronized void addToCache(Node node) {
-        if (!node.isEnabled() || node.isSpawned())
+    public synchronized void add(Node node) {
+        if (!node.isEnabled())
             return;
 
         node.setSpawned(true);
@@ -52,14 +52,20 @@ public class SpawnedNodesCache {
     public synchronized boolean remove(Node node) {
         node.setSpawned(false);
 
-        return this.spawnedNodes.remove(node);
+        try {
+            spawnedNodes.removeIf(fNode -> fNode.getId() == node.getId());
+        } catch (Exception ex) {
+            return false;
+        }
+
+        return true;
     }
 
-    public synchronized void removeWhere(Predicate<Node> condition) {
+    public synchronized void remove(Predicate<Node> condition) {
         for (var node : spawnedNodes.stream().filter(condition).toList()) {
             node.setSpawned(false);
 
-            this.spawnedNodes.remove(node);
+            this.spawnedNodes.removeIf(lNode -> lNode.getId() == node.getId());
         }
     }
 }

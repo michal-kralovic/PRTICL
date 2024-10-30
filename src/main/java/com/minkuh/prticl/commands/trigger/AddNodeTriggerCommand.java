@@ -1,10 +1,11 @@
 package com.minkuh.prticl.commands.trigger;
 
-import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.data.database.entities.Node;
 import com.minkuh.prticl.data.database.entities.Trigger;
+import com.minkuh.prticl.data.database.functions.PrticlNodeFunctions;
+import com.minkuh.prticl.data.database.functions.PrticlTriggerFunctions;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
 
@@ -16,11 +17,13 @@ import java.util.Optional;
 import static com.minkuh.prticl.common.PrticlConstants.*;
 
 public class AddNodeTriggerCommand extends PrticlCommand {
+    private final PrticlTriggerFunctions triggerFunctions;
+    private final PrticlNodeFunctions nodeFunctions;
 
-    private final PrticlDatabase prticlDb;
-
-    public AddNodeTriggerCommand(Prticl plugin) {
-        this.prticlDb = new PrticlDatabase(plugin);
+    public AddNodeTriggerCommand() {
+        var prticlDb = new PrticlDatabase();
+        this.nodeFunctions = prticlDb.getNodeFunctions();
+        this.triggerFunctions = prticlDb.getTriggerFunctions();
     }
 
     @Override
@@ -42,7 +45,7 @@ public class AddNodeTriggerCommand extends PrticlCommand {
         var trigger = triggerOpt.get();
         var node = nodeOpt.get();
 
-        prticlDb.getTriggerFunctions().addNodeToTrigger(trigger, node);
+        triggerFunctions.addNodeToTrigger(trigger, node);
         sender.sendMessage(prticlMessage.player("Successfully assigned the node to the trigger!"));
 
         return true;
@@ -79,8 +82,8 @@ public class AddNodeTriggerCommand extends PrticlCommand {
     private Optional<Trigger> getTriggerFromDatabase(String arg, CommandSender sender) {
         try {
             return arg.startsWith("id:")
-                    ? prticlDb.getTriggerFunctions().getById(Integer.parseInt(arg.substring("id:".length())))
-                    : prticlDb.getTriggerFunctions().getByName(arg);
+                    ? triggerFunctions.getById(Integer.parseInt(arg.substring("id:".length())))
+                    : triggerFunctions.getByName(arg);
         } catch (NumberFormatException e) {
             sender.sendMessage(prticlMessage.error(INCORRECT_NODE_ID_FORMAT));
         } catch (Exception e) {
@@ -93,8 +96,8 @@ public class AddNodeTriggerCommand extends PrticlCommand {
     private Optional<Node> getNodeFromDatabase(String arg, CommandSender sender) {
         try {
             return arg.startsWith("id:")
-                    ? prticlDb.getNodeFunctions().getById(Integer.parseInt(arg.substring("id:".length())))
-                    : prticlDb.getNodeFunctions().getByName(arg);
+                    ? nodeFunctions.getById(Integer.parseInt(arg.substring("id:".length())))
+                    : nodeFunctions.getByName(arg);
         } catch (NumberFormatException e) {
             sender.sendMessage(prticlMessage.error(INCORRECT_NODE_ID_FORMAT));
         } catch (Exception e) {

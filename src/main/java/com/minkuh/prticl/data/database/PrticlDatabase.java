@@ -1,6 +1,5 @@
 package com.minkuh.prticl.data.database;
 
-import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.data.database.entities.Node;
 import com.minkuh.prticl.data.database.entities.Player;
 import com.minkuh.prticl.data.database.entities.IPrticlEntity;
@@ -17,7 +16,7 @@ public class PrticlDatabase {
     private final PrticlTriggerFunctions triggerFunctions;
     private final PrticlPlayerFunctions playerFunctions;
 
-    public PrticlDatabase(Prticl plugin) {
+    public PrticlDatabase() {
         this.nodeFunctions = new PrticlNodeFunctions();
         this.triggerFunctions = new PrticlTriggerFunctions();
         this.playerFunctions = new PrticlPlayerFunctions();

@@ -140,11 +140,11 @@ public class PrticlNodeFunctions extends PrticlFunctionsBase {
         });
     }
 
-    public void add(Node node) {
-        transactify(session -> {
+    public Node add(Node node) {
+        return transactify(session -> {
             var player = new PrticlPlayerFunctions().addOrGetExistingPlayer(session, node.getPlayer());
             node.setPlayer(player);
-            session.merge(node);
+            return session.merge(node);
         });
     }
 

@@ -2,6 +2,7 @@ package com.minkuh.prticl.event_listeners;
 
 import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.common.PrticlSpawner;
+import com.minkuh.prticl.data.caches.CacheManager;
 import com.minkuh.prticl.data.caches.NodeChunkLocationsCache;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
@@ -20,6 +21,7 @@ import java.util.List;
 public class TerrainStateChangeEventListener implements Listener {
     private final Prticl plugin;
     private final PrticlSpawner spawner;
+    private final PrticlDatabase prticlDb = new PrticlDatabase();
 
     public TerrainStateChangeEventListener(Prticl plugin) {
         this.plugin = plugin;
@@ -28,16 +30,15 @@ public class TerrainStateChangeEventListener implements Listener {
 
     @EventHandler
     public void onWorldLoad(@NotNull WorldLoadEvent event) {
-        PrticlDatabase db = new PrticlDatabase(plugin);
-        List<Node> nodes = db.getNodeFunctions().getByWorld(event.getWorld().getUID());
-        List<Node> enabledNodes = db.getNodeFunctions().getEnabledNodes();
+        List<Node> nodes = prticlDb.getNodeFunctions().getByWorld(event.getWorld().getUID());
+        List<Node> enabledNodes = prticlDb.getNodeFunctions().getEnabledNodes();
 
         for (var node : nodes) {
             NodeChunkLocationsCache.getInstance().add(node);
         }
 
         for (var node : enabledNodes) {
-            SpawnedNodesCache.getInstance().addToCache(node);
+            SpawnedNodesCache.getInstance().add(node);
         }
     }
 
@@ -50,11 +51,8 @@ public class TerrainStateChangeEventListener implements Listener {
                 .filter(node -> node.isSpawned() && node.getWorldUUID().equals(eventWorldUuid))
                 .forEach(node -> node.setSpawned(false));
 
-        // Remove them from the SpawnedNodes cache
-        SpawnedNodesCache.getInstance().removeWhere(node -> node.isSpawned() && node.getWorldUUID().equals(eventWorldUuid));
-
-        // Remove them from the NodeChunkLocations cache
-        NodeChunkLocationsCache.getInstance().removeWhere(node -> node.isSpawned() && node.getWorldUUID().equals(eventWorldUuid));
+        // Remove them from the caches
+        CacheManager.removeFromAllCaches(node -> node.isSpawned() && node.getWorldUUID().equals(eventWorldUuid));
     }
 
     @EventHandler
@@ -62,22 +60,30 @@ public class TerrainStateChangeEventListener implements Listener {
         Chunk eventChunk = event.getChunk();
         List<Node> nodesInTheChunk = NodeChunkLocationsCache.getInstance().getNodesFromCacheByChunk(eventChunk);
 
-        if (nodesInTheChunk == null) {
-            plugin.getLogger().fine("No nodes found in chunk: x:" + eventChunk.getX() + ", z:" + eventChunk.getZ());
-            return;
-        }
+        if (nodesInTheChunk == null) return;
 
         for (Node node : nodesInTheChunk) {
-            if (!node.isEnabled()) continue;
+            if (!node.isEnabled() || node.isSpawned()) continue;
 
             spawner.spawnNode(node);
             node.setSpawned(true);
             node.setEnabled(true);
+            SpawnedNodesCache.getInstance().add(node);
         }
     }
 
     @EventHandler
     public void onChunkUnload(@NotNull ChunkUnloadEvent event) {
-        // TODO: Implement chunk unload spawned nodes removal
+        Chunk eventChunk = event.getChunk();
+        List<Node> nodesInTheChunk = NodeChunkLocationsCache.getInstance().getNodesFromCacheByChunk(eventChunk);
+
+        if (nodesInTheChunk == null) return;
+
+        for (Node node : nodesInTheChunk) {
+            if (!node.isEnabled() || !node.isSpawned()) continue;
+
+            node.setSpawned(false);
+            SpawnedNodesCache.getInstance().remove(node);
+        }
     }
 }

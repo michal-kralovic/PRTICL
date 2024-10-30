@@ -1,6 +1,5 @@
 package com.minkuh.prticl.commands;
 
-import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.common.PrticlMessages;
 import com.minkuh.prticl.common.PaginatedResult;
 import com.minkuh.prticl.data.database.PrticlDatabase;
@@ -29,8 +28,8 @@ public class ListCommand extends PrticlCommand {
     private static final PrticlMessages prticlMessage = new PrticlMessages();
     private final PrticlDatabase prticlDatabase;
 
-    public ListCommand(Prticl plugin) {
-        this.prticlDatabase = new PrticlDatabase(plugin);
+    public ListCommand() {
+        this.prticlDatabase = new PrticlDatabase();
     }
 
     @Override

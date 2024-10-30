@@ -17,19 +17,23 @@ public class PlayerInteractEventListener implements Listener {
     private final PrticlSpawner prticlSpawner;
 
     public PlayerInteractEventListener(Prticl plugin) {
-        this.prticlDb = new PrticlDatabase(plugin);
+        this.prticlDb = new PrticlDatabase();
         this.prticlSpawner = new PrticlSpawner(plugin);
     }
 
     @EventHandler
     public void onTriggerBlockInteraction(@NotNull PlayerInteractEvent event) {
-        if (event.getClickedBlock() == null) return;
+        if (event.getClickedBlock() == null) {
+            return;
+        }
 
         if (event.getAction() == PHYSICAL || event.getAction().isRightClick()
                 && event.getClickedBlock().getBlockData() instanceof Powerable) {
             var triggerId = prticlDb.getTriggerFunctions().getTriggerForBlock(event.getClickedBlock().getLocation());
 
-            if (triggerId.isEmpty()) return;
+            if (triggerId.isEmpty()) {
+                return;
+            }
 
             var nodes = prticlDb.getTriggerFunctions().getNodesForTrigger(triggerId.get());
 

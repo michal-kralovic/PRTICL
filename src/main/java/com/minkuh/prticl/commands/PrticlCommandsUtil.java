@@ -27,12 +27,12 @@ public class PrticlCommandsUtil {
 
     public PrticlCommandsUtil(Prticl plugin) {
         COMMANDS.put(SpawnNodeCommand.getCommandName(), new SpawnNodeCommand(plugin));
-        COMMANDS.put(DespawnNodeCommand.getCommandName(), new DespawnNodeCommand(plugin));
-        COMMANDS.put(CreateNodeCommand.getCommandName(), new CreateNodeCommand(plugin));
-        COMMANDS.put(ListCommand.getCommandName(), new ListCommand(plugin));
+        COMMANDS.put(DespawnNodeCommand.getCommandName(), new DespawnNodeCommand());
+        COMMANDS.put(CreateNodeCommand.getCommandName(), new CreateNodeCommand());
+        COMMANDS.put(ListCommand.getCommandName(), new ListCommand());
         COMMANDS.put(HelpCommand.getCommandName(), new HelpCommand());
-        COMMANDS.put(CreateTriggerCommand.getCommandName(), new CreateTriggerCommand(plugin));
-        COMMANDS.put(AddNodeTriggerCommand.getCommandName(), new AddNodeTriggerCommand(plugin));
+        COMMANDS.put(CreateTriggerCommand.getCommandName(), new CreateTriggerCommand());
+        COMMANDS.put(AddNodeTriggerCommand.getCommandName(), new AddNodeTriggerCommand());
     }
 
     /**

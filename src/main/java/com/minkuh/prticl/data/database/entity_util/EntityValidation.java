@@ -9,14 +9,15 @@ import java.util.Locale;
 import static com.minkuh.prticl.common.PrticlConstants.*;
 
 public class EntityValidation {
+    private static final PrticlDatabase prticlDb = new PrticlDatabase();
     static PrticlMessages messages = new PrticlMessages();
 
-    public static boolean isNodeNameValid(PrticlDatabase prticlDatabase, String arg, CommandSender sender) {
+    public static boolean isNodeNameValid(String arg, CommandSender sender) {
         boolean validationResult;
 
         validationResult = isEntityNameValid(arg, sender);
 
-        if (!prticlDatabase.getNodeFunctions().isNodeNameUnique(arg)) {
+        if (!prticlDb.getNodeFunctions().isNodeNameUnique(arg)) {
             sender.sendMessage(messages.error(DUPLICATE_ENTITY_NAME));
             validationResult = false;
         }
@@ -24,12 +25,12 @@ public class EntityValidation {
         return validationResult;
     }
 
-    public static boolean isTriggerNameValid(PrticlDatabase prticlDatabase, String arg, CommandSender sender) {
+    public static boolean isTriggerNameValid(String arg, CommandSender sender) {
         boolean validationResult;
 
         validationResult = isEntityNameValid(arg, sender);
 
-        if (!prticlDatabase.getTriggerFunctions().isTriggerNameUnique(arg)) {
+        if (!prticlDb.getTriggerFunctions().isTriggerNameUnique(arg)) {
             sender.sendMessage(messages.error(DUPLICATE_ENTITY_NAME));
             validationResult = false;
         }

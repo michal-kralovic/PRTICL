@@ -1,10 +1,10 @@
 package com.minkuh.prticl.commands.node;
 
-import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.commands.PrticlCommand;
 import com.minkuh.prticl.data.caches.SpawnedNodesCache;
 import com.minkuh.prticl.data.database.PrticlDatabase;
 import com.minkuh.prticl.data.database.entities.Node;
+import com.minkuh.prticl.data.database.functions.PrticlNodeFunctions;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.StringUtil;
@@ -21,12 +21,10 @@ import static com.minkuh.prticl.common.PrticlConstants.INCORRECT_COMMAND_SYNTAX_
  * A Command for handling the despawning of PrticlNodes.
  */
 public class DespawnNodeCommand extends PrticlCommand {
-    private final Prticl plugin;
-    private final PrticlDatabase prticlDb;
+    private final PrticlNodeFunctions nodeFunctions;
 
-    public DespawnNodeCommand(Prticl plugin) {
-        this.plugin = plugin;
-        this.prticlDb = new PrticlDatabase(this.plugin);
+    public DespawnNodeCommand() {
+        this.nodeFunctions = new PrticlDatabase().getNodeFunctions();
     }
 
     @Override
@@ -45,7 +43,7 @@ public class DespawnNodeCommand extends PrticlCommand {
             }
             var node = nodeOpt.get();
 
-            prticlDb.getNodeFunctions().setEnabled(node, false);
+            nodeFunctions.setEnabled(node, false);
             SpawnedNodesCache.getInstance().remove(node);
 
             sender.sendMessage(prticlMessage.player("Despawned '" + node.getName() + '\''));

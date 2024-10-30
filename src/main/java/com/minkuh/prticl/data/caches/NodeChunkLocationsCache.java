@@ -7,6 +7,7 @@ import org.bukkit.Chunk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
@@ -29,6 +30,14 @@ public final class NodeChunkLocationsCache {
         return INSTANCE;
     }
 
+    public synchronized Optional<Node> getNodeById(int id) {
+        return map.values().stream().flatMap(List::stream).filter(lNode -> lNode.getId() == id).findFirst();
+    }
+
+    public synchronized Optional<Node> getNodeByName(String name) {
+        return map.values().stream().flatMap(List::stream).filter(lNode -> lNode.getName().equals(name)).findFirst();
+    }
+
     public synchronized List<Node> getNodesFromCacheByChunk(Chunk chunk) {
         return getNodesFromCacheByChunkKey(new ChunkKey(chunk.getX(), chunk.getZ()));
     }
@@ -41,10 +50,15 @@ public final class NodeChunkLocationsCache {
         return map.get(chunkKey);
     }
 
+    public synchronized boolean isInCache(Node node) {
+        ChunkKey chunkKey = nodeToKey(node);
+        return map.containsKey(chunkKey) && map.get(chunkKey).stream().anyMatch(lNode -> node.getId() == lNode.getId());
+    }
+
     public synchronized void add(Node node) {
         ChunkKey chunkKey = nodeToKey(node);
 
-        if (map.containsKey(chunkKey)) {
+        if (map.containsKey(chunkKey) && !map.get(chunkKey).contains(node)) {
             map.get(chunkKey).add(node);
         } else {
             map.put(
@@ -74,7 +88,7 @@ public final class NodeChunkLocationsCache {
         }
     }
 
-    public synchronized void removeWhere(Predicate<Node> condition) {
+    public synchronized void remove(Predicate<Node> condition) {
         for (var nodeRow : map.values()) {
             for (var filteredNode : nodeRow.stream().filter(condition).toList()) {
                 remove(filteredNode);
