@@ -1,21 +1,33 @@
 package com.minkuh.prticl.commands;
 
-import com.minkuh.prticl.common.MessageColors;
-    import net.kyori.adventure.text.TextComponent;
+import com.minkuh.prticl.commands.base.Command;
+import com.minkuh.prticl.common.PrticlMessages;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.format.TextDecoration.State;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-import static com.minkuh.prticl.common.PrticlConstants.HELP_COMMAND;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.TextColor.color;
 
-/**
- * Displays help information
- */
-public class HelpCommand extends PrticlCommand {
+// TODO: Rewrite into dynamic sections for nodes, triggers, players, and so on. Currently only does node.
+public class HelpCommand extends Command {
+    @Override
+    public List<String> getTabCompletion(String[] args) {
+        return List.of();
+    }
+
+    @Override
+    public TextComponent.Builder getHelpSection() {
+        return createHelpSectionForCommand(
+                getCommandName(),
+                "Displays helpful information about Prticl.",
+                "/prticl help",
+                "/prticl help"
+        );
+    }
+
     @Override
     public boolean execute(String[] args, CommandSender sender) {
         if (args.length != 1) {
@@ -28,49 +40,40 @@ public class HelpCommand extends PrticlCommand {
     }
 
     @Override
-    public List<String> getTabCompletion(String[] args) {
-        return List.of();
+    public String getCommandName() {
+        return PrticlCommands.Names.HELP;
     }
 
     @Override
-    public TextComponent.Builder getHelpDescription() {
-        return createHelpSectionForCommand(
-                HelpCommand.getCommandName(),
-                "Displays helpful information about Prticl.",
-                "/prticl help",
-                "/prticl help"
-        );
+    public CommandCategory getCategory() {
+        return CommandCategory.OTHER;
     }
 
-    private final TextComponent listPrticlCategories = helpMenuTitle("PRTICL - Help")
-            .appendNewline().appendNewline()
-            .append(text("  Usage: ").color(color(MessageColors.prticlLight)).append(text().content("/prticl help <category>").color(color(MessageColors.system))))
-            .appendNewline().appendNewline()
-            .append(text().content("  - ")
-                    .append(text().content("node » ")).color(color(MessageColors.system))
-                    .append(text().content("Shows help for all the available node subcommands.").color(color(MessageColors.prticlLight))))
-            .build();
+    private TextComponent.Builder helpMenuTitle(String content) {
+        return text().appendNewline().appendNewline()
+                .append(text().content("        [").decoration(TextDecoration.BOLD, TextDecoration.State.TRUE).color(color(PrticlMessages.Colors.strong))
+                        .append(text().decoration(TextDecoration.BOLD, TextDecoration.State.FALSE).content(" " + content + " ").color(color(PrticlMessages.Colors.light))
+                                .append(text().decoration(TextDecoration.BOLD, TextDecoration.State.TRUE).content("]").color(color(PrticlMessages.Colors.strong)))));
+    }
 
     private TextComponent listPrticlNodeSubcommands() {
         var output = helpMenuTitle("PRTICL - Help - Node Subcommands")
                 .appendNewline().appendNewline();
 
-        for (var command : PrticlCommandsUtil.COMMANDS.entrySet()) {
-            output.append(command.getValue().getHelpDescription());
+        for (var command : PrticlCommands.getCommands().entrySet()) {
+            output.append(command.getValue().getHelpSection());
             output.appendNewline();
         }
 
         return output.build();
     }
 
-    private TextComponent.Builder helpMenuTitle(String content) {
-        return text().appendNewline().appendNewline()
-                .append(text().content("        [").decoration(TextDecoration.BOLD, State.TRUE).color(color(MessageColors.prticlStrong))
-                        .append(text().decoration(TextDecoration.BOLD, State.FALSE).content(" " + content + " ").color(color(MessageColors.prticlLight))
-                                .append(text().decoration(TextDecoration.BOLD, State.TRUE).content("]").color(color(MessageColors.prticlStrong)))));
-    }
-
-    public static String getCommandName() {
-        return HELP_COMMAND;
-    }
+    private final TextComponent listPrticlCategories = helpMenuTitle("PRTICL - Help")
+            .appendNewline().appendNewline()
+            .append(text("  Usage: ").color(color(PrticlMessages.Colors.light)).append(text().content("/prticl help <category>").color(color(PrticlMessages.Colors.system))))
+            .appendNewline().appendNewline()
+            .append(text().content("  - ")
+                    .append(text().content("node » ")).color(color(PrticlMessages.Colors.system))
+                    .append(text().content("Shows help for all the available node subcommands.").color(color(PrticlMessages.Colors.light))))
+            .build();
 }

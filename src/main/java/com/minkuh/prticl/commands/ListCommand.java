@@ -1,147 +1,123 @@
 package com.minkuh.prticl.commands;
 
-import com.minkuh.prticl.common.PrticlMessages;
+import com.minkuh.prticl.commands.base.Command;
 import com.minkuh.prticl.common.PaginatedResult;
-import com.minkuh.prticl.data.database.PrticlDatabase;
-import com.minkuh.prticl.data.database.entities.IPrticlEntity;
-import com.minkuh.prticl.data.database.entities.Node;
-import com.minkuh.prticl.data.database.entities.Trigger;
-import com.minkuh.prticl.data.database.entity_util.PlayerBuilder;
+import com.minkuh.prticl.common.PrticlMessages;
+import com.minkuh.prticl.data.entities.IPrticlEntity;
+import com.minkuh.prticl.data.repositories.NodeRepository;
+import com.minkuh.prticl.data.repositories.PlayerRepository;
+import com.minkuh.prticl.data.repositories.TriggerRepository;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Locale;
+import java.util.logging.Logger;
 
-import static com.minkuh.prticl.common.PrticlConstants.INCORRECT_COMMAND_SYNTAX_OR_OTHER;
-import static com.minkuh.prticl.common.PrticlConstants.LIST_COMMAND;
-import static com.minkuh.prticl.data.database.PrticlDatabase.PRTICL_DATABASE_ENTITIES;
+public class ListCommand extends Command {
+    private final NodeRepository nodeRepository;
+    private final TriggerRepository triggerRepository;
+    private final PlayerRepository playerRepository;
+    private final CommandCategory category;
 
-/**
- * Prticl list command.<br>
- * Displays every single entity stored in the database <br/>
- * (limited to the ones made by the calling player if met with insufficient permissions).
- */
-public class ListCommand extends PrticlCommand {
-    private static final PrticlMessages prticlMessage = new PrticlMessages();
-    private final PrticlDatabase prticlDatabase;
-
-    public ListCommand() {
-        this.prticlDatabase = new PrticlDatabase();
+    public ListCommand(Logger logger, CommandCategory category) {
+        this.nodeRepository = new NodeRepository(logger);
+        this.triggerRepository = new TriggerRepository(logger);
+        this.playerRepository = new PlayerRepository(logger);
+        this.category = category;
     }
 
     @Override
     public boolean execute(String[] args, CommandSender sender) {
+        int page;
         try {
-            IPrticlEntity entityToUse = null;
-
-            for (var clazz : PRTICL_DATABASE_ENTITIES) {
-                String clazzName = clazz.getClass().getSimpleName();
-
-                if (args[0].equalsIgnoreCase(clazzName) || args[0].equalsIgnoreCase(clazzName.substring(0, 1))) {
-                    entityToUse = clazz;
-                    break;
-                }
+            if (args.length >= 1) {
+                page = Integer.parseInt(args[0]) - 1;
+                if (page < 0) page = 0;
+            } else {
+                page = 0;
             }
-
-            if (entityToUse == null) {
-                sender.sendMessage(prticlMessage.error("No such entity: " + args[0]));
-                return true;
-            }
-
-            return listEntities(entityToUse, args, sender);
-        } catch (Exception ex) {
-            sender.sendMessage(prticlMessage.error(INCORRECT_COMMAND_SYNTAX_OR_OTHER));
+        } catch (NumberFormatException ex) {
+            sender.sendMessage(PrticlMessages.error("Incorrect page number format!"));
             return true;
         }
+
+        try {
+            PaginatedResult<?> result;
+            switch (category) {
+                case CommandCategory.NODE -> {
+                    result = nodeRepository.getByPage(page);
+                    displayResults(sender, result, "Nodes");
+                }
+                case CommandCategory.TRIGGER -> {
+                    result = triggerRepository.getByPage(page);
+                    displayResults(sender, result, "Triggers");
+                }
+                case CommandCategory.PLAYER -> {
+                    result = playerRepository.getByPage(page);
+                    displayResults(sender, result, "Players");
+                }
+                default -> throw new UnsupportedOperationException("Listing not supported for this category");
+            }
+        } catch (Exception ex) {
+            sender.sendMessage(PrticlMessages.error(ex.getMessage()));
+        }
+        return true;
     }
 
     @Override
     public List<String> getTabCompletion(String[] args) {
-        if (args.length == 2) {
-            return List.of("page");
+        if (args.length == 1) {
+            return List.of("1", "2", "3");
         }
-
         return List.of();
     }
 
     @Override
-    public TextComponent.Builder getHelpDescription() {
+    public TextComponent.Builder getHelpSection() {
+        String entityType = switch (category) {
+            case CommandCategory.NODE -> "nodes";
+            case CommandCategory.TRIGGER -> "triggers";
+            case CommandCategory.PLAYER -> "players";
+            default -> "entities";
+        };
+
         return createHelpSectionForCommand(
-                ListCommand.getCommandName(),
-                "Lists out all the available entities.",
-                "/prticl <entity> list (page number)",
-                "/prticl player list 1"
+                getCommandName(),
+                "Lists out all available " + entityType + ".",
+                "/prticl " + category.toString().toLowerCase() + " list [page]",
+                "/prticl " + category.toString().toLowerCase() + " list 1"
         );
     }
 
-    private boolean listEntities(IPrticlEntity entity, String[] args, CommandSender sender) {
-        boolean isSenderOp = sender.isOp();
-        int page;
-
-        try {
-            if (args.length == 3) {
-                page = Integer.parseInt(args[2]);
-                page = page == 1 ? 0 : page;
-            } else {
-                page = 0;
-            }
-
-        } catch (NumberFormatException ex) {
-            sender.sendMessage(prticlMessage.error("Incorrect page number!"));
-            return true;
-        }
-
-        var player = PlayerBuilder.fromBukkitPlayer((Player) sender);
-        PaginatedResult<IPrticlEntity> paginatedResult;
-        String entityName;
-
-        // TODO: Change once permissions are implemented
-        switch (entity) {
-            case Node node -> {
-                paginatedResult = isSenderOp
-                        ? prticlDatabase.getNodeFunctions().getByPage(page)
-                        : prticlDatabase.getNodeFunctions().getByPageForPlayer(page, player);
-                entityName = node.getClass().getSimpleName();
-            }
-
-            case Trigger trigger -> {
-                paginatedResult = isSenderOp
-                        ? prticlDatabase.getTriggerFunctions().getByPage(page)
-                        : prticlDatabase.getTriggerFunctions().getByPageForPlayer(page, player);
-                entityName = trigger.getClass().getSimpleName();
-            }
-
-            case com.minkuh.prticl.data.database.entities.Player sPlayer -> {
-                paginatedResult = prticlDatabase.getPlayerFunctions().getByPage(page);
-                entityName = sPlayer.getClass().getSimpleName();
-            }
-
-            default -> throw new UnsupportedOperationException(
-                    "Listing logic for entity of type '" + entity.getClass().getSimpleName() + "' is not implemented!");
-        }
-
-        return mainListLogic(paginatedResult, entityName, sender);
+    @Override
+    public String getCommandName() {
+        return PrticlCommands.Names.LIST;
     }
 
-    private static boolean mainListLogic(@NotNull PaginatedResult<IPrticlEntity> entities, String entityName, CommandSender sender) {
-        int page = entities.getPage();
-        int pageAmount = entities.getTotalPages();
+    @Override
+    public CommandCategory getCategory() {
+        return category;
+    }
 
-        if (pageAmount == 0) {
-            sender.sendMessage(prticlMessage.player("No " + entityName.toLowerCase(Locale.ROOT) + "s " + "to display."));
-        } else if (page <= pageAmount && page >= 0) {
-            sender.sendMessage(prticlMessage.listEntities(entities));
+    private <T extends IPrticlEntity> void displayResults(CommandSender sender, PaginatedResult<T> results, String entityType) {
+        int displayPage = results.getPage() + 1;
+
+        var message = new StringBuilder();
+        message.append(entityType)
+                .append(" (Page ").append(displayPage).append(" of ").append(results.getTotalPages())
+                .append(" | ")
+                .append(results.getTotalItems()).append(" total)\n");
+
+        if (results.getItems().isEmpty()) {
+            message.append("No ").append(entityType.toLowerCase()).append(" found.");
         } else {
-            sender.sendMessage(prticlMessage.error("Invalid page number! (" + 1 + " to " + pageAmount + ")"));
+            for (T item : results.getItems()) {
+                message.append(" - ")
+                        .append(item.getListView())
+                        .append("\n");
+            }
         }
 
-        return true;
-    }
-
-    public static String getCommandName() {
-        return LIST_COMMAND;
+        sender.sendMessage(PrticlMessages.player(message.toString()));
     }
 }

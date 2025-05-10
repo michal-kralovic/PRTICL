@@ -1,10 +1,7 @@
 package com.minkuh.prticl.commands;
 
-import com.minkuh.prticl.commands.node.CreateNodeCommand;
-import com.minkuh.prticl.commands.node.DespawnNodeCommand;
-import com.minkuh.prticl.commands.node.SpawnNodeCommand;
-import com.minkuh.prticl.commands.trigger.AddNodeTriggerCommand;
-import com.minkuh.prticl.commands.trigger.CreateTriggerCommand;
+import com.minkuh.prticl.commands.base.ICommand;
+import com.minkuh.prticl.common.PrticlUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -15,94 +12,58 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static com.minkuh.prticl.common.PrticlConstants.*;
-
 public class PrticlTabCompleter implements TabCompleter {
+    private final Map<String, ICommand> commands;
+    private static final List<String> nodeSubcommandNames = PrticlUtil.getSubcommandNames(CommandCategory.NODE);
+    private static final List<String> triggerSubcommandNames = PrticlUtil.getSubcommandNames(CommandCategory.TRIGGER);
+    private static final List<String> playerSubcommandNames = PrticlUtil.getSubcommandNames(CommandCategory.PLAYER);
+
+    public PrticlTabCompleter(Map<String, ICommand> commands) {
+        this.commands = commands;
+    }
+
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (sender instanceof Player && label.equalsIgnoreCase(PrticlCommand.getCommandName())) {
-            if (args.length == 1) return getSortedStrings(args[0], SUBCOMMANDS);
+        if (!(sender instanceof Player) || !label.equalsIgnoreCase("prticl"))
+            return List.of();
 
-            if (args.length == 2) {
-                if (isNodeSubcommand(args[0]))
-                    return getSortedStrings(args[1], NODE_COMMAND_NAMES);
+        if (args.length == 1)
+            return getSortedStrings(args[0], List.of("node", "trigger", "help", "player"));
 
-                if (isTriggerSubcommand(args[0]))
-                    return getSortedStrings(args[1], TRIGGER_COMMAND_NAMES);
+        if (args.length == 2) {
+            var subCommand = args[0].toLowerCase(Locale.ROOT);
 
-                if (isPlayerSubcommand(args[0]))
-                    return getSortedStrings(args[1], PLAYER_COMMAND_NAMES);
-            }
-
-            String[] tabCompletionArray = Arrays.copyOfRange(args, 1, args.length);
-            if (isNodeSubcommand(args[0])) {
-                return switch (args[1].toLowerCase(Locale.ROOT)) {
-                    case SPAWN_COMMAND ->
-                            PrticlCommandsUtil.COMMANDS.get(SpawnNodeCommand.getCommandName()).getTabCompletion(tabCompletionArray);
-                    case DESPAWN_COMMAND ->
-                            PrticlCommandsUtil.COMMANDS.get(DespawnNodeCommand.getCommandName()).getTabCompletion(tabCompletionArray);
-                    case CREATE_COMMAND ->
-                            PrticlCommandsUtil.COMMANDS.get(CreateNodeCommand.getCommandName()).getTabCompletion(tabCompletionArray);
-                    case LIST_COMMAND ->
-                            PrticlCommandsUtil.COMMANDS.get(ListCommand.getCommandName()).getTabCompletion(tabCompletionArray);
-                    default -> Collections.emptyList();
-                };
-            }
-
-            if (isTriggerSubcommand(args[0])) {
-                return switch (args[1].toLowerCase(Locale.ROOT)) {
-                    case CREATE_COMMAND ->
-                            PrticlCommandsUtil.COMMANDS.get(CreateTriggerCommand.getCommandName()).getTabCompletion(tabCompletionArray);
-                    case NODE_ADD_COMMAND ->
-                            PrticlCommandsUtil.COMMANDS.get(AddNodeTriggerCommand.getCommandName()).getTabCompletion(tabCompletionArray);
-                    default -> Collections.emptyList();
-                };
+            if (PrticlUtil.matchesWordOrLetter(subCommand, PrticlCommands.Names.NODE)) {
+                return getSortedStrings(args[1], nodeSubcommandNames);
+            } else if (PrticlUtil.matchesWordOrLetter(subCommand, PrticlCommands.Names.TRIGGER)) {
+                return getSortedStrings(args[1], triggerSubcommandNames);
+            } else if (PrticlUtil.matchesWordOrLetter(subCommand, PrticlCommands.Names.PLAYER)) {
+                return getSortedStrings(args[1], playerSubcommandNames);
             }
         }
-        return Collections.emptyList();
+
+        var tabCompletionArray = Arrays.copyOfRange(args, 1, args.length);
+        if (PrticlUtil.matchesWordOrLetter(args[0], PrticlCommands.Names.NODE)) {
+            if (nodeSubcommandNames.stream().anyMatch(name -> args[1].equalsIgnoreCase(name))) {
+                return PrticlUtil.getCommandByCategoryAndName(commands, CommandCategory.NODE, args[1]).getTabCompletion(tabCompletionArray);
+            } else {
+                return List.of();
+            }
+        } else if (PrticlUtil.matchesWordOrLetter(args[0], PrticlCommands.Names.TRIGGER)) {
+            if (triggerSubcommandNames.stream().anyMatch(name -> args[1].equalsIgnoreCase(name))) {
+                return PrticlUtil.getCommandByCategoryAndName(commands, CommandCategory.TRIGGER, args[1]).getTabCompletion(tabCompletionArray);
+            } else {
+                return List.of();
+            }
+        } else {
+            return List.of();
+        }
     }
 
-    private static List<String> getSortedStrings(String arg, List<String> list) {
+    private static @NotNull List<String> getSortedStrings(String userArg, List<String> listToSort) {
         List<String> completions = new ArrayList<>();
-        StringUtil.copyPartialMatches(arg, list, completions);
+        StringUtil.copyPartialMatches(userArg, listToSort, completions);
 
         return completions;
-    }
-
-    private static final List<String> SUBCOMMANDS = new ArrayList<>() {{
-        add(NODE_DEFAULT_NAME);
-        add(TRIGGER);
-        add(PLAYER);
-        add(HELP_COMMAND);
-    }};
-
-    private static final List<String> NODE_COMMAND_NAMES = new ArrayList<>() {{
-        add(HelpCommand.getCommandName());
-        add(CreateNodeCommand.getCommandName());
-        add(SpawnNodeCommand.getCommandName());
-        add(DespawnNodeCommand.getCommandName());
-        add(ListCommand.getCommandName());
-    }};
-
-    private static final List<String> TRIGGER_COMMAND_NAMES = new ArrayList<>() {{
-        add(CreateTriggerCommand.getCommandName());
-        add(AddNodeTriggerCommand.getCommandName());
-        add(ListCommand.getCommandName());
-    }};
-
-    private static final List<String> PLAYER_COMMAND_NAMES = new ArrayList<>() {{
-        add(ListCommand.getCommandName());
-    }};
-
-    private boolean isNodeSubcommand(String arg) {
-        return arg.equalsIgnoreCase(NODE_DEFAULT_NAME) || arg.equalsIgnoreCase(NODE_DEFAULT_NAME.substring(0, 1));
-    }
-
-    private boolean isTriggerSubcommand(String arg) {
-        return arg.equalsIgnoreCase(TRIGGER) || arg.equalsIgnoreCase(TRIGGER.substring(0, 1));
-    }
-
-    private boolean isPlayerSubcommand(String arg) {
-        return arg.equalsIgnoreCase(PLAYER) || arg.equalsIgnoreCase(PLAYER.substring(0, 1));
     }
 }

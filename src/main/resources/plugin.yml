@@ -1,8 +1,8 @@
 name: Prticl
-load: STARTUP
-version: '${project.version}'
+version: '1.0.0'
 main: com.minkuh.prticl.Prticl
-api-version: '1.20'
+api-version: '1.21'
+authors: [ Minkuh ]
 commands:
   prticl:
     description: The PRTICL command
