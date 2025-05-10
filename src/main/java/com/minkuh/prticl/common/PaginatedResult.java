@@ -1,49 +1,51 @@
 package com.minkuh.prticl.common;
 
+import com.minkuh.prticl.data.entities.IPrticlEntity;
+
 import java.util.List;
 
-public class PaginatedResult<T> {
-    private List<T> list;
-    private int page;
-    private int totalPages;
-    private int totalCount;
+public class PaginatedResult<T extends IPrticlEntity> {
+    public static final int DEFAULT_PAGE_SIZE = 10;
 
-    public PaginatedResult(List<T> list, int page, int totalPages, int totalCount) {
-        this.list = list;
+    private final List<T> items;
+    private final int totalItems;
+    private final int page;
+    private final int pageSize;
+    private final int totalPages;
+
+    public PaginatedResult(List<T> items, int totalItems, int page, int pageSize) {
+        this.items = items;
+        this.totalItems = totalItems;
         this.page = page;
-        this.totalPages = totalPages;
-        this.totalCount = totalCount;
+        this.pageSize = pageSize;
+        this.totalPages = (int) Math.ceil((double) totalItems / pageSize);
     }
 
-    public List<T> getList() {
-        return list;
+    public List<T> getItems() {
+        return items;
     }
 
-    public void setList(List<T> list) {
-        this.list = list;
+    public int getTotalItems() {
+        return totalItems;
     }
 
     public int getPage() {
         return page;
     }
 
-    public void setPage(int page) {
-        this.page = page;
+    public int getPageSize() {
+        return pageSize;
     }
 
     public int getTotalPages() {
         return totalPages;
     }
 
-    public void setTotalPages(int totalPages) {
-        this.totalPages = totalPages;
+    public boolean hasNextPage() {
+        return page < totalPages - 1;
     }
 
-    public int getTotalCount() {
-        return totalCount;
-    }
-
-    public void setTotalCount(int totalCount) {
-        this.totalCount = totalCount;
+    public boolean hasPreviousPage() {
+        return page > 0;
     }
 }

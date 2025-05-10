@@ -1,10 +1,7 @@
-database:
-  # Only two options are available. TRUE (default) : MySQL | FALSE: PostgreSQL.
-  use-mysql: true
-  data-source:
-    server-name:
-    port:
-    database:
-    user:
-    password:
-    schema:
+colors:
+  strong: "0xb8f2e6"
+  light: "0xeff7f6"
+  player: "0xeff7f6"
+  system: "0xc0fdfb"
+  warning: "0xf1dea1"
+  error: "0xffa69e"
