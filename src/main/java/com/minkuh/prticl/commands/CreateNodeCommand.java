@@ -114,7 +114,7 @@ public class CreateNodeCommand extends Command {
         } else {
             node.setParticleType((Particle.valueOf(getSupportedParticle(args[1]))).toString());
             if (args.length >= 3) {
-                node.setRepeatCount(Integer.parseInt(args[2]));
+                node.setRepeatDelay(Integer.parseInt(args[2]));
             }
             if (args.length >= 4) {
                 node.setRepeatCount(Integer.parseInt(args[3]));
@@ -127,17 +127,12 @@ public class CreateNodeCommand extends Command {
                 }
             }
             if (args.length >= 8) {
+                var location = ((Player) sender).getLocation();
+
                 node.setWorldUUID(worldUUID);
-                if (args.length >= 9) {
-                    node.setX(Integer.parseInt(args[5]));
-                    node.setY(Integer.parseInt(args[6]));
-                    node.setZ(Integer.parseInt(args[7]));
-                } else {
-                    var loc = player.getLocation();
-                    node.setX(loc.x());
-                    node.setY(loc.y());
-                    node.setZ(loc.z());
-                }
+                node.setX(getCoordinate(args[5], location.x()));
+                node.setY(getCoordinate(args[6], location.y()));
+                node.setZ(getCoordinate(args[7], location.z()));
             }
 
             node.setPlayer(fromBukkitPlayer(player));
@@ -146,24 +141,45 @@ public class CreateNodeCommand extends Command {
         return node;
     }
 
+    private double getCoordinate(String arg, double currentCoordinate) {
+        if (!arg.startsWith("~"))
+            return Double.parseDouble(arg);
+        else {
+            var withoutRelativeSymbol = arg.substring(1);
+            if (withoutRelativeSymbol.isEmpty())
+                withoutRelativeSymbol = "0";
+
+            var offset = Double.parseDouble(withoutRelativeSymbol);
+            return currentCoordinate + offset;
+        }
+    }
+
     private String isNodeNameValid(String name) {
-        var output = "";
+        var output = new StringBuilder();
 
         Validate.notNull(name);
 
-        if (name.length() > 50)
-            output = "The node name can't be over 50 characters in length!";
+        if (name.length() > 50) {
+            output.append("The node name can't be over 50 characters in length!");
+            output.append('\n');
+        }
 
-        if (name.isBlank())
-            output = "The node name can't be blank!";
+        if (name.isBlank()) {
+            output.append("The node name can't be blank!");
+            output.append('\n');
+        }
 
-        if (name.toLowerCase(Locale.ROOT).startsWith("id:"))
-            output = "The node name can't start with 'id:'!";
+        if (name.toLowerCase(Locale.ROOT).startsWith("id:")) {
+            output.append("The node name can't start with 'id:'!");
+            output.append('\n');
+        }
 
-        if (!nodeRepository.isNodeNameUnique(name))
-            output = "A node with this name already exists!";
+        if (!nodeRepository.isNodeNameUnique(name)) {
+            output.append("A node with this name already exists!");
+            output.append('\n');
+        }
 
-        return output;
+        return output.toString();
     }
 
     private List<String> sortedParticles(String arg) {

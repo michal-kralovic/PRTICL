@@ -1,5 +1,6 @@
 package com.minkuh.prticl.commands;
 
+import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.commands.base.Command;
 import com.minkuh.prticl.common.PrticlMessages;
 import com.minkuh.prticl.data.repositories.NodeRepository;
@@ -10,15 +11,14 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 
-public class LinkNodeToTriggerCommand extends Command {
+public class UnlinkNodeToTriggerCommand extends Command {
     private final TriggerRepository triggerRepository;
     private final NodeRepository nodeRepository;
 
-    public LinkNodeToTriggerCommand(Logger logger) {
-        this.triggerRepository = new TriggerRepository(logger);
-        this.nodeRepository = new NodeRepository(logger);
+    public UnlinkNodeToTriggerCommand(Prticl prticl) {
+        this.triggerRepository = new TriggerRepository(prticl.getLogger());
+        this.nodeRepository = new NodeRepository(prticl.getLogger());
     }
 
     @Override
@@ -37,12 +37,11 @@ public class LinkNodeToTriggerCommand extends Command {
 
             var linkExists = triggerRepository.doesLinkAlreadyExist(nodeOpt.get().getId(), triggerOpt.get().getId());
             Validate.isTrue(linkExists.isPresent(), "Failed to check whether this link already exists!");
-            Validate.isTrue(!linkExists.get(), "A link between these two already exists!");
+            Validate.isTrue(linkExists.get(), "A link between these two doesn't exist!");
 
-            var succeeded = triggerRepository.addNodeTriggerLink(nodeOpt.get().getId(), triggerOpt.get().getId());
-            Validate.isTrue(succeeded, "Failed to save the link to the DB!");
+            triggerRepository.removeNodeTriggerLink(nodeOpt.get().getId(), triggerOpt.get().getId());
 
-            sender.sendMessage(PrticlMessages.player("Successfully assigned the node to the trigger!"));
+            sender.sendMessage(PrticlMessages.player("Successfully unlinked the node and the trigger!"));
 
             return true;
         } catch (Exception ex) {
@@ -64,14 +63,15 @@ public class LinkNodeToTriggerCommand extends Command {
     public TextComponent.Builder getHelpSection() {
         return createHelpSectionForCommand(
                 getCommandName(),
-                "Links a specific node to a specific trigger.",
-                "/prticl trigger link <(id:X) or (trigger name)> node <(id:X) or (node name)>",
-                "/prticl trigger link foobar node id:1");
+                "Removes a specific node-trigger link.",
+                "/prticl trigger unlink <(id:X) or (trigger name)> node <(id:X) or (node name)>",
+                ""
+        );
     }
 
     @Override
     public String getCommandName() {
-        return PrticlCommands.Names.LINK;
+        return PrticlCommands.Names.UNLINK;
     }
 
     @Override

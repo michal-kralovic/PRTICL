@@ -5,6 +5,7 @@ import com.minkuh.prticl.common.PrticlMessages;
 import com.minkuh.prticl.data.entities.Trigger;
 import com.minkuh.prticl.data.repositories.TriggerRepository;
 import net.kyori.adventure.text.TextComponent;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -94,6 +95,8 @@ public class CreateTriggerCommand extends Command {
     private String isTriggerNameValid(String name) {
         var output = new StringBuilder();
 
+        Validate.notNull(name);
+
         if (name.length() > 50) {
             output.append("The trigger name can't be over 50 characters in length!");
             output.append('\n');
@@ -105,12 +108,12 @@ public class CreateTriggerCommand extends Command {
         }
 
         if (name.toLowerCase(Locale.ROOT).startsWith("id:")) {
-            output.append("The node name can't start with 'id:'!");
+            output.append("The trigger name can't start with 'id:'!");
             output.append('\n');
         }
 
         if (!triggerRepository.isTriggerNameUnique(name)) {
-            output.append("A node with this name already exists!");
+            output.append("A trigger with this name already exists!");
             output.append('\n');
         }
 

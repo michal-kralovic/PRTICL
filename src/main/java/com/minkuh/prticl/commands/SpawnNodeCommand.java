@@ -23,28 +23,6 @@ public class SpawnNodeCommand extends Command {
     }
 
     @Override
-    public String getCommandName() {
-        return PrticlCommands.Names.SPAWN;
-    }
-
-    @Override
-    public List<String> getTabCompletion(String[] args) {
-        if (args.length == 2)
-            return List.of("id/name");
-        return List.of();
-    }
-
-    @Override
-    public TextComponent.Builder getHelpSection() {
-        return createHelpSectionForCommand(
-                getCommandName(),
-                "Spawns a prticl node based on a given id/name.",
-                "/prticl node spawn <(id:X) or (node name)>",
-                "/prticl node spawn id:1"
-        );
-    }
-
-    @Override
     public boolean execute(String[] args, CommandSender sender) {
         if (!isCommandSentByPlayer(sender) || args.length != 1)
             return true;
@@ -66,6 +44,28 @@ public class SpawnNodeCommand extends Command {
             sender.sendMessage(PrticlMessages.error(ex.getMessage()));
         }
         return true;
+    }
+
+    @Override
+    public List<String> getTabCompletion(String[] args) {
+        if (args.length == 2)
+            return List.of("id/name");
+        return List.of();
+    }
+
+    @Override
+    public TextComponent.Builder getHelpSection() {
+        return createHelpSectionForCommand(
+                getCommandName(),
+                "Spawns a prticl node based on a given id/name.",
+                "/prticl node spawn <(id:X) or (node name)>",
+                "/prticl node spawn id:1"
+        );
+    }
+
+    @Override
+    public String getCommandName() {
+        return PrticlCommands.Names.SPAWN;
     }
 
     @Override

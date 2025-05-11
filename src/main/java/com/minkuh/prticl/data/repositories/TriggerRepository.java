@@ -187,13 +187,20 @@ public class TriggerRepository extends Repository {
         }
     }
 
-    public boolean addNodeTriggerRelationship(int nodeId, int triggerId) {
+    public boolean addNodeTriggerLink(int nodeId, int triggerId) {
         int rowsAffected = new Query("INSERT INTO node_trigger (node_id, trigger_id) VALUES (?, ?)")
                 .withParam(1, nodeId)
                 .withParam(2, triggerId)
                 .execute();
 
         return rowsAffected > 0;
+    }
+
+    public void removeNodeTriggerLink(int nodeId, int triggerId) {
+        new Query("DELETE FROM node_trigger WHERE node_id = ? AND trigger_id = ?")
+                .withParam(nodeId)
+                .withParam(triggerId)
+                .execute();
     }
 
     public Optional<Boolean> doesLinkAlreadyExist(int nodeId, int triggerId) {
