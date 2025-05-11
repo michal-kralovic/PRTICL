@@ -6,7 +6,6 @@ import com.minkuh.prticl.data.repositories.NodeRepository;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -25,16 +24,20 @@ public class NodeSpawnManager {
 
     public boolean spawnNode(Node node) {
         Validate.isTrue(node.getId() != 0, "Node ID can't be 0!");
-        if (SpawnedNodes.getName(node.getId()) != null)
+        if (SpawnedNodes.getNode(node.getId()) != null)
             return false;
 
-        var task = new PrticlNodeScheduler(node, this).runTaskTimer(plugin, 0, node.getRepeatDelay());
+        var putSuccessfulNode = SpawnedNodes.putNode(node);
 
-        var putSuccessful = SpawnedNodes.putTask(node.getId(), node.getName(), task);
-        if (!putSuccessful)
+        var task = new PrticlNodeScheduler(node.getId(), this).runTaskTimer(plugin, 0, node.getRepeatDelay());
+
+        var putSuccessfulTask = SpawnedNodes.putTask(node.getId(), task);
+
+        if (!putSuccessfulTask || !putSuccessfulNode) {
             task.cancel();
+        }
 
-        Validate.isTrue(putSuccessful, "Failed to spawn node!");
+        Validate.isTrue(putSuccessfulNode || putSuccessfulTask, "Failed to spawn node!");
 
         nodeRepository.setEnabled(node, true);
         nodeRepository.setSpawned(node, true);
@@ -57,71 +60,95 @@ public class NodeSpawnManager {
     }
 
     private static class PrticlNodeScheduler extends BukkitRunnable {
-        private final Location location;
         private final Node node;
-        private final World world;
+        private final int nodeId;
         private final NodeSpawnManager manager;
         private int counter = 0;
 
-        public PrticlNodeScheduler(Node node, NodeSpawnManager manager) {
-            this.node = node;
+        public PrticlNodeScheduler(int nodeId, NodeSpawnManager manager) {
+            this.nodeId = nodeId;
             this.manager = manager;
-            node.setSpawned(true);
-            this.location = new Location(
-                    Bukkit.getWorld(node.getWorldUUID()),
-                    node.getX(),
-                    node.getY(),
-                    node.getZ()
-            );
-            this.world = location.getWorld();
+            this.node = SpawnedNodes.getNode(nodeId);
+
+            if (node != null) {
+                node.setSpawned(true);
+            }
         }
 
         @Override
         public void run() {
+            if (node == null) {
+                cancel();
+                return;
+            }
+
             // If repeat count is greater than 0, we impose a repeat count limit on the node
             if (node.getRepeatCount() > 0) {
-                if (counter < node.getRepeatCount() - 1) {
+                if (counter < node.getRepeatCount()) {
                     counter++;
                 } else {
-                    manager.despawnNode(node, false);
+                    manager.despawnNode(node, true);
                     cancel();
+                    return;
                 }
             }
 
             if (node.isEnabled()) {
-                world.spawnParticle(
-                        node.getParticleType(),
-                        location,
-                        node.getParticleDensity()
+                var location = new Location(
+                        Bukkit.getWorld(node.getWorldUUID()),
+                        node.getX(),
+                        node.getY(),
+                        node.getZ()
                 );
 
+                var world = location.getWorld();
+                if (world != null) {
+                    world.spawnParticle(
+                            node.getParticleType(),
+                            location,
+                            node.getParticleDensity()
+                    );
+                }
                 return;
             }
 
             node.setSpawned(false);
-            SpawnedNodes.deleteAndCancelNode(node.getId());
+            SpawnedNodes.deleteAndCancelNode(nodeId);
             cancel();
         }
     }
 
+
     public static class SpawnedNodes {
-        private static final Map<Integer, BukkitTask> spawnedNodes = new ConcurrentHashMap<>();
-        private static final Map<Integer, String> spawnedNodeNames = new ConcurrentHashMap<>();
+        private static final Map<Integer, BukkitTask> spawnedNodeTasks = new ConcurrentHashMap<>();
+        private static final Map<Integer, Node> spawnedNodes = new ConcurrentHashMap<>();
 
         /**
          * Creates a new node with the specified ID and associated task.
          *
          * @param nodeId   The ID for the new node
-         * @param nodeName The name for the new node
          * @param task     The BukkitTask to associate with this node
          * @return true if the node was created, false if a node with this ID already exists
          */
-        public static boolean putTask(int nodeId, String nodeName, BukkitTask task) {
-            if (spawnedNodes.containsKey(nodeId)) {
+        public static boolean putTask(int nodeId, BukkitTask task) {
+            if (spawnedNodeTasks.containsKey(nodeId)) {
                 return false;
             }
-            spawnedNodes.put(nodeId, task);
-            spawnedNodeNames.put(nodeId, nodeName);
+            spawnedNodeTasks.put(nodeId, task);
+            return true;
+        }
+
+        /**
+         * Creates a new node map entry with the specified ID.
+         *
+         * @param node   The node
+         * @return true if the node was created, false if a node with this ID already exists
+         */
+        public static boolean putNode(Node node) {
+            if (spawnedNodes.containsKey(node.getId())) {
+                return false;
+            }
+            spawnedNodes.put(node.getId(), node);
             return true;
         }
 
@@ -132,17 +159,17 @@ public class NodeSpawnManager {
          * @return The BukkitTask associated with the node, or null if no such node exists
          */
         public static BukkitTask getTask(int nodeId) {
-            return spawnedNodes.get(nodeId);
+            return spawnedNodeTasks.get(nodeId);
         }
 
         /**
-         * Retrieves the name associated with the specified node ID.
+         * Retrieves the node with the specified node ID.
          *
          * @param nodeId The ID of the node to retrieve
          * @return The BukkitTask associated with the node, or null if no such node exists
          */
-        public static String getName(int nodeId) {
-            return spawnedNodeNames.get(nodeId);
+        public static Node getNode(int nodeId) {
+            return spawnedNodes.get(nodeId);
         }
 
         /**
@@ -152,7 +179,7 @@ public class NodeSpawnManager {
          * @return true if a node with this ID exists, false otherwise
          */
         public static boolean hasTask(int nodeId) {
-            return spawnedNodes.containsKey(nodeId);
+            return spawnedNodeTasks.containsKey(nodeId);
         }
 
         /**
@@ -161,7 +188,7 @@ public class NodeSpawnManager {
          * @return An unmodifiable Map of all node IDs to their associated tasks
          */
         public static Map<Integer, BukkitTask> getAllTasks() {
-            return Collections.unmodifiableMap(spawnedNodes);
+            return Collections.unmodifiableMap(spawnedNodeTasks);
         }
 
         /**
@@ -169,8 +196,8 @@ public class NodeSpawnManager {
          *
          * @return An unmodifiable list of all node IDs to their associated tasks
          */
-        public static Map<Integer, String> getAllNames() {
-            return Collections.unmodifiableMap(spawnedNodeNames);
+        public static Map<Integer, Node> getAllNodes() {
+            return Collections.unmodifiableMap(spawnedNodes);
         }
 
         /**
@@ -179,7 +206,7 @@ public class NodeSpawnManager {
          * @return The count of spawned nodes
          */
         public static int getTaskCount() {
-            return spawnedNodes.size();
+            return spawnedNodeTasks.size();
         }
 
         /**
@@ -190,8 +217,8 @@ public class NodeSpawnManager {
          * @return The removed BukkitTask, or null if no node with this ID exists
          */
         public static BukkitTask deleteTask(int nodeId) {
-            spawnedNodeNames.remove(nodeId);
-            return spawnedNodes.remove(nodeId);
+            spawnedNodes.remove(nodeId);
+            return spawnedNodeTasks.remove(nodeId);
         }
 
         /**
@@ -201,8 +228,8 @@ public class NodeSpawnManager {
          * @return true if a node was found and removed, false otherwise
          */
         public static boolean deleteAndCancelNode(int nodeId) {
-            spawnedNodeNames.remove(nodeId);
-            BukkitTask task = spawnedNodes.remove(nodeId);
+            spawnedNodes.remove(nodeId);
+            BukkitTask task = spawnedNodeTasks.remove(nodeId);
 
             if (task != null) {
                 task.cancel();
@@ -217,19 +244,19 @@ public class NodeSpawnManager {
          * Note: This method does not cancel the BukkitTasks.
          */
         public static void clearNodes() {
+            spawnedNodeTasks.clear();
             spawnedNodes.clear();
-            spawnedNodeNames.clear();
         }
 
         /**
          * Clears all nodes from the map and cancels all associated tasks.
          */
         public static void clearAndCancelAllNodes() {
-            for (BukkitTask task : spawnedNodes.values()) {
+            for (BukkitTask task : spawnedNodeTasks.values()) {
                 task.cancel();
             }
+            spawnedNodeTasks.clear();
             spawnedNodes.clear();
-            spawnedNodeNames.clear();
         }
     }
 }

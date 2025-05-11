@@ -1,16 +1,22 @@
 package com.minkuh.prticl.common;
 
 import com.minkuh.prticl.commands.CommandCategory;
+import com.minkuh.prticl.commands.NodeProperties;
 import com.minkuh.prticl.commands.PrticlCommands;
 import com.minkuh.prticl.commands.base.ICommand;
+import org.apache.commons.lang3.EnumUtils;
+import org.bukkit.Particle;
+import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PrticlUtil {
+    private static final List<String> PARTICLE_LIST = Arrays.stream(Particle.values())
+            .map(p -> "minecraft:" + p.name().toLowerCase())
+            .toList();
+
     public static boolean matchesWordOrLetter(String first, String second) {
         if (first.equalsIgnoreCase(second))
             return true;
@@ -51,6 +57,31 @@ public class PrticlUtil {
                 .values()
                 .stream()
                 .map(c -> ((com.minkuh.prticl.commands.base.Command) c).getCommandName())
+                .toList();
+    }
+
+    public static List<String> sortedParticles(String arg) {
+        final List<String> completions = new ArrayList<>();
+
+        StringUtil.copyPartialMatches(arg, PARTICLE_LIST, completions);
+        Collections.sort(completions);
+
+        return completions;
+    }
+
+    public static String getSupportedParticle(String arg) throws IllegalArgumentException {
+        arg = arg.contains(":") ? arg.split(":")[1].toUpperCase(Locale.ROOT) : arg.toUpperCase(Locale.ROOT);
+
+        if (!EnumUtils.isValidEnum(Particle.class, arg))
+            throw new IllegalArgumentException("The " + Particle.class.getName() + " enum doesn't contain the input particle \"" + arg + "\"");
+
+        return arg.toUpperCase(Locale.ROOT);
+    }
+
+    public static List<NodeProperties> getNodeProperties(boolean editableByPlayer) {
+        return Arrays
+                .stream(NodeProperties.values())
+                .filter(np -> np.isPlayerEditable() == editableByPlayer)
                 .toList();
     }
 }

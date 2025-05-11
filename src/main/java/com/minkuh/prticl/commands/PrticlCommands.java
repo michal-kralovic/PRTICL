@@ -19,7 +19,8 @@ public class PrticlCommands {
         addCommand(new SpawnNodeCommand(prticl));
         addCommand(new DespawnNodeCommand(prticl));
         addCommand(new LinkNodeToTriggerCommand(prticl.getLogger()));
-        addCommand(new UnlinkNodeToTriggerCommand(prticl));
+        addCommand(new UnlinkNodeToTriggerCommand(prticl.getLogger()));
+        addCommand(new EditNodePropertyCommand(prticl));
 
         // Register list commands for each entity type
         addCommand(new ListCommand(prticl.getLogger(), CommandCategory.NODE));
@@ -42,6 +43,7 @@ public class PrticlCommands {
 
         public static final String SPAWN = "spawn";
         public static final String DESPAWN = "despawn";
+        public static final String EDIT = "edit";
 
 
         public static final String TRIGGER = "trigger";

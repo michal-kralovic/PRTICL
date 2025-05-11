@@ -35,6 +35,8 @@ public class LinkNodeToTriggerCommand extends Command {
             Validate.isTrue(triggerOpt.isPresent(), "This trigger does not exist!");
             Validate.isTrue(nodeOpt.isPresent(), "This node does not exist!");
 
+            Validate.isTrue(nodeOpt.get().getRepeatCount() > 0, "You can only link a trigger to a node with a set repeat count.");
+
             var linkExists = triggerRepository.doesLinkAlreadyExist(nodeOpt.get().getId(), triggerOpt.get().getId());
             Validate.isTrue(linkExists.isPresent(), "Failed to check whether this link already exists!");
             Validate.isTrue(!linkExists.get(), "A link between these two already exists!");

@@ -67,7 +67,7 @@ public class DespawnNodeCommand extends Command {
     @Override
     public List<String> getTabCompletion(String[] args) {
         if (args.length == 2) {
-            List<String> spawnedNodeNames = NodeSpawnManager.SpawnedNodes.getAllNames().values().stream().toList();
+            List<String> spawnedNodeNames = NodeSpawnManager.SpawnedNodes.getAllNodes().values().stream().map(Node::getName).toList();
             var sortedNodeNames = new ArrayList<String>();
 
             StringUtil.copyPartialMatches(args[1], spawnedNodeNames, sortedNodeNames);

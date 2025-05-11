@@ -144,18 +144,28 @@ public class NodeRepository extends Repository {
                 .toList(rs -> this.mapNodeFromResultSet(rs, false));
     }
 
-    private boolean updateNode(Node node) {
-        String updateQuery = "UPDATE nodes SET name = ?, repeat_delay = ?, repeat_count = ?, " +
-                "particle_density = ?, particle_type = ?, is_enabled = ?, world_uuid = ?, " +
-                "x = ?, y = ?, z = ?, player_id = ? WHERE id = ?";
+    public boolean updateNode(Node node) {
+        var updateQuery = "UPDATE nodes SET " +
+                "name = ?, " +
+                "repeat_delay = ?, " +
+                "repeat_count = ?, " +
+                "particle_density = ?, " +
+                "particle_type = ?, " +
+                "is_enabled = ?, " +
+                "is_spawned = ?, " +
+                "world_uuid = ?, " +
+                "x = ?, y = ?, z = ?, " +
+                "player_id = ? " +
+                "WHERE id = ?";
 
-        int updated = new Query(updateQuery)
+        var updated = new Query(updateQuery)
                 .withParam(node.getName())
                 .withParam(node.getRepeatDelay())
                 .withParam(node.getRepeatCount())
                 .withParam(node.getParticleDensity())
                 .withParam(node.getParticleType().name())
                 .withParam(node.isEnabled())
+                .withParam(node.isSpawned())
                 .withParam(node.getWorldUUID().toString())
                 .withParam(node.getX())
                 .withParam(node.getY())

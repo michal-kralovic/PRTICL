@@ -1,6 +1,5 @@
 package com.minkuh.prticl.commands;
 
-import com.minkuh.prticl.Prticl;
 import com.minkuh.prticl.commands.base.Command;
 import com.minkuh.prticl.common.PrticlMessages;
 import com.minkuh.prticl.data.repositories.NodeRepository;
@@ -11,14 +10,15 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 public class UnlinkNodeToTriggerCommand extends Command {
     private final TriggerRepository triggerRepository;
     private final NodeRepository nodeRepository;
 
-    public UnlinkNodeToTriggerCommand(Prticl prticl) {
-        this.triggerRepository = new TriggerRepository(prticl.getLogger());
-        this.nodeRepository = new NodeRepository(prticl.getLogger());
+    public UnlinkNodeToTriggerCommand(Logger logger) {
+        this.triggerRepository = new TriggerRepository(logger);
+        this.nodeRepository = new NodeRepository(logger);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class UnlinkNodeToTriggerCommand extends Command {
                 getCommandName(),
                 "Removes a specific node-trigger link.",
                 "/prticl trigger unlink <(id:X) or (trigger name)> node <(id:X) or (node name)>",
-                ""
+                "/prticl t unlink id:1 node id:1"
         );
     }
 
