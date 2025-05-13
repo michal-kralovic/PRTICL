@@ -50,6 +50,48 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>deploy-and-restart</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <exec executable="powershell.exe">
+                                    <arg value="-ExecutionPolicy"/>
+                                    <arg value="Bypass"/>
+                                    <arg value="-File"/>
+                                    <arg value="${basedir}/KillTerminals.ps1"/>
+                                </exec>
+
+                                <sleep milliseconds="500"/>
+
+                                <exec executable="powershell.exe">
+                                    <arg value="-ExecutionPolicy"/>
+                                    <arg value="Bypass"/>
+                                    <arg value="-File"/>
+                                    <arg value="${basedir}/CopyFile.ps1"/>
+                                    <arg value="${project.build.directory}"/>
+                                    <arg value="${project.build.finalName}"/>
+                                </exec>
+
+                                <exec executable="powershell.exe">
+                                    <arg value="-ExecutionPolicy"/>
+                                    <arg value="Bypass"/>
+                                    <arg value="-File"/>
+                                    <arg value="${basedir}/StartServer.ps1"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <resources>
             <resource>

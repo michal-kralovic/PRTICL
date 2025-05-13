@@ -13,7 +13,6 @@ public class PrticlCommands {
         if (COMMANDS == null) COMMANDS = new HashMap<>();
 
         // Register standard commands
-        addCommand(new HelpCommand());
         addCommand(new CreateNodeCommand(prticl.getLogger()));
         addCommand(new CreateTriggerCommand(prticl.getLogger()));
         addCommand(new SpawnNodeCommand(prticl));
@@ -26,6 +25,9 @@ public class PrticlCommands {
         addCommand(new ListCommand(prticl.getLogger(), CommandCategory.NODE));
         addCommand(new ListCommand(prticl.getLogger(), CommandCategory.TRIGGER));
         addCommand(new ListCommand(prticl.getLogger(), CommandCategory.PLAYER));
+
+        // Has to go last for static context
+        addCommand(new HelpCommand());
     }
 
     public static Map<String, ICommand> getCommands() {
